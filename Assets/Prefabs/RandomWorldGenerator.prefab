@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8279462425637013902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8279462425637013896}
+  - component: {fileID: 8279462425637013897}
+  - component: {fileID: -5460765074772610611}
+  m_Layer: 0
+  m_Name: RandomWorldGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8279462425637013896
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8279462425637013902}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8279462425637013897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8279462425637013902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e374c22d92fabbb438f14405ef7efb77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iniChance: 10
+  birthLimit: 1
+  deathLimit: 1
+  numR: 2
+  tmpSize: {x: 50, y: 50, z: 50}
+  baseMap: {fileID: 0}
+  environmentMap: {fileID: 0}
+  botMap: {fileID: 0}
+  backgroundMap: {fileID: 0}
+  tilesToChooseFrom:
+  - {fileID: 11400000, guid: 3254fff388e4e214ca3c4b8b02b9c140, type: 2}
+  - {fileID: 11400000, guid: 0b6e994a8d172fa4aba19cd1301d12aa, type: 2}
+  - {fileID: 11400000, guid: 2507f50e66fc36042a621a99df8731be, type: 2}
+  - {fileID: 11400000, guid: 4e869245c2045d94aa2e241a28ea2eba, type: 2}
+  plainsEnvironmentTilesToChooseFrom:
+  - {fileID: 11400000, guid: 74fe90d49e4bdd64c8473b1819d7cdd9, type: 2}
+  - {fileID: 11400000, guid: 68f66f30f66674440b818976b19f5eef, type: 2}
+  islandEnvironmentTilesToChooseFrom: []
+  swampEnvironmentTilesToChooseFrom:
+  - {fileID: 11400000, guid: 2ef0c25089e7c9448afd38d2675d53dd, type: 2}
+  - {fileID: 11400000, guid: e128389792343244f84e638f8342256b, type: 2}
+  - {fileID: 11400000, guid: 54c4c52f78f5372438ca5ae7f5fb9174, type: 2}
+  mountainEnvironmentTilesToChooseFrom:
+  - {fileID: 11400000, guid: 62ea1a8fcd7f9fe47800134631156668, type: 2}
+  - {fileID: 11400000, guid: 6ce5e67752788c8409cb1329ec8fd113, type: 2}
+  - {fileID: 11400000, guid: e291578bc7c322049a1073c7817d42f0, type: 2}
+  forestEnvironmentTilesToChooseFrom:
+  - {fileID: 11400000, guid: 9e289170ba243a9478f87e0e662d6b0c, type: 2}
+  - {fileID: 11400000, guid: 4f6239904d8ea2d4bbbf56ef80a07793, type: 2}
+  - {fileID: 11400000, guid: 03d3096cf095177469db9e4e75d099fe, type: 2}
+  botTile: {fileID: 11400000, guid: a7b0e784aba885549a2e4bb2f1112aa2, type: 2}
+  backgroundTile: {fileID: 0}
+--- !u!114 &-5460765074772610611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8279462425637013902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
