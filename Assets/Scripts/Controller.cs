@@ -631,6 +631,7 @@ public class Controller : NetworkBehaviour
                     }
                     locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
                    locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
+                    locallySelectedCard.transform.position = locallySelectedCardInHandToTurnOff.transform.position;
                     raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject.SetActive(false);
                     AddIndexOfCardInHandToTickQueueLocal(raycastHitCardInHand.transform.GetComponent<CardInHand>().indexOfCard);
                     return true;
