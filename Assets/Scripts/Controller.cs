@@ -611,6 +611,7 @@ public class Controller : NetworkBehaviour
         //AddToMaxMana(baseTileSent.manaType);
     }
 
+    CardInHand locallySelectedCardInHandToTurnOff;
     bool CheckForRaycast()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -622,9 +623,15 @@ public class Controller : NetworkBehaviour
                 {
                     if (locallySelectedCard != null)
                     {
+                        if (locallySelectedCardInHandToTurnOff != null)
+                        {
+                            locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
+                        }
                         Destroy(locallySelectedCard.gameObject);
                     }
-                    locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
+                    locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
+                   locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
+                    raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject.SetActive(false);
                     AddIndexOfCardInHandToTickQueueLocal(raycastHitCardInHand.transform.GetComponent<CardInHand>().indexOfCard);
                     return true;
                 }
@@ -642,6 +649,10 @@ public class Controller : NetworkBehaviour
                 {
                     if (locallySelectedCard != null)
                     {
+                        if (locallySelectedCardInHandToTurnOff != null)
+                        {
+                            locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
+                        }
                         Destroy(locallySelectedCard.gameObject);
                     }
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
@@ -654,6 +665,10 @@ public class Controller : NetworkBehaviour
                 {
                     if (locallySelectedCard != null)
                     {
+                        if (locallySelectedCardInHandToTurnOff != null)
+                        {
+                            locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
+                        }
                         Destroy(locallySelectedCard.gameObject);
                     }
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
@@ -850,6 +865,10 @@ public class Controller : NetworkBehaviour
     {
         if (locallySelectedCard != null)
         {
+            if (locallySelectedCardInHandToTurnOff != null)
+            {
+                locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
+            }
             Destroy(locallySelectedCard.gameObject);
         }
         cardSelected = null;
