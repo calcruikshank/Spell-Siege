@@ -23,6 +23,7 @@ public class CardInHand : MonoBehaviour
     [SerializeField] TextMeshProUGUI whiteManaText;
     [SerializeField] TextMeshProUGUI blackManaText;
     [SerializeField] TextMeshProUGUI blueManaText;
+
     //[SerializeField] TextMeshProUGUI genericManaText;
 
     BaseTile.ManaType manaType;

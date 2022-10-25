@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -61,6 +62,7 @@ public class Controller : NetworkBehaviour
     List<CardInHand> cardsInHand = new List<CardInHand>();
 
     public CardInHand cardSelected;
+    public CardInHand locallySelectedCard;
     public List<Vector3> allVertextPointsInTilesOwned = new List<Vector3>();
 
     Transform instantiatedPlayerUI;
@@ -233,6 +235,28 @@ public class Controller : NetworkBehaviour
             tickTimer = 0f;
             SendAllInputsInQueue();
         }
+
+        if (locallySelectedCard != null)
+        {
+            if (locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled == true)
+            {
+                locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled = false;
+                foreach (Image img in locallySelectedCard.GetComponentsInChildren<Image>())
+                {
+                    Color imageColor = img.color;
+                    imageColor.a = .4f;
+                    img.color = imageColor;
+                }
+                foreach (TextMeshProUGUI tmp in locallySelectedCard.GetComponentsInChildren<TextMeshProUGUI>())
+                {
+                    Color imageColor = tmp.color;
+                    imageColor.a = .4f;
+                    tmp.color = imageColor;
+                }
+            }
+            locallySelectedCard.transform.position = new Vector3( mousePosition.x, mousePosition.y + 1f, mousePosition.z );
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             cellPositionSentToClients = grid.WorldToCell(mousePosition);
@@ -248,6 +272,10 @@ public class Controller : NetworkBehaviour
                 if (!CheckForRaycast())
                 {
                     AddToTickQueueLocal(cellPositionSentToClients);
+                    if (locallySelectedCard != null)
+                    {
+                        Destroy(locallySelectedCard.gameObject);
+                    }
                 }
             }
             else
@@ -592,6 +620,11 @@ public class Controller : NetworkBehaviour
             {
                 if (raycastHitCardInHand.transform.GetComponent<CardInHand>().isPurchasable)
                 {
+                    if (locallySelectedCard != null)
+                    {
+                        Destroy(locallySelectedCard.gameObject);
+                    }
+                    locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
                     AddIndexOfCardInHandToTickQueueLocal(raycastHitCardInHand.transform.GetComponent<CardInHand>().indexOfCard);
                     return true;
                 }
@@ -807,6 +840,10 @@ public class Controller : NetworkBehaviour
 
     void SetStateToNothingSelected()
     {
+        if (locallySelectedCard != null)
+        {
+            Destroy(locallySelectedCard.gameObject);
+        }
         cardSelected = null;
         creatureSelected = null;
         state = State.NothingSelected;
