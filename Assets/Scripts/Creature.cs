@@ -15,7 +15,7 @@ public class Creature : MonoBehaviour
     [SerializeField] int range; //num of tiles that can attack
     [SerializeField] float UsageRate = 1f; // the rate at which the minion can use abilities/ attack 
     [SerializeField] float Attack;
-    [SerializeField] float AttackRate;
+    float AttackRate = 4;
     float AttackRateTimer;
     float CurrentHealth;
     [SerializeField] float MaxHealth;
@@ -173,6 +173,10 @@ public class Creature : MonoBehaviour
     List<Structure> currentTargetedStructures = new List<Structure>();
     private void CheckForCreaturesWithinRange()
     {
+        structresWithinRange = new List<Structure>();
+        creaturesWithinRange = new List<Creature>();
+        currentTargetedStructures = new List<Structure>();
+        currentTargetedCreature = new List<Creature>();
         float lowestHealthCreatureWithinRange = -1;
         foreach (BaseTile baseTile in allTilesWithinRange)
         {
@@ -233,7 +237,10 @@ public class Creature : MonoBehaviour
                     lowestHealthCreatureWithinRange = creatureInRange.CurrentHealth;
                     if (currentTargetedCreature.Count < numOfTargetables)
                     {
-                        currentTargetedCreature.Add(creatureInRange);
+                        if (!currentTargetedCreature.Contains(creatureInRange))
+                        {
+                            currentTargetedCreature.Add(creatureInRange);
+                        }
 
                     }
                 }
@@ -246,12 +253,11 @@ public class Creature : MonoBehaviour
             {
                 if (currentTargetedCreature.Count <= 0)
                 {
-                    currentTargetedStructures.Add(structureInRange);
+                    if (!currentTargetedStructures.Contains(structureInRange))
+                    {
+                        currentTargetedStructures.Add(structureInRange);
+                    }
                 }
-            }
-            if (structureInRange.playerOwningStructure == this.playerOwningCreature)
-            {
-                currentTargetedStructures.Remove(structureInRange);
             }
         }
 

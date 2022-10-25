@@ -31,11 +31,6 @@ public class MeleeVisualAttack : MonoBehaviour
                 shutDown = true;
             }
         }
-        if (targetedCreature == null)
-        {
-            this.GetComponentInChildren<ParticleSystem>().Stop();
-            shutDown = true;
-        }
         if (targetedStructure != null)
         {
             if (shutDown == false)
@@ -45,7 +40,7 @@ public class MeleeVisualAttack : MonoBehaviour
                 shutDown = true;
             }
         }
-        if (targetedStructure == null)
+        if (targetedStructure == null && targetedCreature == null)
         {
             this.GetComponentInChildren<ParticleSystem>().Stop();
             shutDown = true;

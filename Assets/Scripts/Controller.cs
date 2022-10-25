@@ -56,7 +56,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 80; //todo make this 800
+    int turnThreshold = 800; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> cardsInDeck;
     List<CardInHand> cardsInHand = new List<CardInHand>();
@@ -241,6 +241,7 @@ public class Controller : NetworkBehaviour
             if (locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled == true)
             {
                 locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled = false;
+                locallySelectedCard.gameObject.SetActive(true);
                 foreach (Image img in locallySelectedCard.GetComponentsInChildren<Image>())
                 {
                     Color imageColor = img.color;
@@ -689,6 +690,16 @@ public class Controller : NetworkBehaviour
     private void VisualPathfinderOnCreatureSelected(Creature creature)
     {
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType == BaseTile.traversableType.Untraversable || creature.thisTraversableType == Creature.travType.Walking && BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType != BaseTile.traversableType.TraversableByAll)
+        {
+            creature.HidePathfinderLR();
+            return;
+        }
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).structureOnTile != null)
+        {
+            creature.HidePathfinderLR();
+            return;
+        }
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).CreatureOnTile() != null)
         {
             creature.HidePathfinderLR();
             return;
