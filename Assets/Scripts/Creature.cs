@@ -300,6 +300,7 @@ public class Creature : MonoBehaviour
     public virtual void SetMove(Vector3 positionToTarget)
     {
         HidePathfinderLR();
+        rangeLr.enabled = false;
         Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(positionToTarget.x, 0, positionToTarget.z));
 
         List<BaseTile> tempPathVectorList = pathfinder1.FindPath(currentCellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);
@@ -667,11 +668,22 @@ public class Creature : MonoBehaviour
     private void OnMouseOver()
     {
         rangeLr.enabled = true;
+        if (playerOwningCreature.locallySelectedCard != null)
+        {
+            playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
+        }
     }
 
     private void OnMouseExit()
     {
-        rangeLr.enabled = false;
+        if (playerOwningCreature.locallySelectedCreature != this)
+        {
+            rangeLr.enabled = false;
+            if (playerOwningCreature.locallySelectedCard != null)
+            {
+                playerOwningCreature.locallySelectedCard.gameObject.SetActive(true);
+            }
+        }
     }
 
 

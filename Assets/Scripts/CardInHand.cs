@@ -173,4 +173,22 @@ public class CardInHand : MonoBehaviour
     {
         isPurchasable = false;
     }
+    private void OnMouseOver()
+    {
+        if (playerOwningCard.locallySelectedCard != null)
+        {
+            playerOwningCard.locallySelectedCard.gameObject.SetActive(false);
+        }
+    }
+
+    private void OnMouseExit()
+    {
+        if (playerOwningCard.locallySelectedCreature != this)
+        {
+            if (playerOwningCard.locallySelectedCard != null)
+            {
+                playerOwningCard.locallySelectedCard.gameObject.SetActive(true);
+            }
+        }
+    }
 }

@@ -46,7 +46,7 @@ public class Controller : NetworkBehaviour
 
     Transform castle;
     Transform instantiatedCaste;
-    Creature creatureSelected;
+    public Creature creatureSelected;
     Vector3Int currentLocalHoverCellPosition;
     Vector3Int cellPositionSentToClients;
     Vector3Int targetedCellPosition;
@@ -81,7 +81,7 @@ public class Controller : NetworkBehaviour
     public List<int> IndecesOfCardsInHandQueue = new List<int>();
 
     public bool hasTickedSinceSendingLastMessage = true;
-    Creature locallySelectedCreature;
+    public Creature locallySelectedCreature;
 
     PlayerResources resources;
 
@@ -640,6 +640,10 @@ public class Controller : NetworkBehaviour
             {
                 if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this)
                 {
+                    if (locallySelectedCard != null)
+                    {
+                        Destroy(locallySelectedCard.gameObject);
+                    }
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
 
@@ -648,6 +652,10 @@ public class Controller : NetworkBehaviour
                 }
                 if (state == State.SpellInHandSelected)
                 {
+                    if (locallySelectedCard != null)
+                    {
+                        Destroy(locallySelectedCard.gameObject);
+                    }
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
                     return true;
                 }
