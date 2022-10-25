@@ -583,7 +583,6 @@ public class Controller : NetworkBehaviour
         Vector3 positionToSpawn = highlightMap.GetCellCenterWorld(placedCellPosition);
 
         SetOwningTile(placedCellPosition);
-
         for (int i = 0; i < BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).neighborTiles.Count; i++)
         {
             SetOwningTile(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).neighborTiles[i].tilePosition);
@@ -591,6 +590,7 @@ public class Controller : NetworkBehaviour
         instantiatedCaste = Instantiate(castle, positionToSpawn, Quaternion.identity);
         instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
         instantiatedCaste.GetComponent<Structure>().playerOwningStructure = this;
+        BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).structureOnTile = instantiatedCaste.GetComponent<Structure>();
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
         AddToMana();
         SetStateToWaiting();
@@ -630,7 +630,7 @@ public class Controller : NetworkBehaviour
                         Destroy(locallySelectedCard.gameObject);
                     }
                     locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
-                   locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
+                    locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
                     locallySelectedCard.transform.position = locallySelectedCardInHandToTurnOff.transform.position;
                     raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject.SetActive(false);
                     AddIndexOfCardInHandToTickQueueLocal(raycastHitCardInHand.transform.GetComponent<CardInHand>().indexOfCard);
@@ -738,7 +738,10 @@ public class Controller : NetworkBehaviour
             //show error
             return;
         }
-
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).traverseType == BaseTile.traversableType.SwimmingAndFlying && cardSelected.GameObjectToInstantiate.GetComponent<Creature>().thisTraversableType == Creature.travType.Walking)
+        {
+            return;
+        }
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).playerOwningTile == this)
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).structureOnTile == null)

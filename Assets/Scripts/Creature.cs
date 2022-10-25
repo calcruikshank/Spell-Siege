@@ -49,7 +49,7 @@ public class Creature : MonoBehaviour
         SwimmingAndWalking,
         Flying
     }
-    [HideInInspector] public travType thisTraversableType;
+    public travType thisTraversableType;
 
 
     LineRenderer lr;
@@ -102,7 +102,6 @@ public class Creature : MonoBehaviour
 
     protected virtual void SetTravType()
     {
-        thisTraversableType = travType.Walking;
     }
 
     void SetupLR()

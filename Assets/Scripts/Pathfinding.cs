@@ -59,9 +59,19 @@ public class Pathfinding
                 {
                     continue;
                 }
+                if (neighbor.StructureOnTile() != null)
+                {
+                    continue;
+                }
                 switch (travTypeSent)
                 {
                     case Creature.travType.Flying:
+                        if (neighbor.traverseType == BaseTile.traversableType.Untraversable)
+                        {
+                            continue;
+                        }
+                        break;
+                    case Creature.travType.SwimmingAndWalking:
                         if (neighbor.traverseType == BaseTile.traversableType.Untraversable)
                         {
                             continue;
