@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 public class MeleeVisualAttack : MonoBehaviour
 {
     Creature targetedCreature;
+    Structure targetedStructure;
     float amountofdamage;
     public bool shutDown = false;
     public void SetTarget(Creature creatureToTarget, float attack)
@@ -34,5 +36,25 @@ public class MeleeVisualAttack : MonoBehaviour
             this.GetComponentInChildren<ParticleSystem>().Stop();
             shutDown = true;
         }
+        if (targetedStructure != null)
+        {
+            if (shutDown == false)
+            {
+                targetedStructure.TakeDamage(amountofdamage);
+                this.GetComponentInChildren<ParticleSystem>().Stop();
+                shutDown = true;
+            }
+        }
+        if (targetedStructure == null)
+        {
+            this.GetComponentInChildren<ParticleSystem>().Stop();
+            shutDown = true;
+        }
+    }
+
+    internal void SetTargetStructure(Structure structureToAttack, float attack)
+    {
+        targetedStructure = structureToAttack;
+        amountofdamage = attack;
     }
 }

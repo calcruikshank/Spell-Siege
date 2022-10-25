@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,7 @@ public class Structure : MonoBehaviour
     Tilemap baseTileMap;
     public Vector3Int currentCellPosition;
 
+    public float health = 100;
     public BaseTile tileCurrentlyOn;
 
     private void Start()
@@ -25,5 +27,10 @@ public class Structure : MonoBehaviour
     private void OnDestroy()
     {
         tileCurrentlyOn.RemoveStructureFromTile(this);
+    }
+
+    internal void TakeDamage(float amountofdamage)
+    {
+        health -= amountofdamage;
     }
 }

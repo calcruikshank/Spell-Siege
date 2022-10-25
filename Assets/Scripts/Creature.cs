@@ -168,7 +168,9 @@ public class Creature : MonoBehaviour
     }
 
     List<Creature> creaturesWithinRange = new List<Creature>();
+    List<Structure> structresWithinRange = new List<Structure>();
     List<Creature> currentTargetedCreature = new List<Creature>();
+    List<Structure> currentTargetedStructures = new List<Structure>();
     private void CheckForCreaturesWithinRange()
     {
         float lowestHealthCreatureWithinRange = -1;
@@ -179,6 +181,16 @@ public class Creature : MonoBehaviour
                 if (!creaturesWithinRange.Contains(baseTile.CreatureOnTile()))
                 {
                     creaturesWithinRange.Add(baseTile.CreatureOnTile());
+                }
+            }
+        }
+        foreach (BaseTile baseTile in allTilesWithinRange)
+        {
+            if (baseTile.StructureOnTile() != null)
+            {
+                if (!structresWithinRange.Contains(baseTile.StructureOnTile()))
+                {
+                    structresWithinRange.Add(baseTile.StructureOnTile());
                 }
             }
         }
@@ -197,6 +209,21 @@ public class Creature : MonoBehaviour
                 return;
             }
         }
+        foreach (Structure structureInRange in structresWithinRange)
+        {
+            if (structureInRange == null)
+            {
+                structresWithinRange.Remove(structureInRange);
+                currentTargetedStructures = new List<Structure>();
+                return;
+            }
+            if (!allTilesWithinRange.Contains(structureInRange.tileCurrentlyOn))
+            {
+                structresWithinRange.Remove(structureInRange);
+                currentTargetedStructures = new List<Structure>();
+                return;
+            }
+        }
         foreach (Creature creatureInRange in creaturesWithinRange)
         {
             if (creatureInRange.playerOwningCreature != this.playerOwningCreature)
@@ -210,6 +237,21 @@ public class Creature : MonoBehaviour
 
                     }
                 }
+            }
+        }
+        foreach (Structure structureInRange in structresWithinRange)
+        {
+            
+            if (structureInRange.playerOwningStructure != this.playerOwningCreature)
+            {
+                if (currentTargetedCreature.Count <= 0)
+                {
+                    currentTargetedStructures.Add(structureInRange);
+                }
+            }
+            if (structureInRange.playerOwningStructure == this.playerOwningCreature)
+            {
+                currentTargetedStructures.Remove(structureInRange);
             }
         }
 
@@ -232,8 +274,22 @@ public class Creature : MonoBehaviour
                 }
             }
         }
+        if (currentTargetedCreature.Count <= 0 && currentTargetedStructures.Count > 0)
+        {
+            if (AttackRateTimer >= AttackRate)
+            {
+                AttackRateTimer = 0;
+                for (int i = 0; i < currentTargetedStructures.Count; i++)
+                {
+                    VisualAttackAnimationOnStructure(currentTargetedStructures[i]);
+                    //AttackCreature(currentTargetedCreature[i]);
+                }
+            }
+        }
 
     }
+
+
     void VisualAttackAnimation(Creature creatureToAttack)
     {
         if (visualAttackParticle != null)
@@ -245,9 +301,26 @@ public class Creature : MonoBehaviour
             }
             else
             {
-                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
+                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity);
                 instantiatedParticle.transform.LookAt(creatureToAttack.transform);
                 instantiatedParticle.GetComponent<MeleeVisualAttack>().SetTarget(creatureToAttack, Attack);
+            }
+        }
+    }
+    private void VisualAttackAnimationOnStructure(Structure structureToAttack)
+    {
+        if (visualAttackParticle != null)
+        {
+            if (range != 1)
+            {
+                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, Attack);
+            }
+            else
+            {
+                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity);
+                instantiatedParticle.transform.LookAt(structureToAttack.transform);
+                instantiatedParticle.GetComponent<MeleeVisualAttack>().SetTargetStructure(structureToAttack, Attack);
             }
         }
     }

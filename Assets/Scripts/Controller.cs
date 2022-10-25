@@ -589,12 +589,18 @@ public class Controller : NetworkBehaviour
         }
         instantiatedCaste = Instantiate(castle, positionToSpawn, Quaternion.identity);
         instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
-        instantiatedCaste.GetComponent<Structure>().playerOwningStructure = this;
-        BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).structureOnTile = instantiatedCaste.GetComponent<Structure>();
+        AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
         AddToMana();
         SetStateToWaiting();
         GameManager.singleton.AddPlayerToReady(this);
+    }
+
+    private void AddStructureToTile(Structure structure, Vector3Int positionSent)
+    {
+        BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).structureOnTile = structure;
+        structure.tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent);
+        structure.playerOwningStructure = this;
     }
 
     private void AddTileToHarvestedTilesList(BaseTile baseTileSent)
