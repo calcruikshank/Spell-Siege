@@ -11,6 +11,9 @@ public class Spell : MonoBehaviour
     Controller playerCastingSpell;
 
     [SerializeField] Transform particleToInstantiate;
+    Transform instantiatedParticle;
+    [SerializeField] int damage = 3;
+    float lifetime;
     public void InjectDependencies(Vector3Int targetTile, Controller playerCasting)
     {
         currentCellPosition = targetTile;
@@ -198,7 +201,28 @@ public class Spell : MonoBehaviour
 
     protected virtual void Cast()
     {
-        Instantiate(particleToInstantiate, BaseMapTileState.singleton.GetWorldPositionOfCell(currentCellPosition), Quaternion.identity);
+        instantiatedParticle = Instantiate(particleToInstantiate, BaseMapTileState.singleton.GetWorldPositionOfCell(currentCellPosition), Quaternion.identity);
         Debug.Log(currentCellPosition);
+        foreach (BaseTile bt in allTilesWithinRange) 
+        {
+            if (bt.CreatureOnTile() != null)
+            {
+                bt.CreatureOnTile().TakeDamage(damage);
+            }
+        }
+
+    }
+
+    private void Update()
+    {
+        if (instantiatedParticle != null)
+        {
+            lifetime += Time.deltaTime;
+            if (lifetime >= instantiatedParticle.GetComponent<ParticleSystem>().main.duration)
+            {
+                Destroy(rangeLrGO);
+                Destroy(instantiatedParticle.gameObject);
+            }
+        }
     }
 }
