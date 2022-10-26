@@ -56,7 +56,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 800; //todo make this 800
+    int turnThreshold = 80; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> cardsInDeck;
     List<CardInHand> cardsInHand = new List<CardInHand>();
@@ -671,16 +671,19 @@ public class Controller : NetworkBehaviour
                 }
                 if (state == State.SpellInHandSelected)
                 {
-                    if (locallySelectedCard != null)
+                    if (cardSelected.GameObjectToInstantiate.GetComponent<Spell>().range == 0)
                     {
-                        if (locallySelectedCardInHandToTurnOff != null)
+                        if (locallySelectedCard != null)
                         {
-                            locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
+                            if (locallySelectedCardInHandToTurnOff != null)
+                            {
+                                locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
+                            }
+                            Destroy(locallySelectedCard.gameObject);
                         }
-                        Destroy(locallySelectedCard.gameObject);
+                        AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
+                        return true;
                     }
-                    AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
-                    return true;
                 }
             }
         }
