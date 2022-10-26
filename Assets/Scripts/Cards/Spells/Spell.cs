@@ -4,18 +4,20 @@ using UnityEngine;
 
 public class Spell : MonoBehaviour
 {
-    [SerializeField]public int range = 0;
-    Vector3Int targetTilePosition;
+    [SerializeField]public int range = 2;
     List<BaseTile> allTilesWithinRange = new List<BaseTile>();
     List<Vector3> rangePositions = new List<Vector3>();
     Vector3Int currentCellPosition;
     Controller playerCastingSpell;
+
+    [SerializeField] Transform particleToInstantiate;
     public void InjectDependencies(Vector3Int targetTile, Controller playerCasting)
     {
         currentCellPosition = targetTile;
         playerCastingSpell = playerCasting;
         SetRangeLineRenderer();
         CalculateAllTilesWithinRange();
+        Cast();
     }
     void CalculateAllTilesWithinRange()
     {
@@ -196,6 +198,7 @@ public class Spell : MonoBehaviour
 
     protected virtual void Cast()
     {
-
+        Instantiate(particleToInstantiate, BaseMapTileState.singleton.GetWorldPositionOfCell(currentCellPosition), Quaternion.identity);
+        Debug.Log(currentCellPosition);
     }
 }
