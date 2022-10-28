@@ -326,7 +326,7 @@ public class Creature : MonoBehaviour
     public void TakeDamage(float attack)
     {
         this.CurrentHealth -= attack;
-        GameManager.singleton.SpawnDamageText(new Vector3(this.transform.position.x, this.transform.position.y + 1, this.transform.position.z), attack);
+        GameManager.singleton.SpawnDamageText(new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), attack);
         UpdateCreatureHUD();
         if (this.CurrentHealth <= 0)
         {
