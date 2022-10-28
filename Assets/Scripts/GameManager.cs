@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -51,6 +52,9 @@ public class GameManager : NetworkBehaviour
     public Transform blackManaSymbol;
     public Transform whiteManaSymbol;
 
+
+    [SerializeField] TextMeshPro damageText;
+    Transform instantiatedDamageText;
     private void Awake()
     {
         if (singleton != null) Destroy(this);
@@ -112,5 +116,12 @@ public class GameManager : NetworkBehaviour
                 gameManagerTick = 0;
             }
         }
+    }
+
+    public void SpawnDamageText(Vector3 positionSent, float damageSent)
+    {
+        instantiatedDamageText = Instantiate(damageText.transform, positionSent, Quaternion.identity);
+        instantiatedDamageText.localEulerAngles = new Vector3(90, 0, 0);
+        instantiatedDamageText.GetComponent<TextMeshPro>().text = damageSent.ToString();
     }
 }

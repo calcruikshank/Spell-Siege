@@ -14,11 +14,13 @@ public class Creature : MonoBehaviour
     [SerializeField] float speed = 1f; //move speed
     [SerializeField] int range; //num of tiles that can attack
     [SerializeField] float UsageRate = 1f; // the rate at which the minion can use abilities/ attack 
-    [SerializeField] float Attack;
+    [SerializeField] protected float Attack;
     float AttackRate = 4;
-    float AttackRateTimer;
-    float CurrentHealth;
-    [SerializeField] float MaxHealth;
+    protected float abilityRate = 4;
+    protected float AttackRateTimer;
+    protected float abilityRateTimer;
+    [HideInInspector] public float CurrentHealth;
+    [SerializeField]public float MaxHealth;
 
     [SerializeField] TextMeshPro attackText;
     [SerializeField] TextMeshPro healthText;
@@ -152,22 +154,29 @@ public class Creature : MonoBehaviour
                 Move();
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
+                HandleAbilityRate();
+                HandleFriendlyCreaturesList();
                 HandleAttack();
                 break;
             case CreatureState.Idle:
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
+                HandleAbilityRate();
+                HandleFriendlyCreaturesList();
                 HandleAttack();
                 break;
             case CreatureState.Summoned:
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
+                HandleAbilityRate();
+                HandleFriendlyCreaturesList();
                 HandleAttack();
                 break;
         }
     }
 
     List<Creature> creaturesWithinRange = new List<Creature>();
+    protected List<Creature> friendlyCreaturesWithinRange = new List<Creature>();
     List<Structure> structresWithinRange = new List<Structure>();
     List<Creature> currentTargetedCreature = new List<Creature>();
     List<Structure> currentTargetedStructures = new List<Structure>();
@@ -175,6 +184,7 @@ public class Creature : MonoBehaviour
     {
         structresWithinRange = new List<Structure>();
         creaturesWithinRange = new List<Creature>();
+        friendlyCreaturesWithinRange = new List<Creature>();
         currentTargetedStructures = new List<Structure>();
         currentTargetedCreature = new List<Creature>();
         float lowestHealthCreatureWithinRange = -1;
@@ -200,36 +210,6 @@ public class Creature : MonoBehaviour
         }
         foreach (Creature creatureInRange in creaturesWithinRange)
         {
-            if (creatureInRange == null)
-            {
-                creaturesWithinRange.Remove(creatureInRange);
-                currentTargetedCreature = new List<Creature>();
-                return;
-            }
-            if (!allTilesWithinRange.Contains(creatureInRange.tileCurrentlyOn))
-            {
-                creaturesWithinRange.Remove(creatureInRange);
-                currentTargetedCreature = new List<Creature>();
-                return;
-            }
-        }
-        foreach (Structure structureInRange in structresWithinRange)
-        {
-            if (structureInRange == null)
-            {
-                structresWithinRange.Remove(structureInRange);
-                currentTargetedStructures = new List<Structure>();
-                return;
-            }
-            if (!allTilesWithinRange.Contains(structureInRange.tileCurrentlyOn))
-            {
-                structresWithinRange.Remove(structureInRange);
-                currentTargetedStructures = new List<Structure>();
-                return;
-            }
-        }
-        foreach (Creature creatureInRange in creaturesWithinRange)
-        {
             if (creatureInRange.playerOwningCreature != this.playerOwningCreature)
             {
                 if (lowestHealthCreatureWithinRange == -1 || creatureInRange.CurrentHealth < lowestHealthCreatureWithinRange)
@@ -243,6 +223,13 @@ public class Creature : MonoBehaviour
                         }
 
                     }
+                }
+            }
+            if (creatureInRange.playerOwningCreature == this.playerOwningCreature)
+            {
+                if (!friendlyCreaturesWithinRange.Contains(creatureInRange))
+                {
+                    friendlyCreaturesWithinRange.Add(creatureInRange);
                 }
             }
         }
@@ -266,7 +253,12 @@ public class Creature : MonoBehaviour
 
     [SerializeField] Transform visualAttackParticle;
 
-    void HandleAttack()
+    protected virtual void HandleFriendlyCreaturesList()
+    {
+
+    }
+
+    protected virtual void HandleAttack()
     {
         if (currentTargetedCreature.Count > 0)
         {
@@ -296,7 +288,7 @@ public class Creature : MonoBehaviour
     }
 
 
-    void VisualAttackAnimation(Creature creatureToAttack)
+    protected virtual void VisualAttackAnimation(Creature creatureToAttack)
     {
         if (visualAttackParticle != null)
         {
@@ -313,7 +305,7 @@ public class Creature : MonoBehaviour
             }
         }
     }
-    private void VisualAttackAnimationOnStructure(Structure structureToAttack)
+    protected virtual void VisualAttackAnimationOnStructure(Structure structureToAttack)
     {
         if (visualAttackParticle != null)
         {
@@ -334,6 +326,7 @@ public class Creature : MonoBehaviour
     public void TakeDamage(float attack)
     {
         this.CurrentHealth -= attack;
+        GameManager.singleton.SpawnDamageText(new Vector3(this.transform.position.x, this.transform.position.y + 1, this.transform.position.z), attack);
         UpdateCreatureHUD();
         if (this.CurrentHealth <= 0)
         {
@@ -353,6 +346,10 @@ public class Creature : MonoBehaviour
     {
         AttackRateTimer += Time.fixedDeltaTime;
 
+    }
+    void HandleAbilityRate()
+    {
+        abilityRateTimer += Time.fixedDeltaTime;
     }
     public void UpdateCreatureHUD()
     {
@@ -774,7 +771,15 @@ public class Creature : MonoBehaviour
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
     public virtual void Taunt() { }
-    public virtual void Heal() { }
+    public virtual void Heal(float amount) 
+    {
+        CurrentHealth += amount;
+        if (CurrentHealth > MaxHealth)
+        {
+            CurrentHealth = MaxHealth;
+        }
+        UpdateCreatureHUD();
+    }
 
 
     #endregion
