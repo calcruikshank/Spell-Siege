@@ -242,6 +242,7 @@ public class Controller : NetworkBehaviour
             {
                 locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled = false;
                 locallySelectedCard.gameObject.SetActive(true);
+
                 foreach (Image img in locallySelectedCard.GetComponentsInChildren<Image>())
                 {
                     Color imageColor = img.color;
@@ -779,7 +780,10 @@ public class Controller : NetworkBehaviour
                 }
                 SpendManaToCast(cardSelected.GetComponent<CardInHand>());
                 GameObject instantiatedCreature = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+              
                 instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
+
+                instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelected);
                 creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().ownedCreatureID, instantiatedCreature.GetComponent<Creature>());
                 RemoveCardFromHand(cardSelected);
                 SetStateToNothingSelected();

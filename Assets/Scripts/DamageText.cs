@@ -25,10 +25,10 @@ public class DamageText : MonoBehaviour
         moveVector -= moveVector * .015f * Time.deltaTime;
         if (dissapearTimer > dissapearTimerMax * .5f)
         {
-            float decreaseScaleAmount = 1f;
-            transform.localScale -= Vector3.one * decreaseScaleAmount * Time.deltaTime;
-            //float increaseScaleAmount = 1f;
-           // transform.localScale += Vector3.one * increaseScaleAmount * Time.deltaTime;
+            //float decreaseScaleAmount = 1f;
+            //transform.localScale -= Vector3.one * decreaseScaleAmount * Time.deltaTime;
+            float increaseScaleAmount = 1f;
+            transform.localScale += Vector3.one * increaseScaleAmount * Time.deltaTime;
         }
         else
         {

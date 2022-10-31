@@ -23,6 +23,7 @@ public class GameManager : NetworkBehaviour
     public TileBase highlightTile;
 
     public Transform cardParent;
+    public Transform canvasMain;
     public List<Controller> playerList = new List<Controller>();
     public List<Controller> playersThatHavePlacedCastle = new List<Controller>();
     public List<Controller> playersThatHaveBeenReceived = new List<Controller>();
@@ -55,11 +56,13 @@ public class GameManager : NetworkBehaviour
 
     [SerializeField] TextMeshPro damageText;
     Transform instantiatedDamageText;
+    Transform instantiatedHealthText;
     private void Awake()
     {
         if (singleton != null) Destroy(this);
         singleton = this;
         state = State.Setup;
+        canvasMain = FindObjectOfType<Canvas>().transform;
     }
     private void Update()
     {
@@ -120,8 +123,19 @@ public class GameManager : NetworkBehaviour
 
     public void SpawnDamageText(Vector3 positionSent, float damageSent)
     {
-        instantiatedDamageText = Instantiate(damageText.transform, positionSent, Quaternion.identity);
+        Transform instantiatedDamageText = Instantiate(damageText.transform, positionSent, Quaternion.identity);
         instantiatedDamageText.localEulerAngles = new Vector3(90, 0, 0);
         instantiatedDamageText.GetComponent<TextMeshPro>().text = damageSent.ToString();
+    }
+
+
+    [SerializeField] Transform healParticle;
+    internal void SpawnHealText(Vector3 positionSent, float amount)
+    {
+        Transform instantiatedHealthText = Instantiate(damageText.transform, positionSent, Quaternion.identity);
+        instantiatedHealthText.localEulerAngles = new Vector3(90, 0, 0);
+        instantiatedHealthText.GetComponent<TextMeshPro>().text = amount.ToString();
+        instantiatedHealthText.GetComponent<TextMeshPro>().color = Color.green;
+        Instantiate(healParticle, positionSent, Quaternion.identity);
     }
 }

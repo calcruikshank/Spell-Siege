@@ -20,7 +20,7 @@ public class Creature : MonoBehaviour
     protected float AttackRateTimer;
     protected float abilityRateTimer;
     [HideInInspector] public float CurrentHealth;
-    [SerializeField]public float MaxHealth;
+    [SerializeField] public float MaxHealth;
 
     [SerializeField] TextMeshPro attackText;
     [SerializeField] TextMeshPro healthText;
@@ -175,12 +175,12 @@ public class Creature : MonoBehaviour
         }
     }
 
-    List<Creature> creaturesWithinRange = new List<Creature>();
+    protected List<Creature> creaturesWithinRange = new List<Creature>();
     protected List<Creature> friendlyCreaturesWithinRange = new List<Creature>();
     List<Structure> structresWithinRange = new List<Structure>();
     List<Creature> currentTargetedCreature = new List<Creature>();
     List<Structure> currentTargetedStructures = new List<Structure>();
-    private void CheckForCreaturesWithinRange()
+    protected virtual void CheckForCreaturesWithinRange()
     {
         structresWithinRange = new List<Structure>();
         creaturesWithinRange = new List<Creature>();
@@ -235,7 +235,7 @@ public class Creature : MonoBehaviour
         }
         foreach (Structure structureInRange in structresWithinRange)
         {
-            
+
             if (structureInRange.playerOwningStructure != this.playerOwningCreature)
             {
                 if (currentTargetedCreature.Count <= 0)
@@ -260,6 +260,21 @@ public class Creature : MonoBehaviour
 
     protected virtual void HandleAttack()
     {
+        if (forcedCreaturesToAttack.Count > 1)
+        {
+            if (AttackRateTimer >= AttackRate)
+            {
+                for (int i = 0; i < forcedCreaturesToAttack.Count; i++)
+                {
+                    if (creaturesWithinRange.Contains(forcedCreaturesToAttack[i]))
+                    {
+                        AttackRateTimer = 0;
+                        VisualAttackAnimation(forcedCreaturesToAttack[i]);
+                        return;
+                    }
+                }
+            }
+        }
         if (currentTargetedCreature.Count > 0)
         {
             if (AttackRateTimer >= AttackRate)
@@ -698,6 +713,8 @@ public class Creature : MonoBehaviour
         rangeLr.startColor = playerOwningCreature.col;
         rangeLr.endColor = playerOwningCreature.col;
     }
+
+
     CancellationTokenSource s_cts;
     internal void ShowPathfinderLinerRendererAsync(Vector3Int hoveredTilePosition)
     {
@@ -740,8 +757,22 @@ public class Creature : MonoBehaviour
         rangeLr.SetPositions(rangePositionsSent.ToArray());
     }
 
+    CardInHand originalCard;
+    Transform originalCardTransform;
+    internal void SetOriginalCard(CardInHand cardSelected)
+    {
+        originalCard = cardSelected;
+        originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.canvasMain.transform);
+        originalCardTransform.transform.position = this.transform.position;
+
+        originalCardTransform.GetComponentInChildren<BoxCollider>().enabled = false;
+
+    }
+
     private void OnMouseOver()
     {
+        originalCardTransform.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .5f, this.transform.position.z);
+        originalCardTransform.gameObject.SetActive(true);
         rangeLr.enabled = true;
         if (playerOwningCreature.locallySelectedCard != null)
         {
@@ -751,14 +782,16 @@ public class Creature : MonoBehaviour
 
     private void OnMouseExit()
     {
-        if (playerOwningCreature.locallySelectedCreature != this)
+        //if (playerOwningCreature.locallySelectedCreature != this)
+        //{
+        originalCardTransform.gameObject.SetActive(false);
+        rangeLr.enabled = false;
+        if (playerOwningCreature.locallySelectedCard != null)
         {
-            rangeLr.enabled = false;
-            if (playerOwningCreature.locallySelectedCard != null)
-            {
-                playerOwningCreature.locallySelectedCard.gameObject.SetActive(true);
-            }
+            playerOwningCreature.locallySelectedCard.gameObject.SetActive(true);
         }
+
+        //}
     }
 
 
@@ -770,14 +803,20 @@ public class Creature : MonoBehaviour
     public virtual void OnDeath() { }
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
-    public virtual void Taunt() { }
-    public virtual void Heal(float amount) 
+
+    List<Creature> forcedCreaturesToAttack = new List<Creature>();
+    public virtual void Taunt(Creature creatureTaunting)
+    {
+        forcedCreaturesToAttack.Add(creatureTaunting);
+    }
+    public virtual void Heal(float amount)
     {
         CurrentHealth += amount;
         if (CurrentHealth > MaxHealth)
         {
             CurrentHealth = MaxHealth;
         }
+        GameManager.singleton.SpawnHealText(this.transform.position, amount);
         UpdateCreatureHUD();
     }
 

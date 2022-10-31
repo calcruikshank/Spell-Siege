@@ -545,8 +545,8 @@ MonoBehaviour:
   range: 1
   UsageRate: 1
   Attack: 7
-  AttackRate: 4
-  MaxHealth: 7
+  CurrentHealth: 0
+  MaxHealth: 21
   attackText: {fileID: 3298186682565764544}
   healthText: {fileID: 7534283529393728702}
   numOfTargetables: 1
@@ -559,6 +559,8 @@ MonoBehaviour:
   currentCellPosition: {x: 0, y: 0, z: 0}
   tileCurrentlyOn: {fileID: 0}
   previousTilePosition: {fileID: 0}
+  actualPosition: {x: 0, y: 0, z: 0}
+  visualAttackParticle: {fileID: 0}
   pathVectorList: []
 --- !u!1 &6330952787006823200
 GameObject:
