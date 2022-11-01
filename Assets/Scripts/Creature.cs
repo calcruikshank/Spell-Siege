@@ -826,6 +826,11 @@ public class Creature : MonoBehaviour
 
     }
 
+    private void OnDestroy()
+    {
+        OnMouseExit();
+    }
+
 
     #endregion
 

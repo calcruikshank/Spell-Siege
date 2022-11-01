@@ -334,17 +334,23 @@ public class Controller : NetworkBehaviour
     }
 
     bool ShowingPurchasableHarvestTiles = false;
+
+    bool keepClicked = false;
     private void HandleSpacebarPressed()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            keepClicked = false;
             CameraControl.Singleton.ReturnHome(new Vector3(instantiatedCaste.transform.position.x, instantiatedCaste.transform.position.y, instantiatedCaste.transform.position.z - 7));
             ShowHarvestedTiles();
         }
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (!keepClicked)
         {
-            CameraControl.Singleton.CancelReturnHome();
-            HideHarvestedTiles();
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                CameraControl.Singleton.CancelReturnHome();
+                HideHarvestedTiles();
+            }
         }
     }
 
@@ -634,7 +640,28 @@ public class Controller : NetworkBehaviour
     CardInHand locallySelectedCardInHandToTurnOff;
     bool CheckForRaycast()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); 
+        if (Physics.Raycast(ray, out RaycastHit raycastHitKeep, Mathf.Infinity))
+        {
+            if (raycastHitKeep.transform.GetComponent<PlayerKeep>() != null)
+            {
+                if (raycastHitKeep.transform.GetComponent<PlayerKeep>().playerOwningStructure == this)
+                {
+                    if (!keepClicked)
+                    {
+                        keepClicked = true;
+                        ShowHarvestedTiles();
+                        return true;
+                    }
+                    if (keepClicked)
+                    {
+                        keepClicked = false;
+                        HideHarvestedTiles();
+                        return true;
+                    }
+                }
+            }
+        }
         if (Physics.Raycast(ray, out RaycastHit raycastHitCardInHand, Mathf.Infinity))
         {
             if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null)
@@ -781,7 +808,7 @@ public class Controller : NetworkBehaviour
         }
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).playerOwningTile == this)
         {
-            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).structureOnTile == null)
+            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).structureOnTile == null && BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).CreatureOnTile() == null)
             {
                 Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
                 if (environmentMap.GetInstantiatedObject(cellSent))
