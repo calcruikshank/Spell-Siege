@@ -557,7 +557,7 @@ public class Controller : NetworkBehaviour
 
     private void PurchaseHarvestTile(Vector3Int vector3Int)
     {
-        SubtractFromMana(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).harvestCost);
+        SpendGenericMana(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).harvestCost);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int));
     }
 
@@ -891,6 +891,46 @@ public class Controller : NetworkBehaviour
         resources.whiteMana -= cardSelected.whiteManaCost;
         resources.blackMana -= cardSelected.blackManaCost;
         resources.greenMana -= cardSelected.greenManaCost;
+        SpendGenericMana(cardSelected.genericManaCost);
+        resourcesChanged.Invoke(resources);
+    }
+
+    private void SpendGenericMana(int genericManaCost)
+    {
+        int totalManaSpent = 0;
+        for (int i = 0; i < genericManaCost; i++)
+        {
+            if (resources.blackMana > 0)
+            {
+                resources.blackMana--;
+                totalManaSpent++;
+                continue;
+            }
+            if (resources.blueMana > 0)
+            {
+                resources.blueMana--;
+                totalManaSpent++;
+                continue;
+            }
+            if (resources.redMana > 0)
+            {
+                resources.redMana--;
+                totalManaSpent++;
+                continue;
+            }
+            if (resources.whiteMana > 0)
+            {
+                resources.whiteMana--;
+                totalManaSpent++;
+                continue;
+            }
+            if (resources.greenMana > 0)
+            {
+                resources.greenMana--;
+                totalManaSpent++;
+                continue;
+            }
+        }
         resourcesChanged.Invoke(resources);
     }
 
@@ -976,60 +1016,7 @@ public class Controller : NetworkBehaviour
     }
 
 
-    private void SubtractFromMana(int harvestCost)
-    {
-        int totalAdded = 0;
-        for (int x = 0; x < harvestCost; x++)
-        {
-            if (totalAdded >= harvestCost) continue;
-            if (resources.blueMana > 0)
-            {
-                for (int i = 0; i < resources.blueMana; i++)
-                {
-                    totalAdded++;
-                    resources.blueMana--;
-                    if (totalAdded == harvestCost) continue;
-                }
-            }
-            if (resources.whiteMana > 0)
-            {
-                for (int i = 0; i < resources.whiteMana; i++)
-                {
-                    totalAdded++;
-                    resources.whiteMana--;
-                    if (totalAdded == harvestCost) continue;
-                }
-            }
-            if (resources.redMana > 0)
-            {
-                for (int i = 0; i < resources.redMana; i++)
-                {
-                    totalAdded++;
-                    resources.redMana--;
-                    if (totalAdded == harvestCost) continue;
-                }
-            }
-            if (resources.blackMana > 0)
-            {
-                for (int i = 0; i < resources.blackMana; i++)
-                {
-                    totalAdded++;
-                    resources.blackMana--;
-                    if (totalAdded == harvestCost) continue;
-                }
-            }
-            if (resources.greenMana > 0)
-            {
-                for (int i = 0; i < resources.greenMana; i++)
-                {
-                    totalAdded++;
-                    resources.greenMana--;
-                    if (totalAdded == harvestCost) continue;
-                }
-            }
-        }
-        resourcesChanged.Invoke(resources);
-    }
+    
     public void AddToMana()
     {
         for (int i = 0; i < harvestedTiles.Count; i++)
