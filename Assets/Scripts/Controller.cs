@@ -16,6 +16,7 @@ public class Controller : NetworkBehaviour
         CreatureSelected,
         CreatureInHandSelected,
         SpellInHandSelected,
+        StructureInHandSeleced,
         PlacingCastle,
         Waiting
     }
@@ -188,6 +189,11 @@ public class Controller : NetworkBehaviour
                 HandleMana();
                 TriggerAllCreatureAbilities();
                 break;
+            case State.StructureInHandSeleced:
+                HandleDrawCards();
+                HandleMana();
+                TriggerAllCreatureAbilities();
+                break;
             case State.CreatureSelected:
                 HandleDrawCards();
                 HandleMana();
@@ -256,7 +262,7 @@ public class Controller : NetworkBehaviour
                     tmp.color = imageColor;
                 }
             }
-            locallySelectedCard.transform.position = new Vector3( mousePosition.x, mousePosition.y + 1f, mousePosition.z );
+            locallySelectedCard.transform.position = new Vector3(mousePosition.x, mousePosition.y + 1f, mousePosition.z);
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -316,6 +322,9 @@ public class Controller : NetworkBehaviour
                 HandleTurn();
                 break;
             case State.SpellInHandSelected:
+                HandleTurn();
+                break;
+            case State.StructureInHandSeleced:
                 HandleTurn();
                 break;
             case State.CreatureSelected:
@@ -569,6 +578,9 @@ public class Controller : NetworkBehaviour
             case State.SpellInHandSelected:
                 HandleSpellInHandSelected(positionSent);
                 break;
+            case State.StructureInHandSeleced:
+                HandleStructureInHandSelected(positionSent);
+                break;
             case State.CreatureSelected:
                 HandleCreatureOnBoardSelected(positionSent);
                 break;
@@ -670,7 +682,7 @@ public class Controller : NetworkBehaviour
                     //SetToCreatureOnFieldSelected(raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
                     return true;
                 }
-                if (state == State.SpellInHandSelected)
+                if (state == State.SpellInHandSelected || state == State.StructureInHandSeleced)
                 {
                     if (cardSelected.GameObjectToInstantiate.GetComponent<Spell>().range == 0)
                     {
@@ -728,6 +740,10 @@ public class Controller : NetworkBehaviour
                 {
                     state = State.SpellInHandSelected;
                 }
+                if (cardSelected.cardType == CardInHand.CardType.Structure)
+                {
+                    state = State.StructureInHandSeleced;
+                }
             }
         }
 
@@ -780,7 +796,7 @@ public class Controller : NetworkBehaviour
                 }
                 SpendManaToCast(cardSelected.GetComponent<CardInHand>());
                 GameObject instantiatedCreature = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-              
+
                 instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
 
                 instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelected);
@@ -817,6 +833,53 @@ public class Controller : NetworkBehaviour
             RemoveCardFromHand(cardSelected);
             SetStateToNothingSelected();
         }
+    }
+    private void HandleStructureInHandSelected(Vector3Int cellSent)
+    {
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent) == null)
+        {
+            return;
+        }
+        if (cardSelected != null)
+        {
+            foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
+            {
+                if (cardSelected != null)
+                {
+                    if (kvp.Value.neighborTiles.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
+                    {
+                        Debug.Log("contains basetile at cell postiion");
+                        Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+                        if (environmentMap.GetInstantiatedObject(cellSent))
+                        {
+                            GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
+                            if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
+                            {
+                                instantiatedObject.AddComponent<ChangeTransparency>();
+                            }
+                            ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
+                            instantiatedObjectsChangeTransparency.ChangeTransparent(100);
+
+                            Destroy(instantiatedObject);
+                        }
+
+                        SetOwningTile(cellSent);
+                        foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
+                        {
+                            SetOwningTile(bt.tilePosition);
+                        }
+                        SpendManaToCast(cardSelected.GetComponent<CardInHand>()); //she works out too much 
+                        GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+                        instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
+
+                        RemoveCardFromHand(cardSelected);
+                        SetStateToNothingSelected();
+                        return;
+                    }
+                }
+            }
+        }
+
     }
 
     private void SpendManaToCast(CardInHand cardSelected)

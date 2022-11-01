@@ -33,4 +33,10 @@ public class Structure : MonoBehaviour
     {
         health -= amountofdamage;
     }
+
+    internal void InjectDependencies(Vector3Int cellSent, Controller controller)
+    {
+        tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent);
+        playerOwningStructure = controller;
+    }
 }

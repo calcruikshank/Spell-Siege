@@ -318,6 +318,7 @@ public class Creature : MonoBehaviour
                 instantiatedParticle.transform.LookAt(creatureToAttack.transform);
                 instantiatedParticle.GetComponent<MeleeVisualAttack>().SetTarget(creatureToAttack, Attack);
             }
+            OnAttack();
         }
     }
     protected virtual void VisualAttackAnimationOnStructure(Structure structureToAttack)
@@ -818,6 +819,11 @@ public class Creature : MonoBehaviour
         }
         GameManager.singleton.SpawnHealText(this.transform.position, amount);
         UpdateCreatureHUD();
+    }
+
+    public virtual void OnAttack()
+    {
+
     }
 
 

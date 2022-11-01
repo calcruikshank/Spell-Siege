@@ -14,7 +14,7 @@ public class CardInHand : MonoBehaviour
     public int whiteManaCost;
     public int blackManaCost;
     public int redManaCost;
-    //public int genericManaCost;
+    public int genericManaCost;
 
     public int remainingMana;
 
@@ -24,7 +24,7 @@ public class CardInHand : MonoBehaviour
     [SerializeField] TextMeshProUGUI blackManaText;
     [SerializeField] TextMeshProUGUI blueManaText;
 
-    //[SerializeField] TextMeshProUGUI genericManaText;
+    [SerializeField] TextMeshProUGUI genericManaText;
 
     BaseTile.ManaType manaType;
 
@@ -47,10 +47,13 @@ public class CardInHand : MonoBehaviour
 
     private void UpdateMana()
     {
-        /*if (genericManaCost == 0)
+        if (genericManaCost == 0)
         {
-            genericManaText.transform.parent.gameObject.SetActive(false);
-        }*/
+            if (genericManaText != null)
+            {
+                genericManaText.transform.parent.gameObject.SetActive(false);
+            }
+        }
         if (greenManaCost == 0)
         {
             greenManaText.transform.parent.gameObject.SetActive(false);
@@ -120,6 +123,7 @@ public class CardInHand : MonoBehaviour
         int tempGreenMana;
         int tempWhiteMana;
         int tempBlackMana;
+        int tempGenericMana;
 
         tempBlueMana = resources.blueMana - blueManaCost;
         tempRedMana = resources.redMana - redManaCost;
@@ -153,6 +157,12 @@ public class CardInHand : MonoBehaviour
         if (tempBlackMana < 0)
         {
 
+            SetToNotPurchasable();
+            return;
+        }
+        tempGenericMana = tempBlackMana + tempBlueMana + tempGreenMana + tempRedMana + tempRedMana;
+        if (tempGenericMana < genericManaCost)
+        {
             SetToNotPurchasable();
             return;
         }
