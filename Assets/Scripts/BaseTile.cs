@@ -211,6 +211,7 @@ public class BaseTile : MonoBehaviour
 
     private void MakeTextObjectForTileCost(Transform parentToSet)
     {
+        Debug.Log("instantiating text");
         GameObject instantiatedText = Instantiate(new GameObject("text", typeof(TextMeshPro)), parentToSet);
         instantiatedText.transform.localPosition = new Vector3(0, .01f, 0);
         costText = instantiatedText.GetComponent<TextMeshPro>();

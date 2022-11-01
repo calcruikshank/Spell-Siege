@@ -864,15 +864,17 @@ public class Controller : NetworkBehaviour
                         }
 
                         SetOwningTile(cellSent);
-                        foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
-                        {
-                            SetOwningTile(bt.tilePosition);
-                        }
+                        
                         SpendManaToCast(cardSelected.GetComponent<CardInHand>()); //she works out too much 
                         GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
                         instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
 
-                        RemoveCardFromHand(cardSelected);
+                        foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
+                        {
+                            SetOwningTile(bt.tilePosition);
+                        }
+                        AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
+                        RemoveCardFromHand(cardSelected); 
                         SetStateToNothingSelected();
                         return;
                     }
