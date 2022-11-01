@@ -16,7 +16,7 @@ public class MousePositionScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit raycastHit, Mathf.Infinity, baseTileMap))
         {
             mousePositionWorldPoint = raycastHit.point;

@@ -767,6 +767,7 @@ public class Creature : MonoBehaviour
         originalCardTransform.transform.position = this.transform.position;
 
         originalCardTransform.GetComponentInChildren<BoxCollider>().enabled = false;
+        originalCardTransform.gameObject.SetActive(false);
 
     }
 
@@ -786,7 +787,10 @@ public class Creature : MonoBehaviour
         //if (playerOwningCreature.locallySelectedCreature != this)
         //{
         originalCardTransform.gameObject.SetActive(false);
-        rangeLr.enabled = false;
+        if (rangeLr != null)
+        {
+            rangeLr.enabled = false;
+        }
         if (playerOwningCreature.locallySelectedCard != null)
         {
             playerOwningCreature.locallySelectedCard.gameObject.SetActive(true);

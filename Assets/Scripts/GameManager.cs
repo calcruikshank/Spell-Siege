@@ -8,6 +8,7 @@ using UnityEngine.Tilemaps;
 
 public class GameManager : NetworkBehaviour
 {
+    [SerializeField] GameObject playerPrefab;
     public static GameManager singleton;
     public State state;
     public Grid grid;
@@ -66,6 +67,33 @@ public class GameManager : NetworkBehaviour
     }
     private void Update()
     {
+    }
+
+    void Start()
+    {
+        if (!IsHost)
+        {
+            Debug.Log("Spawn players");
+            SpawnPlayersServerRpc();
+        }
+    }
+
+    [ServerRpc (RequireOwnership = false)]
+    void SpawnPlayersServerRpc()
+    {
+        SpawnPlayersClientRpc();
+    }
+    [ClientRpc]
+    private void SpawnPlayersClientRpc()
+    {
+        if (IsHost)
+        {
+            for (int i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
+            {
+                GameObject instantiatedObject = Instantiate(playerPrefab);
+                instantiatedObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.ConnectedClientsIds[i]);
+            }
+        }
     }
 
     private void FixedUpdate()
