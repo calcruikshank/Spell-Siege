@@ -32,6 +32,15 @@ public class Structure : MonoBehaviour
     internal void TakeDamage(float amountofdamage)
     {
         health -= amountofdamage;
+        if (health <= 0)
+        {
+            DestroyStructure();
+        }
+    }
+
+    private void DestroyStructure()
+    {
+        Destroy(this.gameObject);
     }
 
     internal void InjectDependencies(Vector3Int cellSent, Controller controller)
