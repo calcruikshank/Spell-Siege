@@ -687,17 +687,20 @@ public class Controller : NetworkBehaviour
             {
                 if (raycastHitKeep.transform.GetComponent<PlayerKeep>().playerOwningStructure == this)
                 {
-                    if (!keepClicked)
+                    if (locallySelectedCard == null || locallySelectedCard.cardType != CardInHand.CardType.Spell)
                     {
-                        keepClicked = true;
-                        ShowHarvestedTiles();
-                        return true;
-                    }
-                    if (keepClicked)
-                    {
-                        keepClicked = false;
-                        HideHarvestedTiles();
-                        return true;
+                        if (!keepClicked)
+                        {
+                            keepClicked = true;
+                            ShowHarvestedTiles();
+                            return true;
+                        }
+                        if (keepClicked)
+                        {
+                            keepClicked = false;
+                            HideHarvestedTiles();
+                            return true;
+                        }
                     }
                 }
             }
@@ -726,13 +729,11 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
-                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this)
+                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected)
                 {
                     SetVisualsToNothingSelectedLocally();
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
-
-                    //SetToCreatureOnFieldSelected(raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
                     return true;
                 }
                 if (state == State.SpellInHandSelected || state == State.StructureInHandSeleced)

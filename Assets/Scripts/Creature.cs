@@ -775,9 +775,13 @@ public class Creature : MonoBehaviour
         originalCardTransform.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .5f, this.transform.position.z);
         originalCardTransform.gameObject.SetActive(true);
         rangeLr.enabled = true;
+
         if (playerOwningCreature.locallySelectedCard != null)
         {
-            playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
+            if (playerOwningCreature.locallySelectedCard.cardType != CardInHand.CardType.Spell)
+            {
+                playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
+            }
         }
     }
 
