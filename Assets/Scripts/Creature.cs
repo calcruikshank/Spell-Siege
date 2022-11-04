@@ -351,7 +351,6 @@ public class Creature : MonoBehaviour
     }
     void Die()
     {
-
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);
         rangeLrGO.SetActive(false);
@@ -390,8 +389,8 @@ public class Creature : MonoBehaviour
 
     public virtual void SetMove(Vector3 positionToTarget)
     {
-        HidePathfinderLR();
         rangeLr.enabled = false;
+        playerOwningCreature.SetVisualsToNothingSelectedLocally();
         Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(positionToTarget.x, 0, positionToTarget.z));
 
         List<BaseTile> tempPathVectorList = pathfinder1.FindPath(currentCellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);

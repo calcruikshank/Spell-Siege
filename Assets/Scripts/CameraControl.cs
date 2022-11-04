@@ -47,14 +47,13 @@ public class CameraControl : MonoBehaviour
         {
             MoveCamera(Input.GetAxis("Mouse ScrollWheel"));
         }
-        if (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
+        if (Input.GetMouseButtonDown(2))
         {
             lastPosition = Input.mousePosition;
         }
 
-        if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
+        if (Input.GetMouseButton(2))
         {
-
             Vector3 delta = Input.mousePosition - lastPosition;
             transform.Translate(-delta.x * mouseSensitivity * Time.fixedDeltaTime, -delta.y * mouseSensitivity * Time.fixedDeltaTime, 0) ;
             lastPosition = Input.mousePosition;

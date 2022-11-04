@@ -57,7 +57,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 800; //todo make this 800
+    int turnThreshold = 80; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> cardsInDeck;
     List<CardInHand> cardsInHand = new List<CardInHand>();
@@ -76,6 +76,8 @@ public class Controller : NetworkBehaviour
     float tickThreshold = .12f;
     public List<Vector3Int> clickQueueForTick = new List<Vector3Int>();
     List<Vector3Int> tempLocalPositionsToSend = new List<Vector3Int>();
+    List<bool> tempRightClicksToSend = new List<bool>();
+    List<bool> rightClicksToEnact = new List<bool>();
     List<Vector3Int> tempLocalTilePositionPurchased = new List<Vector3Int>();
     List<Vector3Int> localTilePositionPurchasedToSend = new List<Vector3Int>();
     List<int> tempLocalIndecesOfCardsInHand = new List<int>();
@@ -264,19 +266,21 @@ public class Controller : NetworkBehaviour
             }
             locallySelectedCard.transform.position = new Vector3(mousePosition.x, mousePosition.y + 1f, mousePosition.z);
         }
-
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (instantiatedCaste != null)
+            {
+                SetVisualsToNothingSelectedLocally();
+                tempRightClicksToSend.Add(true); //handle setting the state to nothing selected
+            }
+        }
         if (Input.GetMouseButtonDown(0))
         {
             cellPositionSentToClients = grid.WorldToCell(mousePosition);
 
             if (state == State.NothingSelected)
             {
-                if (locallySelectedCreature != null)
-                {
-                    AddToTickQueueLocal(cellPositionSentToClients);
-                    locallySelectedCreature = null;
-                    return;
-                }
+                SetVisualsToNothingSelectedLocally();
                 if (!CheckForRaycast())
                 {
                     AddToTickQueueLocal(cellPositionSentToClients);
@@ -308,6 +312,24 @@ public class Controller : NetworkBehaviour
 
     }
 
+    public void SetVisualsToNothingSelectedLocally()
+    {
+        if (locallySelectedCreature != null)
+        {
+            locallySelectedCreature.HidePathfinderLR();
+            locallySelectedCreature = null;
+            Debug.Log("Locally selected creature was not null");
+        }
+
+        if (locallySelectedCard != null)
+        {
+            if (locallySelectedCardInHandToTurnOff != null)
+            {
+                locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
+            }
+            Destroy(locallySelectedCard.gameObject);
+        }
+    }
 
     private void FixedUpdate()
     {
@@ -427,7 +449,7 @@ public class Controller : NetworkBehaviour
     #region regionOfTicks
     void AddToTickQueueLocal(Vector3Int positionSent)
     {
-        locallySelectedCreature = null;
+        //locallySelectedCreature = null;
         tempLocalPositionsToSend.Add(positionSent);
     }
     private void AddToPuchaseTileQueueLocal(Vector3Int cellPositionSentToClients)
@@ -465,6 +487,7 @@ public class Controller : NetworkBehaviour
         message.guidsForCards = tempLocalIndecesOfCardsInHand;
         message.guidsForCreatures = tempIndexOfCreatureOnBoard;
         message.localTilePositionsToBePurchased = tempLocalTilePositionPurchased;
+        message.hasClickedRightClick = tempRightClicksToSend;
         //message.timeBetweenLastTick = timeBetweenLastTick;
         //set guids of struct
         string messageString = JsonUtility.ToJson(message);
@@ -485,10 +508,15 @@ public class Controller : NetworkBehaviour
         {
             indecesOfCreaturesInQueue.Add(tempIndexOfCreatureOnBoard[i]);
         }
+        for (int i = 0; i < tempRightClicksToSend.Count; i++)
+        {
+            rightClicksToEnact.Add(tempRightClicksToSend[i]);
+        }
         tempLocalPositionsToSend.Clear();
         tempLocalIndecesOfCardsInHand.Clear();
         tempIndexOfCreatureOnBoard.Clear();
         tempLocalTilePositionPurchased.Clear();
+        tempRightClicksToSend.Clear();
         if (!GameManager.singleton.playersThatHaveBeenReceived.Contains(this))
         {
             GameManager.singleton.AddToPlayersThatHaveBeenReceived(this);
@@ -528,6 +556,13 @@ public class Controller : NetworkBehaviour
                 AddToTickQueue(receievedMessage.leftClicksWorldPos[i]);
             }
         }
+        if (receievedMessage.hasClickedRightClick.Count > 0)
+        {
+            for (int i = 0; i < receievedMessage.hasClickedRightClick.Count; i++)
+            {
+                rightClicksToEnact.Add(receievedMessage.hasClickedRightClick[i]);
+            }
+        }
         if (!GameManager.singleton.playersThatHaveBeenReceived.Contains(this))
         {
             GameManager.singleton.AddToPlayersThatHaveBeenReceived(this);
@@ -549,6 +584,11 @@ public class Controller : NetworkBehaviour
         for (int i = 0; i < indecesOfCreaturesInQueue.Count; i++)
         {
             SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[indecesOfCreaturesInQueue[i]]);
+        }
+        for (int i = 0; i < rightClicksToEnact.Count; i++)
+        {
+            SetStateToNothingSelected();
+            rightClicksToEnact.Clear();
         }
         for (int i = 0; i < clickQueueForTick.Count; i++)
         {
@@ -668,14 +708,7 @@ public class Controller : NetworkBehaviour
             {
                 if (raycastHitCardInHand.transform.GetComponent<CardInHand>().isPurchasable)
                 {
-                    if (locallySelectedCard != null)
-                    {
-                        if (locallySelectedCardInHandToTurnOff != null)
-                        {
-                            locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
-                        }
-                        Destroy(locallySelectedCard.gameObject);
-                    }
+                    SetVisualsToNothingSelectedLocally();
                     locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
                     locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
                     locallySelectedCard.transform.position = locallySelectedCardInHandToTurnOff.transform.position;
@@ -695,14 +728,7 @@ public class Controller : NetworkBehaviour
             {
                 if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this)
                 {
-                    if (locallySelectedCard != null)
-                    {
-                        if (locallySelectedCardInHandToTurnOff != null)
-                        {
-                            locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
-                        }
-                        Destroy(locallySelectedCard.gameObject);
-                    }
+                    SetVisualsToNothingSelectedLocally();
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
 
@@ -713,14 +739,7 @@ public class Controller : NetworkBehaviour
                 {
                     if (cardSelected.GameObjectToInstantiate.GetComponent<Spell>().range == 0)
                     {
-                        if (locallySelectedCard != null)
-                        {
-                            if (locallySelectedCardInHandToTurnOff != null)
-                            {
-                                locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
-                            }
-                            Destroy(locallySelectedCard.gameObject);
-                        }
+                        SetVisualsToNothingSelectedLocally();
                         AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
                         return true;
                     }
@@ -1033,6 +1052,7 @@ public class Controller : NetworkBehaviour
         }
         cardSelected = null;
         creatureSelected = null;
+       
         state = State.NothingSelected;
     }
     void SetStateToWaiting()
