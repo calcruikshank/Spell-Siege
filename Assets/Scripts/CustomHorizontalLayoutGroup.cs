@@ -28,7 +28,6 @@ public class CustomHorizontalLayoutGroup : MonoBehaviour
                 middleNumber = (numberOfChildren - 1) / 2;
             }
             int distanceFromMiddleNumber = i - middleNumber;
-            Debug.Log(distanceFromMiddleNumber);
             float widthOfChild = transform.GetChild(i).transform.GetComponent<RectTransform>().sizeDelta.x * transform.GetChild(i).transform.GetComponent<RectTransform>().localScale.x;
             
             spacing = widthOfChild * .3f; 
