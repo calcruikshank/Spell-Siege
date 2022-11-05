@@ -250,7 +250,6 @@ public class Controller : NetworkBehaviour
             {
                 locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled = false;
                 locallySelectedCard.gameObject.SetActive(true);
-
                 foreach (Image img in locallySelectedCard.GetComponentsInChildren<Image>())
                 {
                     Color imageColor = img.color;
@@ -713,8 +712,10 @@ public class Controller : NetworkBehaviour
                 {
                     SetVisualsToNothingSelectedLocally();
                     locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
+                    locallySelectedCardInHandToTurnOff.TurnOffVisualCard();
                     locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
                     locallySelectedCard.transform.position = locallySelectedCardInHandToTurnOff.transform.position;
+                    locallySelectedCard.transform.localEulerAngles = Vector3.zero;
                     raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject.SetActive(false);
                     AddIndexOfCardInHandToTickQueueLocal(raycastHitCardInHand.transform.GetComponent<CardInHand>().indexOfCard);
                     return true;

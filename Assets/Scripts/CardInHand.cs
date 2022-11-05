@@ -183,11 +183,20 @@ public class CardInHand : MonoBehaviour
     {
         isPurchasable = false;
     }
+    GameObject visualVersion;
     private void OnMouseOver()
     {
         if (playerOwningCard.locallySelectedCard != null)
         {
             playerOwningCard.locallySelectedCard.gameObject.SetActive(false);
+        }
+        if (visualVersion == null && playerOwningCard.locallySelectedCard == null)
+        {
+            visualVersion = Instantiate(this.gameObject, GameManager.singleton.canvasMain.transform);
+            visualVersion.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z + .525f);
+            visualVersion.transform.localEulerAngles = Vector3.zero;
+            visualVersion.transform.localScale = visualVersion.transform.localScale * 2;
+            visualVersion.GetComponentInChildren<Collider>().enabled = false;
         }
     }
 
@@ -199,6 +208,15 @@ public class CardInHand : MonoBehaviour
             {
                 playerOwningCard.locallySelectedCard.gameObject.SetActive(true);
             }
+            TurnOffVisualCard();
+        }
+    }
+
+    internal void TurnOffVisualCard()
+    {
+        if (visualVersion != null)
+        {
+            Destroy(visualVersion);
         }
     }
 }

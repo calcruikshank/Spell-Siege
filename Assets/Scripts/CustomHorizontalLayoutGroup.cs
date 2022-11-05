@@ -10,6 +10,9 @@ public class CustomHorizontalLayoutGroup : MonoBehaviour
     float startingOffset;
 
     int middleNumber = 0;
+
+    float rotationMultiplier = 5;
+    float yOffsetMultiplier = 10;
     private void Update()
     {
         CalculateCorrrectTransformsOfChildren();
@@ -30,7 +33,7 @@ public class CustomHorizontalLayoutGroup : MonoBehaviour
             int distanceFromMiddleNumber = i - middleNumber;
             float widthOfChild = transform.GetChild(i).transform.GetComponent<RectTransform>().sizeDelta.x * transform.GetChild(i).transform.GetComponent<RectTransform>().localScale.x;
             
-            spacing = widthOfChild * .3f; 
+            spacing = .2f; 
             if (numberOfChildren % 2 != 0)
             {
                 startingOffset = (widthOfChild + spacing) * distanceFromMiddleNumber;
@@ -39,8 +42,8 @@ public class CustomHorizontalLayoutGroup : MonoBehaviour
             {
                 startingOffset = ((widthOfChild + spacing) * distanceFromMiddleNumber) + (widthOfChild / 2);
             }
-            transform.GetChild(i).localPosition = new Vector3( startingOffset, transform.GetChild(i).localPosition.y, transform.GetChild(i).localPosition.z);
-            transform.GetChild(i).localEulerAngles = new Vector3();
+            transform.GetChild(i).localPosition = new Vector3( startingOffset, yOffsetMultiplier * -Mathf.Abs( distanceFromMiddleNumber ), transform.GetChild(i).localPosition.z);
+            transform.GetChild(i).localEulerAngles = new Vector3(transform.GetChild(i).localEulerAngles.x, transform.GetChild(i).localEulerAngles.y, -rotationMultiplier * distanceFromMiddleNumber);
         }
     }
 }
