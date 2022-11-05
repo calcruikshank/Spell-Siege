@@ -76,6 +76,13 @@ public class GameManager : NetworkBehaviour
             Debug.Log("Spawn players");
             SpawnPlayersServerRpc();
         }
+        if (IsHost)
+        {
+            if (NetworkManager.Singleton.ConnectedClientsIds.Count == 1)
+            {
+                SpawnPlayersServerRpc();
+            }
+        }
     }
 
     [ServerRpc (RequireOwnership = false)]

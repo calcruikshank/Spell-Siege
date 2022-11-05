@@ -789,7 +789,10 @@ public class Creature : MonoBehaviour
     {
         //if (playerOwningCreature.locallySelectedCreature != this)
         //{
-        originalCardTransform.gameObject.SetActive(false);
+        if (originalCardTransform != null)
+        {
+            originalCardTransform.gameObject.SetActive(false);
+        }
         if (rangeLr != null)
         {
             rangeLr.enabled = false;
