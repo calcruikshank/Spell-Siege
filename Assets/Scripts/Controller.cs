@@ -730,11 +730,6 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
-                if (state == State.CreatureSelected)
-                {
-                    creatureSelected.SetTargetCreature(raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
-                    return true;
-                }
                 if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected)
                 {
                     SetVisualsToNothingSelectedLocally();
