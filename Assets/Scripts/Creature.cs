@@ -30,7 +30,7 @@ public class Creature : MonoBehaviour
     [HideInInspector] public List<BaseTile> allTilesWithinRange;
     [HideInInspector] public int creatureID;
     [HideInInspector] public int ownedCreatureID;
-    [HideInInspector] public CreatureState creatureState;
+    public CreatureState creatureState;
     [HideInInspector]
     public enum CreatureState
     {
@@ -67,9 +67,9 @@ public class Creature : MonoBehaviour
 
     public Vector3 actualPosition;
     Vector3 targetedPosition;
-    Vector3[] positions = new Vector3[2];
+    Vector3[] positions;
 
-
+    public Creature creatureToFollow;
     List<Vector3> rangePositions = new List<Vector3>();
     protected Grid grid;
     private void Awake()
@@ -164,6 +164,7 @@ public class Creature : MonoBehaviour
                 HandleAbilityRate();
                 HandleFriendlyCreaturesList();
                 HandleAttack();
+                CheckToSeeIfTargetedCreatureIsInRange();
                 break;
             case CreatureState.Summoned:
                 CheckForCreaturesWithinRange();
@@ -173,6 +174,20 @@ public class Creature : MonoBehaviour
                 HandleAttack();
                 break;
         }
+    }
+
+    private void CheckToSeeIfTargetedCreatureIsInRange()
+    {
+        if (creatureToFollow != null)
+        {
+            if (!IsCreatureWithinRange(creatureToFollow))
+            {
+            }
+        }
+    }
+    bool IsCreatureWithinRange(Creature creatureSent)
+    {
+        return allTilesWithinRange.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition( creatureSent.currentCellPosition ));
     }
 
     protected List<Creature> creaturesWithinRange = new List<Creature>();
@@ -402,6 +417,10 @@ public class Creature : MonoBehaviour
         SetLRPoints();
         currentPathIndex = 0;
         creatureState = CreatureState.Moving;
+        foreach (Creature followingcreature in creaturesFollowing)
+        {
+            followingcreature.SetTargetCreature(this);
+        }
 
     }
 
@@ -695,6 +714,41 @@ public class Creature : MonoBehaviour
         SetNewPositionsForRangeLr(rangePositions);
     }
 
+    internal void RemoveAnyPotentialCreaturesContainingThisInFollowList(Creature creatureSent)
+    {
+        if (creaturesFollowing.Count > 0 && creaturesFollowing.Contains(creatureSent))
+        {
+            creaturesFollowing.Clear();
+        }
+        if (creatureToFollow != null)
+        {
+            if (creatureToFollow.creaturesFollowing.Contains(this))
+            {
+                creatureToFollow.creaturesFollowing.Remove(this);
+            }
+        }
+        creatureToFollow = null;
+    }
+
+    public List<Creature> creaturesFollowing;
+    internal void SetTargetCreature(Creature creature)
+    {
+        if (!creature.creaturesFollowing.Contains(this))
+        {
+            creature.creaturesFollowing.Add(this);
+        }
+        creatureToFollow = creature;
+        pathfinder1.SetTargetCreature(creature);
+        if (creature.pathVectorList.Count > 0)
+        {
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creature.pathVectorList[creature.pathVectorList.Count - 1].tilePosition));
+        }
+        else
+        {
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creature.currentCellPosition));
+        }
+
+    }
 
     GameObject rangeLrGO;
     LineRenderer rangeLr;
@@ -745,6 +799,10 @@ public class Creature : MonoBehaviour
     }
     internal void HidePathfinderLR()
     {
+        if (positions == null)
+        {
+            positions = new Vector3[2];
+        }
         lr2.enabled = false;
         lr2.positionCount = positions.Length;
         lr2.SetPositions(positions);

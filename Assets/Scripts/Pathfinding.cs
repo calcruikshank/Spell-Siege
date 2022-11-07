@@ -64,6 +64,10 @@ public class Pathfinding
                         continue;
                     }
                 }
+                if (creatureTargeted.pathVectorList.Contains(neighbor) && neighbor != endingTile)
+                {
+                    continue;
+                }
                 if (neighbor.StructureOnTile() != null)
                 {
                     continue;
