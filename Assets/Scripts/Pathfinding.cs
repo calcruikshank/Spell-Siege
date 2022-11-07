@@ -8,6 +8,8 @@ public class Pathfinding
 {
    Grid grid;
    Tilemap baseMap;
+
+    Creature creatureTargeted = new Creature();
     private List<BaseTile> openList;
     private List<BaseTile> closedList;
     Creature.travType travTypeSent;
@@ -57,7 +59,10 @@ public class Pathfinding
                 }
                 if (neighbor.CreatureOnTile() != null)
                 {
-                    continue;
+                    if (neighbor.CreatureOnTile() != creatureTargeted)
+                    {
+                        continue;
+                    }
                 }
                 if (neighbor.StructureOnTile() != null)
                 {
@@ -175,5 +180,10 @@ public class Pathfinding
         }
 
         return lowestFCostBaseTile;
+    }
+
+    internal void SetTargetCreature(Creature targetedCreature)
+    {
+        creatureTargeted = targetedCreature;
     }
 }
