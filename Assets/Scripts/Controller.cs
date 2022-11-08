@@ -679,7 +679,7 @@ public class Controller : NetworkBehaviour
     CardInHand locallySelectedCardInHandToTurnOff;
     bool CheckForRaycast()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); 
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit raycastHitKeep, Mathf.Infinity))
         {
             if (raycastHitKeep.transform.GetComponent<PlayerKeep>() != null)
@@ -730,7 +730,7 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
-                if (state != State.SpellInHandSelected)
+                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected)
                 {
                     SetVisualsToNothingSelectedLocally();
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
@@ -802,10 +802,8 @@ public class Controller : NetworkBehaviour
         #region creatureSelected
         if (creatureSelected != null)
         {
-            creatureSelected.RemoveAnyPotentialCreaturesContainingThisInFollowList(null);
             creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition));
-            
-            
+
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition) == creatureSelected.tileCurrentlyOn) //this makes sure you can double click to stop the creature and also have it selected
             {
                 SetToCreatureOnFieldSelected(creatureSelected);
@@ -914,7 +912,7 @@ public class Controller : NetworkBehaviour
                         }
 
                         SetOwningTile(cellSent);
-                        
+
                         SpendManaToCast(cardSelected.GetComponent<CardInHand>()); //she works out too much 
                         GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
                         instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
@@ -924,7 +922,7 @@ public class Controller : NetworkBehaviour
                             SetOwningTile(bt.tilePosition);
                         }
                         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
-                        RemoveCardFromHand(cardSelected); 
+                        RemoveCardFromHand(cardSelected);
                         SetStateToNothingSelected();
                         return;
                     }
@@ -1026,13 +1024,6 @@ public class Controller : NetworkBehaviour
     int indexOfCardInHandSelected;
     public void SetToCreatureOnFieldSelected(Creature creatureSelectedSent)
     {
-        if (state == State.CreatureSelected)
-        {
-            creatureSelected.RemoveAnyPotentialCreaturesContainingThisInFollowList(creatureSelectedSent);
-            creatureSelected.SetTargetCreature(creatureSelectedSent);
-            SetStateToNothingSelected();
-            return;
-        }
         if (state == State.SpellInHandSelected)
         {
             if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0)
@@ -1063,7 +1054,7 @@ public class Controller : NetworkBehaviour
         }
         cardSelected = null;
         creatureSelected = null;
-       
+
         state = State.NothingSelected;
     }
     void SetStateToWaiting()
@@ -1074,7 +1065,7 @@ public class Controller : NetworkBehaviour
     }
 
 
-    
+
     public void AddToMana()
     {
         for (int i = 0; i < harvestedTiles.Count; i++)
