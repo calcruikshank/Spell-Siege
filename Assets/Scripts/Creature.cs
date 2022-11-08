@@ -485,7 +485,7 @@ public class Creature : MonoBehaviour
             tileCurrentlyOn.AddCreatureToTile(this);
         }
 
-        if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex].tilePosition) != null)
+        /*if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex].tilePosition) != null)
         {
             if (currentPathIndex == pathVectorList.Count - 1 && BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex].tilePosition) != this)
             {
@@ -523,6 +523,33 @@ public class Creature : MonoBehaviour
                     //BaseTile newBaseTileToMoveTo = BaseMapTileState.singleton.GetNearestBaseTileGivenCell(tileCurrentlyOn, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition));
                     //SetNewTargetPosition(BaseMapTileState.singleton.GetWorldPositionOfCell(newBaseTileToMoveTo.tilePosition));
                 }
+            }
+        }*/
+
+        CheckForLastCreatureInPath();
+        CheckForCreaturesInPath();
+    }
+
+    private void CheckForLastCreatureInPath()
+    {
+        int i = pathVectorList.Count - 1;
+        while (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[i].tilePosition) != null && BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[i].tilePosition) != this)
+        {
+            i--;
+        }
+        if (i != pathVectorList.Count - 1)
+        {
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[i].tilePosition));
+        }
+    }
+    //its not recursive i swear
+    private void CheckForCreaturesInPath()
+    {
+        if (currentPathIndex < pathVectorList.Count - 1)
+        {
+            if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex + 1].tilePosition) != null && BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex + 1].tilePosition) != this)
+            {
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition));
             }
         }
     }
