@@ -746,6 +746,12 @@ public class Controller : NetworkBehaviour
                         return true;
                     }
                 }
+                if (state == State.CreatureSelected)
+                {
+                    SetVisualsToNothingSelectedLocally();
+                    AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
+                    return true;
+                }
             }
         }
         return false;
@@ -797,6 +803,7 @@ public class Controller : NetworkBehaviour
         #region creatureSelected
         if (creatureSelected != null)
         {
+            creatureSelected.targetToFollow = null;
             creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition));
 
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition) == creatureSelected.tileCurrentlyOn) //this makes sure you can double click to stop the creature and also have it selected
@@ -1019,6 +1026,12 @@ public class Controller : NetworkBehaviour
     int indexOfCardInHandSelected;
     public void SetToCreatureOnFieldSelected(Creature creatureSelectedSent)
     {
+        if (state == State.CreatureSelected)
+        {
+            creatureSelected.SetTargetToFollow(creatureSelectedSent);
+            SetStateToNothingSelected();
+            return;
+        }
         if (state == State.SpellInHandSelected)
         {
             if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0)
