@@ -482,10 +482,31 @@ public class Creature : MonoBehaviour
 
     private void CheckForFollowTarget()
     {
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != null )
+        {
+            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != this)
+            {
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).neighborTiles[1].tilePosition));
+            }
+        }
         if (targetToFollow != null)
         {
             if (!creaturesWithinRange.Contains(targetToFollow))
             {
+                if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.OnlyFlying)
+                {
+                    if (thisTraversableType == travType.Walking || thisTraversableType == travType.SwimmingAndWalking || thisTraversableType == travType.Swimming)
+                    {
+                        return;
+                    }
+                }
+                if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.SwimmingAndFlying)
+                {
+                    if (thisTraversableType == travType.Walking)
+                    {
+                        return;
+                    }
+                }
                 SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
             }
             if (targetToFollow.pathVectorList.Count > 0)
