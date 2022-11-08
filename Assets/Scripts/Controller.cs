@@ -410,6 +410,10 @@ public class Controller : NetworkBehaviour
 
     private void TriggerAllCreatureAbilities()
     {
+        foreach (KeyValuePair<int, Creature> kp in creaturesOwned)
+        {
+            kp.Value.OnTurn();
+        }
         foreach (KeyValuePair<Vector3Int, BaseTile> kp in tilesOwned)
         {
             if (kp.Value.CreatureOnTile() != null && kp.Value.CreatureOnTile().playerOwningCreature == this)
@@ -603,6 +607,7 @@ public class Controller : NetworkBehaviour
     private void PurchaseHarvestTile(Vector3Int vector3Int)
     {
         SpendGenericMana(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).harvestCost);
+        manaCap++;
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int));
     }
 
@@ -817,7 +822,7 @@ public class Controller : NetworkBehaviour
         #endregion
     }
 
-    Dictionary<int, Creature> creaturesOwned = new Dictionary<int, Creature>();
+    public Dictionary<int, Creature> creaturesOwned = new Dictionary<int, Creature>();
     void HandleCreatureInHandSelected(Vector3Int cellSent)
     {
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent) == null)
@@ -1073,30 +1078,45 @@ public class Controller : NetworkBehaviour
     }
 
 
-
+    int manaCap = 5;
     public void AddToMana()
     {
         for (int i = 0; i < harvestedTiles.Count; i++)
         {
             if (harvestedTiles[i].manaType == BaseTile.ManaType.Blue)
             {
-                resources.blueMana++;
+                if (resources.blueMana < manaCap)
+                {
+                    resources.blueMana++;
+                }
             }
             if (harvestedTiles[i].manaType == BaseTile.ManaType.Black)
             {
-                resources.blackMana++;
+                if (resources.blackMana < manaCap)
+                {
+                    resources.blackMana++;
+                }
             }
             if (harvestedTiles[i].manaType == BaseTile.ManaType.Red)
             {
-                resources.redMana++;
+                if (resources.redMana < manaCap)
+                {
+                    resources.redMana++;
+                }
             }
             if (harvestedTiles[i].manaType == BaseTile.ManaType.White)
             {
-                resources.whiteMana++;
+                if (resources.whiteMana < manaCap)
+                {
+                    resources.whiteMana++;
+                }
             }
             if (harvestedTiles[i].manaType == BaseTile.ManaType.Green)
             {
-                resources.greenMana++;
+                if (resources.greenMana < manaCap)
+                {
+                    resources.greenMana++;
+                }
             }
         }
 
@@ -1104,25 +1124,41 @@ public class Controller : NetworkBehaviour
     }
     public void AddSpecificManaToPool(BaseTile.ManaType manaTypeSent)
     {
+        
         if (manaTypeSent == BaseTile.ManaType.Black)
         {
-            resources.blackMana++;
+            if (resources.blackMana < manaCap)
+            {
+                resources.blackMana++;
+            }
         }
         if (manaTypeSent == BaseTile.ManaType.Blue)
         {
-            resources.blueMana++;
+            if (resources.blueMana < manaCap)
+            {
+                resources.blueMana++;
+            }
         }
         if (manaTypeSent == BaseTile.ManaType.Red)
         {
-            resources.redMana++;
+            if (resources.redMana < manaCap)
+            {
+                resources.redMana++;
+            }
         }
         if (manaTypeSent == BaseTile.ManaType.Green)
         {
-            resources.greenMana++;
+            if (resources.greenMana < manaCap)
+            {
+                resources.greenMana++;
+            }
         }
         if (manaTypeSent == BaseTile.ManaType.White)
         {
-            resources.whiteMana++;
+            if (resources.whiteMana < manaCap)
+            {
+                resources.whiteMana++;
+            }
         }
 
         resourcesChanged.Invoke(resources);

@@ -173,4 +173,7 @@ public class GameManager : NetworkBehaviour
         instantiatedHealthText.GetComponent<TextMeshPro>().color = Color.green;
         Instantiate(healParticle, positionSent, Quaternion.identity);
     }
+    internal void SpawnLevelUpPrefab(Vector3 positionSent)
+    {
+    }
 }

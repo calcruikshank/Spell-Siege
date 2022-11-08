@@ -154,23 +154,23 @@ public class Creature : MonoBehaviour
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
                 HandleAbilityRate();
-                HandleFriendlyCreaturesList();
-                HandleAttack();
+                //HandleFriendlyCreaturesList();
+                //HandleAttack();
                 break;
             case CreatureState.Idle:
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
                 HandleAbilityRate();
-                HandleFriendlyCreaturesList();
-                HandleAttack();
+                //HandleFriendlyCreaturesList();
+                //HandleAttack();
                 CheckForFollowTarget();
                 break;
             case CreatureState.Summoned:
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
                 HandleAbilityRate();
-                HandleFriendlyCreaturesList();
-                HandleAttack();
+                //HandleFriendlyCreaturesList();
+                //HandleAttack();
                 CheckForFollowTarget();
                 break;
         }
@@ -178,7 +178,7 @@ public class Creature : MonoBehaviour
 
     bool IsCreatureWithinRange(Creature creatureSent)
     {
-        return allTilesWithinRange.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition( creatureSent.currentCellPosition ));
+        return allTilesWithinRange.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(creatureSent.currentCellPosition));
     }
 
     protected List<Creature> creaturesWithinRange = new List<Creature>();
@@ -264,6 +264,36 @@ public class Creature : MonoBehaviour
 
     }
 
+    public void AttackOnTurn()
+    {
+        if (forcedCreaturesToAttack.Count > 1)
+        {
+            for (int i = 0; i < forcedCreaturesToAttack.Count; i++)
+            {
+                if (creaturesWithinRange.Contains(forcedCreaturesToAttack[i]))
+                {
+                    VisualAttackAnimation(forcedCreaturesToAttack[i]);
+                    return;
+                }
+            }
+        }
+        if (currentTargetedCreature.Count > 0)
+        {
+            for (int i = 0; i < currentTargetedCreature.Count; i++)
+            {
+                VisualAttackAnimation(currentTargetedCreature[i]);
+                //AttackCreature(currentTargetedCreature[i]);
+            }
+        }
+        if (currentTargetedCreature.Count <= 0 && currentTargetedStructures.Count > 0)
+        {
+            for (int i = 0; i < currentTargetedStructures.Count; i++)
+            {
+                VisualAttackAnimationOnStructure(currentTargetedStructures[i]);
+                //AttackCreature(currentTargetedCreature[i]);
+            }
+        }
+    }
     protected virtual void HandleAttack()
     {
         if (forcedCreaturesToAttack.Count > 1)
@@ -386,6 +416,27 @@ public class Creature : MonoBehaviour
         this.attackText.text = Attack.ToString();
     }
 
+    internal void OnTurn()
+    {
+        AttackOnTurn();
+        HandleFriendlyCreaturesList();
+        //GiveCounter(1);
+    }
+    void GiveCounter(int numOfCounters)
+    {
+        if (this.transform == null)
+        {
+            return;
+        }
+        for (int i = 0; i < numOfCounters; i++)
+        {
+            MaxHealth++;
+            CurrentHealth++;
+            Attack++;
+        }
+        GameManager.singleton.SpawnLevelUpPrefab(this.transform.position);
+        UpdateCreatureHUD();
+    }
     private void OnTick()
     {
     }
@@ -482,7 +533,7 @@ public class Creature : MonoBehaviour
 
     private void CheckForFollowTarget()
     {
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != null )
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != null)
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != this)
             {
@@ -878,6 +929,7 @@ public class Creature : MonoBehaviour
 
     private void OnDestroy()
     {
+        this.playerOwningCreature.creaturesOwned.Remove(this.ownedCreatureID);
         OnMouseExit();
     }
 
