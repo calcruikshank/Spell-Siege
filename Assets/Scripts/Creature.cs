@@ -417,10 +417,6 @@ public class Creature : MonoBehaviour
         SetLRPoints();
         currentPathIndex = 0;
         creatureState = CreatureState.Moving;
-        foreach (Creature followingcreature in creaturesFollowing)
-        {
-            followingcreature.SetTargetCreature(this);
-        }
 
     }
 
@@ -714,41 +710,6 @@ public class Creature : MonoBehaviour
         SetNewPositionsForRangeLr(rangePositions);
     }
 
-    internal void RemoveAnyPotentialCreaturesContainingThisInFollowList(Creature creatureSent)
-    {
-        if (creaturesFollowing.Count > 0 && creaturesFollowing.Contains(creatureSent))
-        {
-            creaturesFollowing.Clear();
-        }
-        if (creatureToFollow != null)
-        {
-            if (creatureToFollow.creaturesFollowing.Contains(this))
-            {
-                creatureToFollow.creaturesFollowing.Remove(this);
-            }
-        }
-        creatureToFollow = null;
-    }
-
-    public List<Creature> creaturesFollowing;
-    internal void SetTargetCreature(Creature creature)
-    {
-        if (!creature.creaturesFollowing.Contains(this))
-        {
-            creature.creaturesFollowing.Add(this);
-        }
-        creatureToFollow = creature;
-        pathfinder1.SetTargetCreature(creature);
-        if (creature.pathVectorList.Count > 0)
-        {
-            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creature.pathVectorList[creature.pathVectorList.Count - 1].tilePosition));
-        }
-        else
-        {
-            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creature.currentCellPosition));
-        }
-
-    }
 
     GameObject rangeLrGO;
     LineRenderer rangeLr;

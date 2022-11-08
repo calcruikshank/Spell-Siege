@@ -6,10 +6,9 @@ using UnityEngine.Tilemaps;
 
 public class Pathfinding
 {
-   Grid grid;
-   Tilemap baseMap;
+    Grid grid;
+    Tilemap baseMap;
 
-    Creature creatureTargeted = new Creature();
     private List<BaseTile> openList;
     private List<BaseTile> closedList;
     Creature.travType travTypeSent;
@@ -24,7 +23,7 @@ public class Pathfinding
 
         for (int x = GameManager.singleton.startingX; x < GameManager.singleton.endingX; x++)
         {
-            for (int y = GameManager.singleton.startingY; y < GameManager.singleton.endingY; y++) 
+            for (int y = GameManager.singleton.startingY; y < GameManager.singleton.endingY; y++)
             {
                 BaseTile baseTile = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(x, y, 0));
                 //baseTile.gameObject.SetActive(false);
@@ -58,13 +57,6 @@ public class Pathfinding
                     continue;
                 }
                 if (neighbor.CreatureOnTile() != null)
-                {
-                    if (neighbor.CreatureOnTile() != creatureTargeted)
-                    {
-                        continue;
-                    }
-                }
-                if (creatureTargeted.pathVectorList.Contains(neighbor) && neighbor != endingTile)
                 {
                     continue;
                 }
@@ -184,10 +176,5 @@ public class Pathfinding
         }
 
         return lowestFCostBaseTile;
-    }
-
-    internal void SetTargetCreature(Creature targetedCreature)
-    {
-        creatureTargeted = targetedCreature;
     }
 }
