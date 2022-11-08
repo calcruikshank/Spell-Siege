@@ -810,6 +810,8 @@ public class Creature : MonoBehaviour
         originalCard = cardSelected;
         originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.canvasMain.transform);
         originalCardTransform.transform.position = this.transform.position;
+        originalCardTransform.transform.localEulerAngles = Vector3.zero;
+        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 1.5f;
 
         originalCardTransform.GetComponentInChildren<BoxCollider>().enabled = false;
         originalCardTransform.gameObject.SetActive(false);
