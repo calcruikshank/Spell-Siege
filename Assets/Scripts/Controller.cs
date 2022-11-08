@@ -730,7 +730,7 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
-                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected)
+                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected && state != State.CreatureSelected)
                 {
                     SetVisualsToNothingSelectedLocally();
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
@@ -759,11 +759,6 @@ public class Controller : NetworkBehaviour
             return;
         }
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).structureOnTile != null)
-        {
-            creature.HidePathfinderLR();
-            return;
-        }
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).CreatureOnTile() != null)
         {
             creature.HidePathfinderLR();
             return;

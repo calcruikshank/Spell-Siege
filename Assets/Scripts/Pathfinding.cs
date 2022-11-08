@@ -56,7 +56,7 @@ public class Pathfinding
                 {
                     continue;
                 }
-                if (neighbor.CreatureOnTile() != null)
+                if (neighbor.CreatureOnTile() != null && neighbor != endingTile)
                 {
                     continue;
                 }
