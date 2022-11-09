@@ -1,18 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class Structure : MonoBehaviour
 {
-
+    [SerializeField] TextMeshPro keepHealth;
     Grid grid;
     public Controller playerOwningStructure;
     Tilemap baseTileMap;
     public Vector3Int currentCellPosition;
 
-    public float health = 100;
+    [SerializeField] float health = 30;
     public BaseTile tileCurrentlyOn;
 
     private void Start()
@@ -21,7 +22,11 @@ public class Structure : MonoBehaviour
         baseTileMap = GameManager.singleton.baseMap;
         currentCellPosition = grid.WorldToCell(this.transform.position);
         tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
-        tileCurrentlyOn.AddStructureToTile(this);
+        tileCurrentlyOn.AddStructureToTile(this); 
+        if (keepHealth != null)
+        {
+            keepHealth.text = health.ToString();
+        }
     }
 
     private void OnDestroy()
@@ -35,6 +40,10 @@ public class Structure : MonoBehaviour
         if (health <= 0)
         {
             DestroyStructure();
+        }
+        if (keepHealth != null)
+        {
+            keepHealth.text = health.ToString();
         }
     }
 

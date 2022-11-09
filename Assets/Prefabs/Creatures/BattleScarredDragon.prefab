@@ -544,9 +544,9 @@ MonoBehaviour:
   speed: 1.5
   range: 5
   UsageRate: 0
-  Attack: 4
+  Attack: 3
   CurrentHealth: 0
-  MaxHealth: 20
+  MaxHealth: 12
   attackText: {fileID: 3298186682565764544}
   healthText: {fileID: 7534283529393728702}
   numOfTargetables: 1
@@ -560,9 +560,9 @@ MonoBehaviour:
   tileCurrentlyOn: {fileID: 0}
   previousTilePosition: {fileID: 0}
   actualPosition: {x: 0, y: 0, z: 0}
-  creatureToFollow: {fileID: 0}
   visualAttackParticle: {fileID: 4457159321914820, guid: 4b21d5ab091be5a46ad6e87699fab62c, type: 3}
   pathVectorList: []
+  targetToFollow: {fileID: 0}
 --- !u!1 &6330952787006823200
 GameObject:
   m_ObjectHideFlags: 0

@@ -546,7 +546,7 @@ MonoBehaviour:
   UsageRate: 1
   Attack: 1
   CurrentHealth: 0
-  MaxHealth: 9
+  MaxHealth: 3
   attackText: {fileID: 3298186682565764544}
   healthText: {fileID: 7534283529393728702}
   numOfTargetables: 1
@@ -562,6 +562,7 @@ MonoBehaviour:
   actualPosition: {x: 0, y: 0, z: 0}
   visualAttackParticle: {fileID: 6003523913816622651, guid: 3f80c0f2c84ba644d8cc959b3f4f0f50, type: 3}
   pathVectorList: []
+  targetToFollow: {fileID: 0}
 --- !u!1 &6330952787006823200
 GameObject:
   m_ObjectHideFlags: 0

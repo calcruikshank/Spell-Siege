@@ -297,9 +297,9 @@ public class BaseTile : MonoBehaviour
         instantiatedManaSymbol.gameObject.SetActive(true);
     }
 
-    internal void SetHarvestCost(int count)
+    internal void SetHarvestCost(int harvestCostSent)
     {
-        this.harvestCost = harvestCostMultiplier * count;
+        this.harvestCost = harvestCostSent;
         costText.text = harvestCost.ToString();
     }
 }

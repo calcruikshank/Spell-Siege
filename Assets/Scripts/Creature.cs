@@ -464,6 +464,7 @@ public class Creature : MonoBehaviour
 
     protected void SetLRPoints()
     {
+        if (this.transform == null) return;
         List<Vector3> lrList = new List<Vector3>();
         //targetPosition = positionToTarget;
 

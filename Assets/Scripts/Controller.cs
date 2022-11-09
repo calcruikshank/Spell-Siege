@@ -57,7 +57,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 80; //todo make this 800
+    int turnThreshold = 800; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> cardsInDeck;
     List<CardInHand> cardsInHand = new List<CardInHand>();
@@ -609,6 +609,15 @@ public class Controller : NetworkBehaviour
         SpendGenericMana(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).harvestCost);
         manaCap++;
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int));
+        IncreaseCostOfHarvestTiles();
+    }
+
+    int harvestCost = 3;
+    private void IncreaseCostOfHarvestTiles()
+    {
+        harvestCost = harvestedTiles.Count * 3;
+        
+        //AddToMaxMana(baseTileSent.manaType);
     }
 
     #endregion
@@ -655,6 +664,7 @@ public class Controller : NetworkBehaviour
         instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
         AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
+        IncreaseCostOfHarvestTiles();
         AddToMana();
         SetStateToWaiting();
         GameManager.singleton.AddPlayerToReady(this);
@@ -675,10 +685,9 @@ public class Controller : NetworkBehaviour
         {
             if (!harvestedTiles.Contains(bt.Value))
             {
-                bt.Value.SetHarvestCost(harvestedTiles.Count);
+                bt.Value.SetHarvestCost(harvestCost);
             }
         }
-        //AddToMaxMana(baseTileSent.manaType);
     }
 
     CardInHand locallySelectedCardInHandToTurnOff;
@@ -929,6 +938,7 @@ public class Controller : NetworkBehaviour
                             SetOwningTile(bt.tilePosition);
                         }
                         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
+                        manaCap++;
                         RemoveCardFromHand(cardSelected);
                         SetStateToNothingSelected();
                         return;
