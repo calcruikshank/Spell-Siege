@@ -152,6 +152,7 @@ public class Creature : MonoBehaviour
             case CreatureState.Moving:
                 Move();
                 CheckForCreaturesWithinRange();
+                ChooseTarget();
                 HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
@@ -159,6 +160,7 @@ public class Creature : MonoBehaviour
                 break;
             case CreatureState.Idle:
                 CheckForCreaturesWithinRange();
+                ChooseTarget();
                 HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
@@ -167,6 +169,7 @@ public class Creature : MonoBehaviour
                 break;
             case CreatureState.Summoned:
                 CheckForCreaturesWithinRange();
+                ChooseTarget();
                 HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
@@ -181,18 +184,17 @@ public class Creature : MonoBehaviour
         return allTilesWithinRange.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(creatureSent.currentCellPosition));
     }
 
+
     protected List<Creature> creaturesWithinRange = new List<Creature>();
     protected List<Creature> friendlyCreaturesWithinRange = new List<Creature>();
     List<Structure> structresWithinRange = new List<Structure>();
-    List<Creature> currentTargetedCreature = new List<Creature>();
-    List<Structure> currentTargetedStructures = new List<Structure>();
+
+    Creature currentTargetedCreature;
     protected virtual void CheckForCreaturesWithinRange()
     {
         structresWithinRange = new List<Structure>();
         creaturesWithinRange = new List<Creature>();
         friendlyCreaturesWithinRange = new List<Creature>();
-        currentTargetedStructures = new List<Structure>();
-        currentTargetedCreature = new List<Creature>();
         float lowestHealthCreatureWithinRange = -1;
         foreach (BaseTile baseTile in allTilesWithinRange)
         {
@@ -214,21 +216,24 @@ public class Creature : MonoBehaviour
                 }
             }
         }
+
+    }
+    void ChooseTarget()
+    {
+        if (targetToFollow != null)
+        {
+            if (IsCreatureWithinRange(targetToFollow))
+            {
+                currentTargetedCreature = targetToFollow;
+            }
+        }
         foreach (Creature creatureInRange in creaturesWithinRange)
         {
-            if (creatureInRange.playerOwningCreature != this.playerOwningCreature)
+            if (currentTargetedCreature == null)
             {
-                if (lowestHealthCreatureWithinRange == -1 || creatureInRange.CurrentHealth < lowestHealthCreatureWithinRange)
+                if (creatureInRange.playerOwningCreature != this.playerOwningCreature)
                 {
-                    lowestHealthCreatureWithinRange = creatureInRange.CurrentHealth;
-                    if (currentTargetedCreature.Count < numOfTargetables)
-                    {
-                        if (!currentTargetedCreature.Contains(creatureInRange))
-                        {
-                            currentTargetedCreature.Add(creatureInRange);
-                        }
-
-                    }
+                    currentTargetedCreature = creatureInRange;
                 }
             }
             if (creatureInRange.playerOwningCreature == this.playerOwningCreature)
@@ -241,19 +246,10 @@ public class Creature : MonoBehaviour
         }
         foreach (Structure structureInRange in structresWithinRange)
         {
-
             if (structureInRange.playerOwningStructure != this.playerOwningCreature)
             {
-                if (currentTargetedCreature.Count <= 0)
-                {
-                    if (!currentTargetedStructures.Contains(structureInRange))
-                    {
-                        currentTargetedStructures.Add(structureInRange);
-                    }
-                }
             }
         }
-
     }
 
 
@@ -266,78 +262,11 @@ public class Creature : MonoBehaviour
 
     public void AttackOnTurn()
     {
-        if (forcedCreaturesToAttack.Count > 1)
+        if (currentTargetedCreature != null)
         {
-            for (int i = 0; i < forcedCreaturesToAttack.Count; i++)
-            {
-                if (creaturesWithinRange.Contains(forcedCreaturesToAttack[i]))
-                {
-                    VisualAttackAnimation(forcedCreaturesToAttack[i]);
-                    return;
-                }
-            }
-        }
-        if (currentTargetedCreature.Count > 0)
-        {
-            for (int i = 0; i < currentTargetedCreature.Count; i++)
-            {
-                VisualAttackAnimation(currentTargetedCreature[i]);
-                //AttackCreature(currentTargetedCreature[i]);
-            }
-        }
-        if (currentTargetedCreature.Count <= 0 && currentTargetedStructures.Count > 0)
-        {
-            for (int i = 0; i < currentTargetedStructures.Count; i++)
-            {
-                VisualAttackAnimationOnStructure(currentTargetedStructures[i]);
-                //AttackCreature(currentTargetedCreature[i]);
-            }
+            VisualAttackAnimation(currentTargetedCreature);
         }
     }
-    protected virtual void HandleAttack()
-    {
-        if (forcedCreaturesToAttack.Count > 1)
-        {
-            if (AttackRateTimer >= AttackRate)
-            {
-                for (int i = 0; i < forcedCreaturesToAttack.Count; i++)
-                {
-                    if (creaturesWithinRange.Contains(forcedCreaturesToAttack[i]))
-                    {
-                        AttackRateTimer = 0;
-                        VisualAttackAnimation(forcedCreaturesToAttack[i]);
-                        return;
-                    }
-                }
-            }
-        }
-        if (currentTargetedCreature.Count > 0)
-        {
-            if (AttackRateTimer >= AttackRate)
-            {
-                AttackRateTimer = 0;
-                for (int i = 0; i < currentTargetedCreature.Count; i++)
-                {
-                    VisualAttackAnimation(currentTargetedCreature[i]);
-                    //AttackCreature(currentTargetedCreature[i]);
-                }
-            }
-        }
-        if (currentTargetedCreature.Count <= 0 && currentTargetedStructures.Count > 0)
-        {
-            if (AttackRateTimer >= AttackRate)
-            {
-                AttackRateTimer = 0;
-                for (int i = 0; i < currentTargetedStructures.Count; i++)
-                {
-                    VisualAttackAnimationOnStructure(currentTargetedStructures[i]);
-                    //AttackCreature(currentTargetedCreature[i]);
-                }
-            }
-        }
-
-    }
-
 
     protected virtual void VisualAttackAnimation(Creature creatureToAttack)
     {
@@ -614,6 +543,7 @@ public class Creature : MonoBehaviour
     internal void SetToPlayerOwningCreature(Controller controller)
     {
         this.playerOwningCreature = controller;
+        this.transform.GetComponent<MeshRenderer>().material.color = controller.col;
         colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
         ownedCreatureID = GameManager.singleton.creatureGuidCounter;
         GameManager.singleton.creatureGuidCounter++;
