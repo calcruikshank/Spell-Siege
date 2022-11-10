@@ -218,13 +218,28 @@ public class Creature : MonoBehaviour
         }
 
     }
+    Creature tauntingCreature;
     void ChooseTarget()
     {
-        if (targetToFollow != null)
+        if (tauntingCreature != null)
         {
-            if (IsCreatureWithinRange(targetToFollow))
+            if (IsCreatureWithinRange(tauntingCreature))
             {
-                currentTargetedCreature = targetToFollow;
+                currentTargetedCreature = tauntingCreature;
+            }
+            else
+            {
+                tauntingCreature = null;
+            }
+        }
+        if (tauntingCreature == null)
+        {
+            if (targetToFollow != null)
+            {
+                if (IsCreatureWithinRange(targetToFollow))
+                {
+                    currentTargetedCreature = targetToFollow;
+                }
             }
         }
         foreach (Creature creatureInRange in creaturesWithinRange)
@@ -262,6 +277,8 @@ public class Creature : MonoBehaviour
 
     public void AttackOnTurn()
     {
+        CheckForCreaturesWithinRange();
+        ChooseTarget();
         if (currentTargetedCreature != null)
         {
             VisualAttackAnimation(currentTargetedCreature);
@@ -837,10 +854,10 @@ public class Creature : MonoBehaviour
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
 
-    List<Creature> forcedCreaturesToAttack = new List<Creature>();
+    
     public virtual void Taunt(Creature creatureTaunting)
     {
-        forcedCreaturesToAttack.Add(creatureTaunting);
+        tauntingCreature = creatureTaunting;
     }
     public virtual void Heal(float amount)
     {
@@ -867,8 +884,11 @@ public class Creature : MonoBehaviour
     public Creature targetToFollow;
     internal void SetTargetToFollow(Creature creatureToFollow)
     {
-        targetToFollow = creatureToFollow;
-        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition));
+        if (creatureToFollow != this)
+        {
+            targetToFollow = creatureToFollow;
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition));
+        }
     }
 
 
