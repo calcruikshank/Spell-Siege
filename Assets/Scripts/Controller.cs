@@ -317,7 +317,6 @@ public class Controller : NetworkBehaviour
         {
             locallySelectedCreature.HidePathfinderLR();
             locallySelectedCreature = null;
-            Debug.Log("Locally selected creature was not null");
         }
 
         if (locallySelectedCard != null)
@@ -616,7 +615,7 @@ public class Controller : NetworkBehaviour
     private void IncreaseCostOfHarvestTiles()
     {
         harvestCost = harvestedTiles.Count * 3;
-        
+
         //AddToMaxMana(baseTileSent.manaType);
     }
 
@@ -780,8 +779,18 @@ public class Controller : NetworkBehaviour
         }
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).structureOnTile != null)
         {
-            creature.HidePathfinderLR();
-            return;
+            //creature.HidePathfinderLR();
+            //return;
+        }
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).CreatureOnTile() != null)
+        {
+            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).CreatureOnTile() == this)
+            {
+                creature.HidePathfinderLR();
+                return;
+            }
+            //creature.HidePathfinderLR();
+            //return;
         }
         creature.ShowPathfinderLinerRendererAsync(currentLocalHoverCellPosition);
     }
@@ -818,8 +827,15 @@ public class Controller : NetworkBehaviour
         if (creatureSelected != null)
         {
             creatureSelected.targetToFollow = null;
-            creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition));
-
+            creatureSelected.structureToFollow = null;
+            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
+            {
+                creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile);
+            }
+            else
+            {
+                creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition));
+            }
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition) == creatureSelected.tileCurrentlyOn) //this makes sure you can double click to stop the creature and also have it selected
             {
                 SetToCreatureOnFieldSelected(creatureSelected);
@@ -912,7 +928,6 @@ public class Controller : NetworkBehaviour
                 {
                     if (kvp.Value.neighborTiles.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
                     {
-                        Debug.Log("contains basetile at cell postiion");
                         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
                         if (environmentMap.GetInstantiatedObject(cellSent))
                         {
@@ -1134,7 +1149,7 @@ public class Controller : NetworkBehaviour
     }
     public void AddSpecificManaToPool(BaseTile.ManaType manaTypeSent)
     {
-        
+
         if (manaTypeSent == BaseTile.ManaType.Black)
         {
             if (resources.blackMana < manaCap)

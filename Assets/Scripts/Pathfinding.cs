@@ -60,7 +60,7 @@ public class Pathfinding
                 {
                     continue;
                 }
-                if (neighbor.StructureOnTile() != null)
+                if (neighbor.StructureOnTile() != null && neighbor != endingTile)
                 {
                     continue;
                 }
@@ -126,6 +126,14 @@ public class Pathfinding
             currentNode = currentNode.cameFromBaseTile;
         }
         path.Reverse();
+        if (endingTileSent.structureOnTile != null)
+        {
+            path.Remove(endingTileSent);
+        }
+        if (endingTileSent.CreatureOnTile() != null)
+        {
+            path.Remove(endingTileSent);
+        }
         return path;
     }
 

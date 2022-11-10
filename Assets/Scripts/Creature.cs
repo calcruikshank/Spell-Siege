@@ -153,7 +153,7 @@ public class Creature : MonoBehaviour
                 Move();
                 CheckForCreaturesWithinRange();
                 ChooseTarget();
-                HandleAttackRate();
+                //HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
@@ -161,7 +161,7 @@ public class Creature : MonoBehaviour
             case CreatureState.Idle:
                 CheckForCreaturesWithinRange();
                 ChooseTarget();
-                HandleAttackRate();
+                //HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
@@ -170,7 +170,7 @@ public class Creature : MonoBehaviour
             case CreatureState.Summoned:
                 CheckForCreaturesWithinRange();
                 ChooseTarget();
-                HandleAttackRate();
+                //HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
@@ -183,6 +183,10 @@ public class Creature : MonoBehaviour
     {
         return allTilesWithinRange.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(creatureSent.currentCellPosition));
     }
+    bool IsStructureInRange(Structure structureSent)
+    {
+        return allTilesWithinRange.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(structureSent.currentCellPosition));
+    }
 
 
     protected List<Creature> creaturesWithinRange = new List<Creature>();
@@ -190,6 +194,7 @@ public class Creature : MonoBehaviour
     List<Structure> structresWithinRange = new List<Structure>();
 
     Creature currentTargetedCreature;
+    Structure currentTargetedStructure;
     protected virtual void CheckForCreaturesWithinRange()
     {
         structresWithinRange = new List<Structure>();
@@ -221,15 +226,37 @@ public class Creature : MonoBehaviour
     Creature tauntingCreature;
     void ChooseTarget()
     {
-        if (tauntingCreature != null)
+        if (currentTargetedCreature != null)
         {
-            if (IsCreatureWithinRange(tauntingCreature))
+            if (!IsCreatureWithinRange(currentTargetedCreature))
             {
-                currentTargetedCreature = tauntingCreature;
+                currentTargetedCreature = null;
             }
-            else
+        }
+        foreach (Creature tauntingCreatureInList in creaturesTaunting)
+        {
+            if (tauntingCreature != null)
             {
-                tauntingCreature = null;
+                if (!IsCreatureWithinRange(tauntingCreature))
+                {
+                    tauntingCreature = null;
+                }
+            }
+            if (tauntingCreature == null)
+            {
+                if (IsCreatureWithinRange(tauntingCreatureInList))
+                {
+                    if (tauntingCreatureInList.playerOwningCreature != this.playerOwningCreature)
+                    {
+                        currentTargetedCreature = tauntingCreatureInList;
+                    }
+                }
+                else
+                {
+                    creaturesTaunting.Remove(tauntingCreatureInList);
+                    tauntingCreature = null;
+                }
+
             }
         }
         if (tauntingCreature == null)
@@ -238,7 +265,10 @@ public class Creature : MonoBehaviour
             {
                 if (IsCreatureWithinRange(targetToFollow))
                 {
-                    currentTargetedCreature = targetToFollow;
+                    if (targetToFollow.playerOwningCreature != this.playerOwningCreature)
+                    {
+                        currentTargetedCreature = targetToFollow;
+                    }
                 }
             }
         }
@@ -259,12 +289,51 @@ public class Creature : MonoBehaviour
                 }
             }
         }
+
+        if (structureToFollow != null)
+        {
+            if (IsStructureInRange(structureToFollow))
+            {
+                currentTargetedStructure = structureToFollow;
+                currentTargetedCreature = null;
+            }
+            else
+            {
+                currentTargetedStructure = null;
+            }
+        }
         foreach (Structure structureInRange in structresWithinRange)
         {
             if (structureInRange.playerOwningStructure != this.playerOwningCreature)
             {
+                if (currentTargetedStructure == null && currentTargetedCreature == null)
+                {
+                    currentTargetedStructure = structureInRange;
+                }
             }
         }
+
+        #region cleanup
+        if (currentTargetedStructure == null && currentTargetedCreature == null)
+        {
+            if (tauntingCreature != null)
+            {
+                currentTargetedStructure = null;
+                return;
+            }
+            if (targetToFollow != null)
+            {
+                currentTargetedStructure = null;
+                return;
+            }
+            if (structureToFollow != null)
+            {
+                currentTargetedCreature = null;
+                return;
+            }
+        }
+        #endregion
+
     }
 
 
@@ -282,6 +351,10 @@ public class Creature : MonoBehaviour
         if (currentTargetedCreature != null)
         {
             VisualAttackAnimation(currentTargetedCreature);
+        }
+        if (currentTargetedStructure != null)
+        {
+            VisualAttackAnimationOnStructure(currentTargetedStructure);
         }
     }
 
@@ -341,7 +414,7 @@ public class Creature : MonoBehaviour
 
     void HandleAttackRate()
     {
-        AttackRateTimer += Time.fixedDeltaTime;
+        //AttackRateTimer += Time.fixedDeltaTime;
 
     }
     void HandleAbilityRate()
@@ -440,6 +513,26 @@ public class Creature : MonoBehaviour
             }
             if (Vector3.Distance(actualPosition, targetedPosition) <= .02f)
             {
+                if (targetToFollow != null)
+                {
+                    if (creaturesWithinRange.Contains(targetToFollow))
+                    {
+                        if (Vector3.Distance(actualPosition, targetedPosition) <= .02f)
+                        {
+                            SetStateToIdle();
+                        }
+                    }
+                }
+                if (structureToFollow != null)
+                {
+                    if (structresWithinRange.Contains(structureToFollow))
+                    {
+                        if (Vector3.Distance(actualPosition, targetedPosition) <= .02f)
+                        {
+                            SetStateToIdle();
+                        }
+                    }
+                }
                 if (currentPathIndex >= pathVectorList.Count - 1)
                 {
                     if (pathVectorList[currentPathIndex].CreatureOnTile() == null || pathVectorList[currentPathIndex].CreatureOnTile() == this)
@@ -480,7 +573,18 @@ public class Creature : MonoBehaviour
 
     private void CheckForFollowTarget()
     {
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != null)
+        if (targetToFollow != null)
+        {
+            if (pathVectorList.Count > 0)
+            {
+
+                if (!pathVectorList[pathVectorList.Count - 1].neighborTiles.Contains(targetToFollow.tileCurrentlyOn))
+                {
+                    SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
+                }
+            }
+        }
+        /*if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != null)
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != this)
             {
@@ -514,10 +618,10 @@ public class Creature : MonoBehaviour
                     /*if (!allTilesWithinRange.Contains(targetToFollow.pathVectorList[targetToFollow.currentPathIndex + 1]))
                     {
                         SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
-                    }*/
+                    }
                 }
             }
-        }
+        }*/
     }
 
     private void CheckForLastCreatureInPath()
@@ -854,10 +958,11 @@ public class Creature : MonoBehaviour
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
 
-    
+    List<Creature> creaturesTaunting = new List<Creature>();
     public virtual void Taunt(Creature creatureTaunting)
     {
         tauntingCreature = creatureTaunting;
+        creaturesTaunting.Add(tauntingCreature);
     }
     public virtual void Heal(float amount)
     {
@@ -884,11 +989,25 @@ public class Creature : MonoBehaviour
     public Creature targetToFollow;
     internal void SetTargetToFollow(Creature creatureToFollow)
     {
+        if (structureToFollow != null)
+        {
+            structureToFollow = null;
+        }
         if (creatureToFollow != this)
         {
             targetToFollow = creatureToFollow;
             SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition));
         }
+    }
+    public Structure structureToFollow;
+    internal void SetStructureToFollow(Structure structureToFollowSent)
+    {
+        if (targetToFollow != null)
+        {
+            targetToFollow = null;
+        }
+        structureToFollow = structureToFollowSent;
+        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollow.tileCurrentlyOn.tilePosition));
     }
 
 
