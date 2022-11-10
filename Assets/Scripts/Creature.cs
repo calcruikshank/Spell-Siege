@@ -571,10 +571,33 @@ public class Creature : MonoBehaviour
         CheckForCreaturesInPath();
     }
 
+    BaseTile lastTileFollowCreatureWasOn;
     private void CheckForFollowTarget()
     {
+        if (targetToFollow == null)
+        {
+            if (tempLineRendererBetweenCreatures != null)
+            {
+                tempLineRendererBetweenCreatures.enabled = false;
+            }
+        }
         if (targetToFollow != null)
         {
+            DrawLineToTargetedCreature();
+
+            if (lastTileFollowCreatureWasOn == null)
+            {
+
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
+                lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
+                
+            }
+
+
+            if (lastTileFollowCreatureWasOn != targetToFollow.tileCurrentlyOn)
+            {
+                lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
+            }
             if (pathVectorList.Count > 0)
             {
 
@@ -584,6 +607,7 @@ public class Creature : MonoBehaviour
                 }
             }
         }
+
         /*if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != null)
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != this)
@@ -623,6 +647,42 @@ public class Creature : MonoBehaviour
             }
         }*/
     }
+
+
+    LineRenderer tempLineRendererBetweenCreatures;
+
+    GameObject tempLineRendererBetweenCreaturesGameObject;
+    private void DrawLineToTargetedCreature()
+    {
+        if (tempLineRendererBetweenCreaturesGameObject == null)
+        {
+            GenerateTempLineRendererBetweenThisAndTarget();
+        }
+        if (tempLineRendererBetweenCreaturesGameObject != null)
+        {
+            tempLineRendererBetweenCreaturesGameObject.SetActive(true);
+            tempLineRendererBetweenCreatures.enabled = true;
+            List<Vector3> tempPositions = new List<Vector3>();
+            tempLineRendererBetweenCreatures.SetPositions(tempPositions.ToArray());
+        }
+    }
+
+    void GenerateTempLineRendererBetweenThisAndTarget()
+    {
+        tempLineRendererBetweenCreaturesGameObject = new GameObject("LineRendererGameObject", typeof(LineRenderer));
+        tempLineRendererBetweenCreatures = lrGameObject.GetComponent<LineRenderer>();
+        tempLineRendererBetweenCreatures.enabled = false;
+        tempLineRendererBetweenCreatures.alignment = LineAlignment.TransformZ;
+        tempLineRendererBetweenCreatures.transform.localEulerAngles = new Vector3(90, 0, 0);
+        tempLineRendererBetweenCreatures.sortingOrder = 1000;
+        tempLineRendererBetweenCreatures.startWidth = .05f;
+        tempLineRendererBetweenCreatures.endWidth = .05f;
+        tempLineRendererBetweenCreatures.numCapVertices = 1;
+        tempLineRendererBetweenCreatures.material = GameManager.singleton.RenderInFrontMat;
+        tempLineRendererBetweenCreatures.startColor = playerOwningCreature.col;
+        tempLineRendererBetweenCreatures.endColor = playerOwningCreature.col;
+    }
+
 
     private void CheckForLastCreatureInPath()
     {
@@ -674,7 +734,6 @@ public class Creature : MonoBehaviour
     {
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         lr.enabled = false;
-        Debug.Log("setting state to idle and tick " + playerOwningCreature.tick);
         actualPosition = targetedPosition;
         this.transform.position = actualPosition;
         currentCellPosition = grid.WorldToCell(new Vector3(this.transform.position.x, 0, this.transform.position.z));
@@ -906,7 +965,7 @@ public class Creature : MonoBehaviour
         originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.canvasMain.transform);
         originalCardTransform.transform.position = this.transform.position;
         originalCardTransform.transform.localEulerAngles = Vector3.zero;
-        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 1.5f;
+        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 3f;
 
         originalCardTransform.GetComponentInChildren<BoxCollider>().enabled = false;
         originalCardTransform.gameObject.SetActive(false);
