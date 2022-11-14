@@ -36,10 +36,13 @@ public class Creature : MonoBehaviour
     {
         Summoned, //On The turn created
         Moving,
-        Idle
+        Idle,
+        Dead
         //not sure if i need a tapped state yet trying to keep it as simple as possible
     }
 
+
+    bool canAttack = false;
     [HideInInspector] public Controller playerOwningCreature;
     Pathfinding pathfinder1;
     Pathfinding pathfinder2;
@@ -153,7 +156,7 @@ public class Creature : MonoBehaviour
                 Move();
                 CheckForCreaturesWithinRange();
                 ChooseTarget();
-                //HandleAttackRate();
+                HandleAttackRate();
                 HandleAbilityRate(); DrawLine();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
@@ -161,7 +164,7 @@ public class Creature : MonoBehaviour
             case CreatureState.Idle:
                 CheckForCreaturesWithinRange();
                 ChooseTarget(); DrawLine();
-                //HandleAttackRate();
+                HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
@@ -171,11 +174,13 @@ public class Creature : MonoBehaviour
                 CheckForCreaturesWithinRange();
                 ChooseTarget();
                 DrawLine();
-                //HandleAttackRate();
+                HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
                 CheckForFollowTarget();
+                break;
+            case CreatureState.Dead:
                 break;
         }
     }
@@ -223,7 +228,6 @@ public class Creature : MonoBehaviour
         }
 
     }
-    Creature tauntingCreature;
     void ChooseTarget()
     {
         float lowestHealthCreatureWithinRange = -1;
@@ -234,44 +238,9 @@ public class Creature : MonoBehaviour
                 currentTargetedCreature = null;
             }
         }
-        foreach (Creature tauntingCreatureInList in creaturesTaunting)
+        if (targetToFollow != null && IsCreatureWithinRange(targetToFollow))
         {
-            if (tauntingCreature != null)
-            {
-                if (!IsCreatureWithinRange(tauntingCreature))
-                {
-                    tauntingCreature = null;
-                }
-            }
-            if (tauntingCreature == null)
-            {
-                if (IsCreatureWithinRange(tauntingCreatureInList))
-                {
-                    if (tauntingCreatureInList.playerOwningCreature != this.playerOwningCreature)
-                    {
-                        currentTargetedCreature = tauntingCreatureInList;
-                    }
-                }
-                else
-                {
-                    creaturesTaunting.Remove(tauntingCreatureInList);
-                    tauntingCreature = null;
-                }
-
-            }
-        }
-        if (tauntingCreature == null)
-        {
-            if (targetToFollow != null)
-            {
-                if (IsCreatureWithinRange(targetToFollow))
-                {
-                    if (targetToFollow.playerOwningCreature != this.playerOwningCreature)
-                    {
-                        currentTargetedCreature = targetToFollow;
-                    }
-                }
-            }
+            currentTargetedCreature = targetToFollow;
         }
         if (targetToFollow == null || !IsCreatureWithinRange(targetToFollow))
         {
@@ -339,11 +308,6 @@ public class Creature : MonoBehaviour
         #region cleanup
         if (currentTargetedStructure == null && currentTargetedCreature == null)
         {
-            if (tauntingCreature != null)
-            {
-                currentTargetedStructure = null;
-                return;
-            }
             if (targetToFollow != null)
             {
                 currentTargetedStructure = null;
@@ -367,17 +331,19 @@ public class Creature : MonoBehaviour
 
     }
 
-    public void AttackOnTurn()
+    public void HandleAttack()
     {
         CheckForCreaturesWithinRange();
         ChooseTarget();
         if (currentTargetedCreature != null)
         {
             VisualAttackAnimation(currentTargetedCreature);
+            canAttack = false;
         }
         if (currentTargetedStructure != null)
         {
             VisualAttackAnimationOnStructure(currentTargetedStructure);
+            canAttack = false;
         }
     }
 
@@ -437,7 +403,10 @@ public class Creature : MonoBehaviour
 
     void HandleAttackRate()
     {
-        //AttackRateTimer += Time.fixedDeltaTime;
+        if (canAttack)
+        {
+            HandleAttack();
+        }
 
     }
 
@@ -462,7 +431,7 @@ public class Creature : MonoBehaviour
 
     internal void OnTurn()
     {
-        AttackOnTurn();
+        canAttack = true;
         HandleFriendlyCreaturesList();
         //GiveCounter(1);
     }
@@ -488,11 +457,19 @@ public class Creature : MonoBehaviour
     [HideInInspector] public List<BaseTile> pathVectorList = new List<BaseTile>();
     int currentPathIndex;
 
+    
+
     public virtual void SetMove(Vector3 positionToTarget)
     {
         rangeLr.enabled = false;
         playerOwningCreature.SetVisualsToNothingSelectedLocally();
         Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(positionToTarget.x, 0, positionToTarget.z));
+
+        if (tempLineRendererBetweenCreatures != null)
+        {
+            tempLineRendererBetweenCreatures.enabled = false;
+        }
+
 
         List<BaseTile> tempPathVectorList = pathfinder1.FindPath(currentCellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);
         if (tempPathVectorList == null) return;
@@ -508,11 +485,10 @@ public class Creature : MonoBehaviour
 
     protected void SetLRPoints()
     {
-        if (this.transform == null) return;
         List<Vector3> lrList = new List<Vector3>();
         //targetPosition = positionToTarget;
 
-        lrList.Add(new Vector3(this.transform.position.x, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[0].tilePosition).y, this.transform.position.z));
+        lrList.Add(actualPosition);
         for (int i = currentPathIndex; i < pathVectorList.Count; i++)
         {
             lrList.Add(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[i].tilePosition));
@@ -527,8 +503,7 @@ public class Creature : MonoBehaviour
 
     public void Move()
     {
-        
-        if (pathVectorList != null)
+        if (pathVectorList.Count > 0)
         {
             targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
 
@@ -546,8 +521,24 @@ public class Creature : MonoBehaviour
                     {
                         if (Vector3.Distance(actualPosition, targetedPosition) <= .02f)
                         {
-                            //SetStateToIdle();
+                            SetStateToIdle();
                         }
+                    }
+                }
+
+                if (targetToFollow != null)
+                {
+                    if (lastTileFollowCreatureWasOn == null)
+                    {
+                        lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
+                    }
+
+
+                    if (lastTileFollowCreatureWasOn != targetToFollow.tileCurrentlyOn)
+                    {
+                        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
+                        lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
+
                     }
                 }
                 if (structureToFollow != null)
@@ -579,23 +570,27 @@ public class Creature : MonoBehaviour
             {
                 currentPathIndex++;
             }
-        }
-        //Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(targetPosition.x, 0, targetPosition.z));
-        currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
-        if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
-        {
-            tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
-        }
-        if (previousTilePosition != tileCurrentlyOn)
-        {
-            CalculateAllTilesWithinRange();
-            previousTilePosition.RemoveCreatureFromTile(this);
-            previousTilePosition = tileCurrentlyOn;
-            tileCurrentlyOn.AddCreatureToTile(this);
-        }
+            //Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(targetPosition.x, 0, targetPosition.z));
+            currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
+            if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
+            {
+                tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
+            }
+            if (previousTilePosition != tileCurrentlyOn)
+            {
+                CalculateAllTilesWithinRange();
+                previousTilePosition.RemoveCreatureFromTile(this);
+                previousTilePosition = tileCurrentlyOn;
+                tileCurrentlyOn.AddCreatureToTile(this);
+            }
 
-        CheckForLastCreatureInPath();
-        CheckForCreaturesInPath();
+            CheckForLastCreatureInPath();
+            CheckForCreaturesInPath();
+        }
+        else
+        {
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell( tileCurrentlyOn.tilePosition ));
+        }
     }
 
     void DrawLine()
@@ -623,20 +618,6 @@ public class Creature : MonoBehaviour
         }
         if (targetToFollow != null)
         {
-
-            if (lastTileFollowCreatureWasOn == null)
-            {
-
-                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
-                lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
-
-            }
-
-
-            if (lastTileFollowCreatureWasOn != targetToFollow.tileCurrentlyOn)
-            {
-                lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
-            }
             if (pathVectorList.Count > 0)
             {
 
@@ -702,8 +683,8 @@ public class Creature : MonoBehaviour
             tempLineRendererBetweenCreaturesGameObject.SetActive(true);
             tempLineRendererBetweenCreatures.enabled = true;
             List<Vector3> tempPositions = new List<Vector3>();
-            tempPositions.Add(this.actualPosition);
-            tempPositions.Add(positionSent);
+            tempPositions.Add(new Vector3( this.actualPosition.x, this.actualPosition.y + .1f, this.actualPosition.z ));
+            tempPositions.Add(new Vector3(positionSent.x, positionSent.y + .1f, positionSent.z));
             tempLineRendererBetweenCreatures.SetPositions(tempPositions.ToArray());
         }
     }
@@ -1006,7 +987,7 @@ public class Creature : MonoBehaviour
         originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.canvasMain.transform);
         originalCardTransform.transform.position = this.transform.position;
         originalCardTransform.transform.localEulerAngles = Vector3.zero;
-        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 3f;
+        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 2f;
 
         originalCardTransform.GetComponentInChildren<BoxCollider>().enabled = false;
         originalCardTransform.gameObject.SetActive(false);
@@ -1058,11 +1039,8 @@ public class Creature : MonoBehaviour
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
 
-    List<Creature> creaturesTaunting = new List<Creature>();
     public virtual void Taunt(Creature creatureTaunting)
     {
-        tauntingCreature = creatureTaunting;
-        creaturesTaunting.Add(tauntingCreature);
     }
     public virtual void Heal(float amount)
     {
@@ -1082,8 +1060,29 @@ public class Creature : MonoBehaviour
 
     private void OnDestroy()
     {
+        SetStateToDead();
+    }
+    void SetStateToDead()
+    {
+        if (targetToFollow != null)
+        {
+            targetToFollow = null;
+        }
+        if (structureToFollow != null)
+        {
+            structureToFollow = null;
+        }
+        if (tempLineRendererBetweenCreaturesGameObject != null)
+        {
+            tempLineRendererBetweenCreaturesGameObject.SetActive(false);
+        }
+        if (pathVectorList != null)
+        {
+            pathVectorList = null;
+        }
         this.playerOwningCreature.creaturesOwned.Remove(this.ownedCreatureID);
         OnMouseExit();
+        creatureState = CreatureState.Dead;
     }
 
     public Creature targetToFollow;
