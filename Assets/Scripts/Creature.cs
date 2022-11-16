@@ -306,7 +306,7 @@ public class Creature : MonoBehaviour
         }
 
         #region cleanup
-        if (currentTargetedStructure == null && currentTargetedCreature == null)
+        if (currentTargetedStructure != null && currentTargetedCreature != null)
         {
             if (targetToFollow != null)
             {
@@ -318,6 +318,7 @@ public class Creature : MonoBehaviour
                 currentTargetedCreature = null;
                 return;
             }
+            currentTargetedStructure = null;
         }
         #endregion
     }
@@ -512,57 +513,71 @@ public class Creature : MonoBehaviour
 
     public void Move()
     {
-        if (targetToFollow != null)
-        {
-            if (targetToFollow.tileCurrentlyOn != lastTileFollowCreatureWasOn)
-            {
-                lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
-
-                if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.OnlyFlying)
-                {
-                    if (thisTraversableType == travType.Walking || thisTraversableType == travType.SwimmingAndWalking || thisTraversableType == travType.Swimming)
-                    {
-                        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition));
-                        return;
-                    }
-                }
-                if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.SwimmingAndFlying)
-                {
-                    if (thisTraversableType == travType.Walking)
-                    {
-                        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition));
-                        return;
-                    }
-                }
-                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
-            }
-            if (targetToFollow.playerOwningCreature != this.playerOwningCreature)
-            {
-                if (IsCreatureWithinRange(targetToFollow))
-                {
-                    if (Vector3.Distance(actualPosition, targetToFollow.tileCurrentlyOn.tilePosition) <= .02f)
-                    {
-                        SetStateToIdle();
-                    }
-                }
-            }
-            
-        }
-        if (structureToFollow != null)
-        {
-            if (structureToFollow.playerOwningStructure != this.playerOwningCreature)
-            {
-                if (IsStructureInRange(structureToFollow))
-                {
-                    if (Vector3.Distance(actualPosition, structureToFollow.tileCurrentlyOn.tilePosition) <= .02f)
-                    {
-                        SetStateToIdle();
-                    }
-                }
-            }
-        }
         if (pathVectorList != null)
         {
+            if (targetToFollow != null)
+            {
+                if (targetToFollow.tileCurrentlyOn != lastTileFollowCreatureWasOn)
+                {
+                    lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
+
+                    if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.OnlyFlying)
+                    {
+                        if (thisTraversableType == travType.Walking || thisTraversableType == travType.SwimmingAndWalking || thisTraversableType == travType.Swimming)
+                        {
+                            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition));
+                            return;
+                        }
+                    }
+                    if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.SwimmingAndFlying)
+                    {
+                        if (thisTraversableType == travType.Walking)
+                        {
+                            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition));
+                            return;
+                        }
+                    }
+                    SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
+                }
+                if (targetToFollow.playerOwningCreature != this.playerOwningCreature)
+                {
+                    if (pathVectorList.Count > 1)
+                    {
+                        if (IsCreatureWithinRange(targetToFollow))
+                        {
+                            if (currentPathIndex != 0)
+                            {
+                                if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
+                                {
+                                    SetStateToIdle();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            if (structureToFollow != null)
+            {
+                if (structureToFollow.playerOwningStructure != this.playerOwningCreature)
+                {
+                    if (pathVectorList.Count > 1)
+                    {
+                        if (IsStructureInRange(structureToFollow))
+                        {
+                            if (currentPathIndex != 0)
+                            {
+                                if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
+                                {
+                                    SetStateToIdle();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             if (pathVectorList.Count == 0)
             {
                 SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition));
@@ -1106,7 +1121,10 @@ public class Creature : MonoBehaviour
         }
         if (creatureToFollow != this)
         {
-            targetToFollow = creatureToFollow;
+            if (creatureToFollow.playerOwningCreature != this.playerOwningCreature)
+            {
+                targetToFollow = creatureToFollow;
+            }
             SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition));
         }
     }
@@ -1117,7 +1135,10 @@ public class Creature : MonoBehaviour
         {
             targetToFollow = null;
         }
-        structureToFollow = structureToFollowSent;
+        if (structureToFollowSent.playerOwningStructure != this.playerOwningCreature)
+        {
+            structureToFollow = structureToFollowSent;
+        }
         SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollow.tileCurrentlyOn.tilePosition));
     }
 
