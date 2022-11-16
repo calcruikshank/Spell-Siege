@@ -9,6 +9,8 @@ public class VisualAttackParticle : MonoBehaviour
     float amountofdamage;
     public bool shutDown = false;
     Structure targetedStructure;
+
+    [SerializeField] float speed = 10f;
     public void SetTarget(Creature creatureToTarget, float attack)
     {
         targetedCreature = creatureToTarget;
@@ -23,28 +25,40 @@ public class VisualAttackParticle : MonoBehaviour
         }
         if (targetedCreature != null)
         {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, targetedCreature.actualPosition, 10f * Time.deltaTime);
+            this.transform.position = Vector3.MoveTowards(this.transform.position, targetedCreature.actualPosition, speed * Time.deltaTime);
 
-            if (Vector3.Distance(this.transform.position, targetedCreature.actualPosition) < .01f && shutDown == false)
+            if (Vector3.Distance(this.transform.position, targetedCreature.actualPosition) < .02f && shutDown == false)
             {
                 targetedCreature.TakeDamage(amountofdamage);
-                this.GetComponent<ParticleSystem>().Stop();
+
+                if (this.GetComponentInChildren<ParticleSystem>() != null)
+                {
+                    this.GetComponent<ParticleSystem>().Stop();
+                }
                 shutDown = true;
             }
         }
         if (targetedStructure != null)
         {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, targetedStructure.transform.position, 10f * Time.deltaTime); 
-            if (Vector3.Distance(this.transform.position, targetedStructure.transform.position) < .01f && shutDown == false)
+            this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3( targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z), 10f * Time.deltaTime); 
+            if (Vector3.Distance(this.transform.position, new Vector3(targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z)) < .02f && shutDown == false)
             {
                 targetedStructure.TakeDamage(amountofdamage);
-                this.GetComponent<ParticleSystem>().Stop();
+                if (this.GetComponentInChildren<ParticleSystem>() != null)
+                {
+                    this.GetComponent<ParticleSystem>().Stop();
+                }
+
                 shutDown = true;
             }
         }
         if (targetedStructure == null && targetedCreature == null)
         {
-            this.GetComponentInChildren<ParticleSystem>().Stop();
+            if (this.GetComponentInChildren<ParticleSystem>() != null) 
+            {
+                this.GetComponentInChildren<ParticleSystem>().Stop();
+            }
+            
             shutDown = true;
         }
     }

@@ -275,7 +275,7 @@ public class Creature : MonoBehaviour
         }
 
 
-        
+
         if (currentTargetedStructure != null)
         {
             if (!IsStructureInRange(currentTargetedStructure))
@@ -352,6 +352,7 @@ public class Creature : MonoBehaviour
         }
     }
 
+    
     protected virtual void VisualAttackAnimation(Creature creatureToAttack)
     {
         if (visualAttackParticle != null)
@@ -477,7 +478,10 @@ public class Creature : MonoBehaviour
 
 
         List<BaseTile> tempPathVectorList = pathfinder1.FindPath(currentCellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);
-        if (tempPathVectorList == null) return;
+        if (tempPathVectorList == null)
+        {
+            return;
+        }
         List<BaseTile> path = tempPathVectorList;
         pathVectorList = path;
         //SetNewTargetPosition(BaseMapTileState.singleton.GetWorldPositionOfCell(path[1].tilePosition));
@@ -508,6 +512,55 @@ public class Creature : MonoBehaviour
 
     public void Move()
     {
+        if (targetToFollow != null)
+        {
+            if (targetToFollow.tileCurrentlyOn != lastTileFollowCreatureWasOn)
+            {
+                lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
+
+                if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.OnlyFlying)
+                {
+                    if (thisTraversableType == travType.Walking || thisTraversableType == travType.SwimmingAndWalking || thisTraversableType == travType.Swimming)
+                    {
+                        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition));
+                        return;
+                    }
+                }
+                if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.SwimmingAndFlying)
+                {
+                    if (thisTraversableType == travType.Walking)
+                    {
+                        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition));
+                        return;
+                    }
+                }
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
+            }
+            if (targetToFollow.playerOwningCreature != this.playerOwningCreature)
+            {
+                if (IsCreatureWithinRange(targetToFollow))
+                {
+                    if (Vector3.Distance(actualPosition, targetToFollow.tileCurrentlyOn.tilePosition) <= .02f)
+                    {
+                        SetStateToIdle();
+                    }
+                }
+            }
+            
+        }
+        if (structureToFollow != null)
+        {
+            if (structureToFollow.playerOwningStructure != this.playerOwningCreature)
+            {
+                if (IsStructureInRange(structureToFollow))
+                {
+                    if (Vector3.Distance(actualPosition, structureToFollow.tileCurrentlyOn.tilePosition) <= .02f)
+                    {
+                        SetStateToIdle();
+                    }
+                }
+            }
+        }
         if (pathVectorList != null)
         {
             if (pathVectorList.Count == 0)
@@ -527,10 +580,7 @@ public class Creature : MonoBehaviour
             {
                 if (currentPathIndex >= pathVectorList.Count - 1)
                 {
-                    if (Vector3.Distance(actualPosition, targetedPosition) <= .02f)
-                    {
-                        SetStateToIdle();
-                    }
+                     SetStateToIdle();
 
                 }
                 else
@@ -540,7 +590,10 @@ public class Creature : MonoBehaviour
             }
             if (tileCurrentlyOn == pathVectorList[0] && currentPathIndex == 0 && pathVectorList.Count > 1)
             {
-                currentPathIndex++; //for keeping position
+                if (pathVectorList.Count > 1)
+                {
+                    currentPathIndex++; //for keeping position
+                }
             }
         }
 
@@ -558,15 +611,7 @@ public class Creature : MonoBehaviour
         }
 
         CheckForCreaturesInPath();
-        if (targetToFollow != null)
-        {
-            if (targetToFollow.tileCurrentlyOn != lastTileFollowCreatureWasOn)
-            {
-                lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
-
-                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
-            }
-        }
+        
 
     }
 
@@ -574,13 +619,12 @@ public class Creature : MonoBehaviour
     {
         if (targetToFollow != null)
         {
-
             DrawLineToTargetedCreature(targetToFollow.actualPosition);
         }
         if (structureToFollow != null)
         {
 
-            DrawLineToTargetedCreature(structureToFollow.transform.position);
+            DrawLineToTargetedCreature(BaseMapTileState.singleton.GetWorldPositionOfCell( structureToFollow.tileCurrentlyOn.tilePosition ));
         }
     }
     BaseTile lastTileFollowCreatureWasOn;

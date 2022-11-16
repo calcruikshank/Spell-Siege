@@ -170,6 +170,8 @@ public class Controller : NetworkBehaviour
         StartTurnPhase();
     }
 
+
+
     public void StartTurnPhase()
     {
         switch (state)
@@ -271,6 +273,23 @@ public class Controller : NetworkBehaviour
             {
                 SetVisualsToNothingSelectedLocally();
                 tempRightClicksToSend.Add(true); //handle setting the state to nothing selected
+            }
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (locallySelectedCreature != null || locallySelectedCard != null)
+            {
+                if (cellPositionSentToClients != null)
+                {
+                    if (cellPositionSentToClients != grid.WorldToCell(mousePosition))
+                    {
+                        if (!CheckForRaycast())
+                        {
+                            AddToTickQueueLocal(grid.WorldToCell(mousePosition));
+                            SetVisualsToNothingSelectedLocally();
+                        }
+                    }
+                }
             }
         }
         if (Input.GetMouseButtonDown(0))
