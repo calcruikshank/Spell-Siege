@@ -59,7 +59,7 @@ public class Controller : NetworkBehaviour
     public int turnTimer;
     int turnThreshold = 80; //todo make this 800
     int maxHandSize = 7;
-    [SerializeField] List<CardInHand> cardsInDeck;
+    [SerializeField] public List<CardInHand> cardsInDeck;
     List<CardInHand> cardsInHand = new List<CardInHand>();
 
     public CardInHand cardSelected;
@@ -934,10 +934,21 @@ public class Controller : NetworkBehaviour
                     instantiatedObjectsChangeTransparency.ChangeTransparent(100);
                 }
 
+                RemoveCardFromHand(cardSelected);
                 SpendManaToCast(cardSelected.GetComponent<CardInHand>());
                 GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
                 instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
+                OnSpellCast();
+                SetStateToNothingSelected();
+            }
+            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0)
+            {
+                Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+
                 RemoveCardFromHand(cardSelected);
+                SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+                GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+                instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
                 OnSpellCast();
                 SetStateToNothingSelected();
             }
@@ -1052,7 +1063,7 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    void DrawCard()
+    public void DrawCard()
     {
         if (cardsInDeck.Count <= 0)
         {
@@ -1065,6 +1076,28 @@ public class Controller : NetworkBehaviour
         CardInHand cardAddingToHand = cardsInDeck[cardsInDeck.Count - 1]; //todo this might cause problems when dealing with shuffling cards back into the deck
         cardAddingToHand.indexOfCard = cardsInDeck.Count - 1;
         cardsInDeck.RemoveAt(cardsInDeck.Count - 1);
+
+        GameObject instantiatedCardInHand = Instantiate(cardAddingToHand.gameObject, cardParent);
+        CardInHand instantiatedCardInHandBehaviour = instantiatedCardInHand.GetComponent<CardInHand>();
+        instantiatedCardInHandBehaviour.indexOfCard = cardAddingToHand.indexOfCard;
+
+        cardsInHand.Add(instantiatedCardInHandBehaviour);
+        instantiatedCardInHandBehaviour.playerOwningCard = this;
+        instantiatedCardInHandBehaviour.CheckToSeeIfPurchasable(resources);
+    }
+    public void DrawCardWithIndex(int indexOfCard)
+    {
+        if (cardsInDeck.Count <= 0)
+        {
+            return;
+        }
+        if (cardsInHand.Count >= maxHandSize)
+        {
+            return;
+        }
+        CardInHand cardAddingToHand = cardsInDeck[indexOfCard]; //todo this might cause problems when dealing with shuffling cards back into the deck
+        cardAddingToHand.indexOfCard = cardsInDeck.Count - 1;
+        cardsInDeck.RemoveAt(indexOfCard);
 
         GameObject instantiatedCardInHand = Instantiate(cardAddingToHand.gameObject, cardParent);
         CardInHand instantiatedCardInHandBehaviour = instantiatedCardInHand.GetComponent<CardInHand>();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,21 +6,24 @@ using UnityEngine;
 public class Spell : MonoBehaviour
 {
     [SerializeField]public int range = 2;
-    List<BaseTile> allTilesWithinRange = new List<BaseTile>();
-    List<Vector3> rangePositions = new List<Vector3>();
-    Vector3Int currentCellPosition;
-    Controller playerCastingSpell;
+    protected List<BaseTile> allTilesWithinRange = new List<BaseTile>();
+    protected List<Vector3> rangePositions = new List<Vector3>();
+    protected Vector3Int currentCellPosition;
+    protected Controller playerCastingSpell;
 
     [SerializeField] Transform particleToInstantiate;
     Transform instantiatedParticle;
-    [SerializeField] int damage = 3;
+    [SerializeField] protected int damage = 3;
     float lifetime;
     public void InjectDependencies(Vector3Int targetTile, Controller playerCasting)
     {
         currentCellPosition = targetTile;
         playerCastingSpell = playerCasting;
         SetRangeLineRenderer();
-        CalculateAllTilesWithinRange();
+        if (range != 0)
+        {
+            CalculateAllTilesWithinRange();
+        }
         Cast();
     }
     void CalculateAllTilesWithinRange()
@@ -213,16 +217,17 @@ public class Spell : MonoBehaviour
 
     protected virtual void Cast()
     {
-        instantiatedParticle = Instantiate(particleToInstantiate, BaseMapTileState.singleton.GetWorldPositionOfCell(currentCellPosition), Quaternion.identity);
-        Debug.Log(currentCellPosition);
-        foreach (BaseTile bt in allTilesWithinRange) 
+        if (particleToInstantiate != null)
         {
-            if (bt.CreatureOnTile() != null)
-            {
-                bt.CreatureOnTile().TakeDamage(damage);
-            }
+            instantiatedParticle = Instantiate(particleToInstantiate, BaseMapTileState.singleton.GetWorldPositionOfCell(currentCellPosition), Quaternion.identity);
         }
+        SpecificCastEffect();
+        
 
+    }
+
+    protected virtual void SpecificCastEffect()
+    {
     }
 
     private void Update()
