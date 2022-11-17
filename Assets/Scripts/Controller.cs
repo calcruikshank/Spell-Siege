@@ -59,8 +59,9 @@ public class Controller : NetworkBehaviour
     public int turnTimer;
     int turnThreshold = 80; //todo make this 800
     int maxHandSize = 7;
-    [SerializeField] public List<CardInHand> cardsInDeck;
-    List<CardInHand> cardsInHand = new List<CardInHand>();
+    [SerializeField] List<CardInHand> deckSelected = new List<CardInHand>();
+    public List<CardInHand> cardsInDeck = new List<CardInHand>();
+    public List<CardInHand> cardsInHand = new List<CardInHand>();
 
     public CardInHand cardSelected;
     public CardInHand locallySelectedCard;
@@ -116,6 +117,9 @@ public class Controller : NetworkBehaviour
         transparentCol.a = .5f;
         SpawnHUDAndHideOnAllNonOwners();
         instantiatedPlayerUI.gameObject.SetActive(false);
+        cardsInDeck = new List<CardInHand>();
+
+        cardsInDeck = deckSelected;
         cardsInDeck = GameManager.singleton.Shuffle(cardsInDeck);
         turn += OnTurn;
         resources = new PlayerResources();
@@ -1080,6 +1084,7 @@ public class Controller : NetworkBehaviour
             return;
         }
         CardInHand cardAddingToHand = cardsInDeck[cardsInDeck.Count - 1]; //todo this might cause problems when dealing with shuffling cards back into the deck
+        
         cardAddingToHand.indexOfCard = cardsInDeck.Count - 1;
         cardsInDeck.RemoveAt(cardsInDeck.Count - 1);
 

@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class CardInHand : MonoBehaviour
 {
+    [SerializeField] Card card;
     [SerializeField]public Transform GameObjectToInstantiate;
     public int indexOfCard;
 
@@ -42,10 +43,20 @@ public class CardInHand : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        SetCard();
         UpdateMana();
     }
 
-    private void UpdateMana()
+    void SetCard()
+    {
+        this.blueManaCost = card.blueManaCost;
+        this.greenManaCost = card.greenManaCost;
+        this.redManaCost = card.redManaCost;
+        this.whiteManaCost = card.whiteManaCost;
+        this.blackManaCost = card.blackManaCost;
+        this.genericManaCost = card.genericManaCost;
+    }
+    public void UpdateMana()
     {
         if (genericManaCost == 0)
         {

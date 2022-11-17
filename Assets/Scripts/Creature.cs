@@ -50,7 +50,20 @@ public class Creature : MonoBehaviour
         Dead
         //not sure if i need a tapped state yet trying to keep it as simple as possible
     }
+    public enum CreatureType
+    {
+        None,
+        Dragon, //On The turn created
+        Elf,
+        Goblin,
+        Reptile, 
+        Human,
+        Angel,
+        Wizard
 
+        //not sure if i need a tapped state yet trying to keep it as simple as possible
+    }
+    public CreatureType creatureType;
 
     bool canAttack = false;
     [HideInInspector] public Controller playerOwningCreature;
@@ -818,6 +831,7 @@ public class Creature : MonoBehaviour
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
         ownedCreatureID = GameManager.singleton.creatureGuidCounter;
         GameManager.singleton.creatureGuidCounter++;
+        OnETB();
     }
 
     void SetStateToIdle()

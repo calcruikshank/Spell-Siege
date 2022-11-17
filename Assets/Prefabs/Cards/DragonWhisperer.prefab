@@ -1130,13 +1130,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d64a1f6a99f40e4d9d3069f88da2f3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameObjectToInstantiate: {fileID: 0}
+  card: {fileID: 11400000, guid: 9c4cdfdb518333046b1e4e0b4118e7c8, type: 2}
+  GameObjectToInstantiate: {fileID: 6239865746917987993, guid: e7456b9065b5c4d428df1d2e54aef827, type: 3}
   indexOfCard: 26
   greenManaCost: 0
-  blueManaCost: 1
+  blueManaCost: 0
   whiteManaCost: 0
   blackManaCost: 0
-  redManaCost: 0
+  redManaCost: 2
   genericManaCost: 0
   remainingMana: 0
   greenManaText: {fileID: 249541396620921924}
@@ -1690,7 +1691,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Dragons you cast cost one less red mana
+  m_text: 'On Cast: Reduce the cost of dragons in your hand by one'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2564,11 +2565,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1690288381437894055, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2089538658473786027, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3166533201164938181, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_Pivot.x
@@ -2656,35 +2657,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3200726202127352562, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3200726202127352562, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3200726202127352562, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 252.57501
       objectReference: {fileID: 0}
     - target: {fileID: 3200726202127352562, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 4448914665255470463, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4448914665255470463, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4448914665255470463, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 352.575
       objectReference: {fileID: 0}
     - target: {fileID: 4448914665255470463, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 4706540284086102503, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_Name

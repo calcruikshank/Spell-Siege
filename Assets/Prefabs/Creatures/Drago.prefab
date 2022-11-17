@@ -545,6 +545,7 @@ MonoBehaviour:
   range: 4
   UsageRate: 1
   Attack: 2
+  CurrentAttack: 0
   CurrentHealth: 0
   MaxHealth: 4
   attackText: {fileID: 3298186682565764544}
@@ -554,6 +555,7 @@ MonoBehaviour:
   creatureID: 0
   ownedCreatureID: 0
   creatureState: 0
+  creatureType: 1
   playerOwningCreature: {fileID: 0}
   thisTraversableType: 3
   currentCellPosition: {x: 0, y: 0, z: 0}
@@ -563,6 +565,7 @@ MonoBehaviour:
   visualAttackParticle: {fileID: 4457159321914820, guid: 4b21d5ab091be5a46ad6e87699fab62c, type: 3}
   pathVectorList: []
   targetToFollow: {fileID: 0}
+  structureToFollow: {fileID: 0}
 --- !u!1 &6330952787006823200
 GameObject:
   m_ObjectHideFlags: 0
