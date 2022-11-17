@@ -815,7 +815,7 @@ public class Creature : MonoBehaviour
     {
         this.playerOwningCreature = controller;
         this.transform.GetComponent<MeshRenderer>().material.color = controller.col;
-        colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
+        //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
         ownedCreatureID = GameManager.singleton.creatureGuidCounter;
         GameManager.singleton.creatureGuidCounter++;
     }

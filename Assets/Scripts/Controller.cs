@@ -888,28 +888,34 @@ public class Controller : NetworkBehaviour
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).structureOnTile == null && BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).CreatureOnTile() == null)
             {
-                Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
-                if (environmentMap.GetInstantiatedObject(cellSent))
-                {
-                    GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
-                    if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
-                    {
-                        instantiatedObject.AddComponent<ChangeTransparency>();
-                    }
-                    ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
-                    instantiatedObjectsChangeTransparency.ChangeTransparent(100);
-                }
+
                 SpendManaToCast(cardSelected.GetComponent<CardInHand>());
-                GameObject instantiatedCreature = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-
-                instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
-
-                instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelected);
-                creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().ownedCreatureID, instantiatedCreature.GetComponent<Creature>());
-                RemoveCardFromHand(cardSelected);
-                SetStateToNothingSelected();
+                CastCreatureOnTile(cardSelected, cellSent);
             }
         }
+    }
+
+    public void CastCreatureOnTile(CardInHand cardSelectedSent, Vector3Int cellSent)
+    {
+        Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+        GameObject instantiatedCreature = Instantiate(cardSelectedSent.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+        RemoveCardFromHand(cardSelectedSent);
+        if (environmentMap.GetInstantiatedObject(cellSent))
+        {
+            GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
+            if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
+            {
+                instantiatedObject.AddComponent<ChangeTransparency>();
+            }
+            ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
+            instantiatedObjectsChangeTransparency.ChangeTransparent(100);
+        }
+
+        instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
+
+        instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
+        creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().ownedCreatureID, instantiatedCreature.GetComponent<Creature>());
+        SetStateToNothingSelected();
     }
 
     private void HandleSpellInHandSelected(Vector3Int cellSent)
@@ -1111,7 +1117,10 @@ public class Controller : NetworkBehaviour
     void RemoveCardFromHand(CardInHand cardToRemove)
     {
         cardsInHand.Remove(cardToRemove);
-        Destroy(cardToRemove.gameObject);
+        if (cardToRemove != null)
+        {
+            cardToRemove.transform.parent = null;
+        }
     }
 
 
@@ -1296,6 +1305,25 @@ public class Controller : NetworkBehaviour
        
     }
 
+    internal CardInHand GetRandomCreatureInHand()
+    {
+        List<int> numbersChosen = new List<int>();
+        CardInHand creatureSelectedInHand = new CardInHand();
+        while (creatureSelectedInHand == null)
+        {
+            int randomNumber = UnityEngine.Random.Range(0, cardsInHand.Count);
+            if (numbersChosen.Contains(randomNumber))
+            {
+                break;
+            }
+            numbersChosen.Add(randomNumber);
+            if (cardsInHand[randomNumber].cardType == CardInHand.CardType.Creature)
+            {
+                creatureSelectedInHand = cardsInHand[randomNumber];
+            }
+        }
+        return creatureSelectedInHand;
+    }
 }
 
 
