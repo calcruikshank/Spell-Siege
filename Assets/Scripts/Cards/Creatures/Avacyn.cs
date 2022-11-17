@@ -1,20 +1,19 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BattleScarredDragon : FlyingCreature
+public class Avacyn : FlyingCreature
 {
     List<Creature> creaturesDoubled = new List<Creature>();
     protected override void CheckForCreaturesWithinRange()
     {
         base.CheckForCreaturesWithinRange();
 
-        DoubleAttack();
-        
+        MakeIndestructible();
+
     }
 
-    private void DoubleAttack()
+    private void MakeIndestructible()
     {
         if (creaturesDoubled != null)
         {
@@ -22,7 +21,7 @@ public class BattleScarredDragon : FlyingCreature
             {
                 if (!friendlyCreaturesWithinRange.Contains(friendly))
                 {
-                    friendly.IncreaseAttackByX(-friendly.Attack);
+                    friendly.ToggleIndestructibilty(false);
                 }
             }
         }
@@ -30,7 +29,7 @@ public class BattleScarredDragon : FlyingCreature
         {
             if (!creaturesDoubled.Contains(friendly))
             {
-                friendly.IncreaseAttackByX(friendly.Attack);
+                friendly.ToggleIndestructibilty(true);
             }
         }
         creaturesDoubled = friendlyCreaturesWithinRange;
@@ -40,9 +39,9 @@ public class BattleScarredDragon : FlyingCreature
     {
         foreach (Creature friendly in creaturesDoubled)
         {
-            friendly.IncreaseAttackByX(-friendly.Attack);
+            friendly.ToggleIndestructibilty(false);
         }
         base.OnDeath();
-
+        
     }
 }

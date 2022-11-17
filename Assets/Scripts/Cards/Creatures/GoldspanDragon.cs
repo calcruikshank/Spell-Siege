@@ -4,5 +4,8 @@ using UnityEngine;
 
 public class GoldspanDragon : FlyingCreature
 {
-    
+    public override void OnAttack()
+    {
+        playerOwningCreature.AddSpecificManaToPool(BaseTile.ManaType.Red);
+    }
 }

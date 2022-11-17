@@ -100,7 +100,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 7
+  m_text: 12
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 9ad269c99dcf42b7aedefd83dd5a7b9d, type: 2}
@@ -406,7 +406,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: eb2671ed8c5da974893a537a357bbb92, type: 2}
+  - {fileID: 2100000, guid: e8318664c2168f040b9fff7e3a7cbcbf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -440,9 +440,10 @@ GameObject:
   - component: {fileID: 6239865746917987992}
   - component: {fileID: 6239865746917987999}
   - component: {fileID: 6239865746917987998}
-  - component: {fileID: 1225357375011656312}
+  - component: {fileID: 5376288166146080792}
+  - component: {fileID: 239429507096817703}
   m_Layer: 6
-  m_Name: Raziel
+  m_Name: SlumberingAncient
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -492,7 +493,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 92f67949a919b6346841cb6b167c0e1c, type: 2}
+  - {fileID: 2100000, guid: 90367128c5a8eef4aade784c431cda0f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -528,7 +529,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &1225357375011656312
+--- !u!114 &5376288166146080792
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -537,17 +538,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 6239865746917987997}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee7aee41eff00a84e899a92783f2e011, type: 3}
+  m_Script: {fileID: 11500000, guid: 53a68f90a83d3234e9a75448b3a1adeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   colorIndicator: {fileID: 7921025047922479681}
-  speed: 1
+  speed: 0.8
   range: 1
   UsageRate: 1
-  Attack: 7
+  Attack: 12
   CurrentAttack: 0
   CurrentHealth: 0
-  MaxHealth: 7
+  MaxHealth: 12
   attackText: {fileID: 3298186682565764544}
   healthText: {fileID: 7534283529393728702}
   numOfTargetables: 1
@@ -556,15 +557,27 @@ MonoBehaviour:
   ownedCreatureID: 0
   creatureState: 0
   playerOwningCreature: {fileID: 0}
-  thisTraversableType: 0
+  thisTraversableType: 2
   currentCellPosition: {x: 0, y: 0, z: 0}
   tileCurrentlyOn: {fileID: 0}
   previousTilePosition: {fileID: 0}
   actualPosition: {x: 0, y: 0, z: 0}
-  visualAttackParticle: {fileID: 6003523913816622651, guid: 3f80c0f2c84ba644d8cc959b3f4f0f50, type: 3}
+  visualAttackParticle: {fileID: 0}
   pathVectorList: []
   targetToFollow: {fileID: 0}
   structureToFollow: {fileID: 0}
+--- !u!114 &239429507096817703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6239865746917987997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a49bf1c4e191c164c880f638cd38fe90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6330952787006823200
 GameObject:
   m_ObjectHideFlags: 0
@@ -749,7 +762,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 7
+  m_text: 12
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 9ad269c99dcf42b7aedefd83dd5a7b9d, type: 2}

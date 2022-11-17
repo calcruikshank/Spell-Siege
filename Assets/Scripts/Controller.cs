@@ -100,6 +100,8 @@ public class Controller : NetworkBehaviour
 
     public List<BaseTile> harvestedTiles = new List<BaseTile>();
 
+
+    public int spellCounter = 0;
     public override void OnNetworkSpawn()
     {
 
@@ -624,6 +626,10 @@ public class Controller : NetworkBehaviour
 
     private void PurchaseHarvestTile(Vector3Int vector3Int)
     {
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).isBeingHarvested)
+        {
+            return;
+        }
         SpendGenericMana(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).harvestCost);
         manaCap++;
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int));
@@ -771,7 +777,7 @@ public class Controller : NetworkBehaviour
                 }
                 if (state == State.SpellInHandSelected || state == State.StructureInHandSeleced)
                 {
-                    if (cardSelected.GameObjectToInstantiate.GetComponent<Spell>().range == 0)
+                    if (cardSelected.GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
                     {
                         SetVisualsToNothingSelectedLocally();
                         AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
@@ -912,25 +918,29 @@ public class Controller : NetworkBehaviour
         {
             return;
         }
-        if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range != 0)
+        if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>() != null)
         {
-            Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
-            if (environmentMap.GetInstantiatedObject(cellSent))
+            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range != 0)
             {
-                GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
-                if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
+                Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+                if (environmentMap.GetInstantiatedObject(cellSent))
                 {
-                    instantiatedObject.AddComponent<ChangeTransparency>();
+                    GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
+                    if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
+                    {
+                        instantiatedObject.AddComponent<ChangeTransparency>();
+                    }
+                    ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
+                    instantiatedObjectsChangeTransparency.ChangeTransparent(100);
                 }
-                ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
-                instantiatedObjectsChangeTransparency.ChangeTransparent(100);
-            }
 
-            SpendManaToCast(cardSelected.GetComponent<CardInHand>());
-            GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-            instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
-            RemoveCardFromHand(cardSelected);
-            SetStateToNothingSelected();
+                SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+                GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+                instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
+                RemoveCardFromHand(cardSelected);
+                OnSpellCast();
+                SetStateToNothingSelected();
+            }
         }
     }
     private void HandleStructureInHandSelected(Vector3Int cellSent)
@@ -1083,7 +1093,7 @@ public class Controller : NetworkBehaviour
         }
         if (state == State.SpellInHandSelected)
         {
-            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0)
+            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
             {
                 Debug.Log("Casting spell on " + creatureSelectedSent);
                 CastSpellOnTargetedCreature(creatureSelectedSent);
@@ -1096,6 +1106,12 @@ public class Controller : NetworkBehaviour
 
     private void CastSpellOnTargetedCreature(Creature creatureSelectedSent)
     {
+        SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+        GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, creatureSelectedSent.tileCurrentlyOn.tilePosition, Quaternion.identity);
+        instantiatedSpell.GetComponent<TargetedSpell>().InjectDependencies(creatureSelectedSent, this);
+        RemoveCardFromHand(cardSelected);
+        OnSpellCast();
+        
         SetStateToNothingSelected();
     }
 
@@ -1240,7 +1256,16 @@ public class Controller : NetworkBehaviour
 
 
 
+    //overridables
+    public virtual void OnSpellCast()
+    {
+        spellCounter++;
+       
+    }
+
 }
+
+
 
 public struct PlayerResources
 {
@@ -1251,3 +1276,4 @@ public struct PlayerResources
     public int greenMana;
 
 }
+

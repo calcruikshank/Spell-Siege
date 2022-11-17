@@ -14,7 +14,10 @@ public class Creature : MonoBehaviour
     [SerializeField] float speed = 1f; //move speed
     [SerializeField] int range; //num of tiles that can attack
     [SerializeField] float UsageRate = 1f; // the rate at which the minion can use abilities/ attack 
-    [SerializeField] protected float Attack;
+
+
+    [SerializeField] public float Attack;
+    public float CurrentAttack;
     float AttackRate = 4;
     protected float abilityRate = 4;
     protected float AttackRateTimer;
@@ -23,6 +26,13 @@ public class Creature : MonoBehaviour
     [SerializeField] public float MaxHealth;
 
     [SerializeField] TextMeshPro attackText;
+
+    bool indestructible = false;
+    internal void ToggleIndestructibilty(bool v)
+    {
+        indestructible = v;
+    }
+
     [SerializeField] TextMeshPro healthText;
 
     [SerializeField] int numOfTargetables = 1;
@@ -101,6 +111,7 @@ public class Creature : MonoBehaviour
         GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
         GameManager.singleton.allCreatureGuidCounter++;
         CurrentHealth = MaxHealth;
+        CurrentAttack = Attack;
         UpdateCreatureHUD();
     }
 
@@ -184,6 +195,11 @@ public class Creature : MonoBehaviour
                 break;
         }
     }
+    internal void IncreaseAttackByX(float v)
+    {
+        CurrentAttack += v;
+        UpdateCreatureHUD();
+    }
 
     bool IsCreatureWithinRange(Creature creatureSent)
     {
@@ -197,7 +213,7 @@ public class Creature : MonoBehaviour
 
     protected List<Creature> creaturesWithinRange = new List<Creature>();
     protected List<Creature> friendlyCreaturesWithinRange = new List<Creature>();
-    List<Structure> structresWithinRange = new List<Structure>();
+    protected List<Structure> structresWithinRange = new List<Structure>();
 
     Creature currentTargetedCreature;
     Structure currentTargetedStructure;
@@ -216,9 +232,12 @@ public class Creature : MonoBehaviour
                 }
                 if (baseTile.CreatureOnTile().playerOwningCreature == this.playerOwningCreature)
                 {
-                    if (!friendlyCreaturesWithinRange.Contains(baseTile.CreatureOnTile()))
+                    if (baseTile.CreatureOnTile() != this)
                     {
-                        friendlyCreaturesWithinRange.Add(baseTile.CreatureOnTile());
+                        if (!friendlyCreaturesWithinRange.Contains(baseTile.CreatureOnTile()))
+                        {
+                            friendlyCreaturesWithinRange.Add(baseTile.CreatureOnTile());
+                        }
                     }
                 }
             }
@@ -341,6 +360,7 @@ public class Creature : MonoBehaviour
             {
                 VisualAttackAnimation(currentTargetedCreature);
                 canAttack = false;
+                OnAttack();
             }
         }
         if (currentTargetedStructure != null)
@@ -349,6 +369,7 @@ public class Creature : MonoBehaviour
             {
                 VisualAttackAnimationOnStructure(currentTargetedStructure);
                 canAttack = false;
+                OnAttack();
             }
         }
     }
@@ -390,18 +411,26 @@ public class Creature : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float attack)
+    public virtual void TakeDamage(float attack)
     {
-        this.CurrentHealth -= attack;
         GameManager.singleton.SpawnDamageText(new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), attack);
+        if (indestructible) return;
+        this.CurrentHealth -= attack;
         UpdateCreatureHUD();
         if (this.CurrentHealth <= 0)
         {
             Die();
         }
     }
-    void Die()
+
+    public void Kill()
     {
+        if (indestructible) return;
+        Die();
+    }
+    public void Die()
+    {
+        OnDeath();
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);
         rangeLrGO.SetActive(false);
@@ -433,7 +462,19 @@ public class Creature : MonoBehaviour
         {
             this.healthText.color = Color.white;
         }
-        this.attackText.text = Attack.ToString();
+        if (CurrentAttack > Attack)
+        {
+            this.attackText.color = Color.green;
+        }
+        if (CurrentAttack == Attack)
+        {
+            this.attackText.color = Color.white;
+        }
+        if (CurrentAttack < Attack)
+        {
+            this.attackText.color = Color.red;
+        }
+        this.attackText.text = CurrentAttack.ToString();
     }
 
     internal void OnTurn()
@@ -1066,6 +1107,9 @@ public class Creature : MonoBehaviour
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
 
+    public virtual void OnOwnerCastSpell()
+    {
+    }
     public virtual void Taunt(Creature creatureTaunting)
     {
     }
@@ -1138,9 +1182,10 @@ public class Creature : MonoBehaviour
         if (structureToFollowSent.playerOwningStructure != this.playerOwningCreature)
         {
             structureToFollow = structureToFollowSent;
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollow.tileCurrentlyOn.tilePosition));
         }
-        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollow.tileCurrentlyOn.tilePosition));
     }
+
 
 
     #endregion
