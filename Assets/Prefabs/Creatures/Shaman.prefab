@@ -545,6 +545,7 @@ MonoBehaviour:
   range: 1
   UsageRate: 1
   Attack: 2
+  CurrentAttack: 0
   CurrentHealth: 0
   MaxHealth: 2
   attackText: {fileID: 3298186682565764544}
@@ -560,9 +561,10 @@ MonoBehaviour:
   tileCurrentlyOn: {fileID: 0}
   previousTilePosition: {fileID: 0}
   actualPosition: {x: 0, y: 0, z: 0}
-  visualAttackParticle: {fileID: 0}
+  visualAttackParticle: {fileID: 6003523913816622651, guid: 3f80c0f2c84ba644d8cc959b3f4f0f50, type: 3}
   pathVectorList: []
   targetToFollow: {fileID: 0}
+  structureToFollow: {fileID: 0}
 --- !u!1 &6330952787006823200
 GameObject:
   m_ObjectHideFlags: 0
