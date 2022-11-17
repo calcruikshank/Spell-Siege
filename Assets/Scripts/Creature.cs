@@ -443,13 +443,16 @@ public class Creature : MonoBehaviour
     }
     public void Die()
     {
+        GameManager.singleton.allCreaturesOnField.Remove(creatureID);
         OnDeath();
+        GameManager.singleton.CreatureDied(this);
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);
         rangeLrGO.SetActive(false);
         Destroy(this.gameObject);
     }
 
+    
     void HandleAttackRate()
     {
         if (canAttack)
@@ -1120,7 +1123,10 @@ public class Creature : MonoBehaviour
     public virtual void OnDeath() { }
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
+    public virtual void OtherCreatureDied(Creature creatureThatDied)
+    {
 
+    }
     public virtual void OnOwnerCastSpell()
     {
     }

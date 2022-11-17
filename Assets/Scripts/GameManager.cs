@@ -176,4 +176,12 @@ public class GameManager : NetworkBehaviour
     internal void SpawnLevelUpPrefab(Vector3 positionSent)
     {
     }
+
+    internal void CreatureDied(Creature creatureSent)
+    {
+        foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
+        {
+            kvp.Value.OtherCreatureDied(creatureSent);
+        }
+    }
 }

@@ -12,7 +12,10 @@ public class DragonWhisperer : Creature
             {
                 if (cardindeck.GameObjectToInstantiate.GetComponent<Creature>().creatureType == CreatureType.Dragon)
                 {
-                    cardindeck.redManaCost--;
+                    if (cardindeck.redManaCost > 0)
+                    {
+                        cardindeck.redManaCost--;
+                    }
                     cardindeck.UpdateMana();
                 }
             }
