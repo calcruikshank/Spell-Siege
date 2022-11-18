@@ -59,7 +59,8 @@ public class Controller : NetworkBehaviour
     public int turnTimer;
     int turnThreshold = 80; //todo make this 800
     int maxHandSize = 7;
-    [SerializeField] List<CardInHand> deckSelected = new List<CardInHand>();
+    [SerializeField] List<CardInHand> dragonDeck = new List<CardInHand>();
+    [SerializeField] List<CardInHand> demonDeck = new List<CardInHand>();
     public List<CardInHand> cardsInDeck = new List<CardInHand>();
     public List<CardInHand> cardsInHand = new List<CardInHand>();
 
@@ -119,7 +120,23 @@ public class Controller : NetworkBehaviour
         instantiatedPlayerUI.gameObject.SetActive(false);
         cardsInDeck = new List<CardInHand>();
 
-        cardsInDeck = deckSelected;
+        if (NetworkManager.Singleton.IsHost && IsOwner)
+        {
+            cardsInDeck = dragonDeck;
+        }
+        if (!IsHost && IsOwner)
+        {
+            cardsInDeck = demonDeck;
+        }
+
+        if (!IsOwner && IsHost)
+        {
+            cardsInDeck = demonDeck;
+        }
+        if (!IsOwner && !IsHost)
+        {
+            cardsInDeck = dragonDeck;
+        }
         cardsInDeck = GameManager.singleton.Shuffle(cardsInDeck);
         turn += OnTurn;
         resources = new PlayerResources();

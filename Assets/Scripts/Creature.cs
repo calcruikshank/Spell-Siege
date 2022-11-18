@@ -406,7 +406,10 @@ public class Creature : MonoBehaviour
             {
                 Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity);
                 instantiatedParticle.transform.LookAt(creatureToAttack.transform);
-                instantiatedParticle.GetComponent<MeleeVisualAttack>().SetDeathtouch(creatureToAttack, Attack);
+                if (deathtouch)
+                {
+                    instantiatedParticle.GetComponent<MeleeVisualAttack>().SetDeathtouch(creatureToAttack, Attack);
+                }
                 instantiatedParticle.GetComponent<MeleeVisualAttack>().SetTarget(creatureToAttack, Attack);
             }
             OnAttack();
