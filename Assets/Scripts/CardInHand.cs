@@ -19,6 +19,8 @@ public class CardInHand : MonoBehaviour
 
     public int remainingMana;
 
+    public Keywords keywords;
+
     [SerializeField] TextMeshProUGUI greenManaText;
     [SerializeField] TextMeshProUGUI redManaText;
     [SerializeField] TextMeshProUGUI whiteManaText;
@@ -55,6 +57,8 @@ public class CardInHand : MonoBehaviour
         this.whiteManaCost = card.whiteManaCost;
         this.blackManaCost = card.blackManaCost;
         this.genericManaCost = card.genericManaCost;
+        keywords = this.GetComponentInChildren<Keywords>();
+        keywords.InjectDependencies(card);
     }
     public void UpdateMana()
     {

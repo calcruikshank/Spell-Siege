@@ -13,4 +13,14 @@ public class Card : ScriptableObject
     public int blackManaCost;
     public int redManaCost;
     public int genericManaCost;
+
+    //keywords
+    public bool lifelink;
+    public bool deathtouch;
+    public bool flying;
+    public bool amphibious;
+    public bool taunt;
+
+    public int MaxAttack;
+    public int MaxHealth;
 }

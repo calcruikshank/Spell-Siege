@@ -27,6 +27,10 @@ public class MeleeVisualAttack : MonoBehaviour
             if (shutDown == false)
             {
                 targetedCreature.TakeDamage(amountofdamage);
+                if (deathtouch)
+                {
+                    targetedCreature.Kill();
+                }
                 this.GetComponentInChildren<ParticleSystem>().Stop();
                 shutDown = true;
             }
@@ -51,5 +55,11 @@ public class MeleeVisualAttack : MonoBehaviour
     {
         targetedStructure = structureToAttack;
         amountofdamage = attack;
+    }
+
+    bool deathtouch = false;
+    internal void SetDeathtouch(Creature creatureToAttack, float attack)
+    {
+        deathtouch = true;
     }
 }

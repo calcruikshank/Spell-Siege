@@ -511,6 +511,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3166533201164938181}
   - component: {fileID: 2984098306060237556}
+  - component: {fileID: 2414473259722707710}
   m_Layer: 5
   m_Name: Keywords
   m_TagString: Untagged
@@ -571,6 +572,23 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
+--- !u!114 &2414473259722707710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4706540284086102503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10471f0fbd909fb4cab02b43cce705f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lifelinkIndicator: {fileID: 8744822733279611268}
+  deathtouchIndicator: {fileID: 1462044256281918723}
+  flyingIndicator: {fileID: 6719780390482932113}
+  amphibiousIndicator: {fileID: 3200726202127352562}
+  tauntIndicator: {fileID: 4448914665255470463}
 --- !u!1 &5766449157560364025
 GameObject:
   m_ObjectHideFlags: 0

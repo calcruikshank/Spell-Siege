@@ -30,6 +30,10 @@ public class VisualAttackParticle : MonoBehaviour
             if (Vector3.Distance(this.transform.position, targetedCreature.actualPosition) < .02f && shutDown == false)
             {
                 targetedCreature.TakeDamage(amountofdamage);
+                if (deathtouch)
+                {
+                    targetedCreature.Kill();
+                }
 
                 if (this.GetComponentInChildren<ParticleSystem>() != null)
                 {
@@ -48,7 +52,6 @@ public class VisualAttackParticle : MonoBehaviour
                 {
                     this.GetComponent<ParticleSystem>().Stop();
                 }
-
                 shutDown = true;
             }
         }
@@ -67,5 +70,11 @@ public class VisualAttackParticle : MonoBehaviour
     {
         targetedStructure = structureToAttack;
         amountofdamage = attack;
+    }
+
+    bool deathtouch = false;
+    internal void SetDeathtouch(Creature creatureToAttack, float attack)
+    {
+        deathtouch = true;
     }
 }

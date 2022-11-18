@@ -59,7 +59,8 @@ public class Creature : MonoBehaviour
         Reptile, 
         Human,
         Angel,
-        Wizard
+        Wizard,
+        Demon
 
         //not sure if i need a tapped state yet trying to keep it as simple as possible
     }
@@ -396,11 +397,16 @@ public class Creature : MonoBehaviour
             {
                 Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
                 instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, Attack);
+                if (deathtouch)
+                {
+                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, Attack);
+                }
             }
             else
             {
                 Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity);
                 instantiatedParticle.transform.LookAt(creatureToAttack.transform);
+                instantiatedParticle.GetComponent<MeleeVisualAttack>().SetDeathtouch(creatureToAttack, Attack);
                 instantiatedParticle.GetComponent<MeleeVisualAttack>().SetTarget(creatureToAttack, Attack);
             }
             OnAttack();
@@ -998,6 +1004,9 @@ public class Creature : MonoBehaviour
         SetNewPositionsForRangeLr(rangePositions);
     }
 
+    public bool lifelink = false;
+    public bool deathtouch = false;
+    public bool taunt = false;
 
     GameObject rangeLrGO;
     LineRenderer rangeLr;
@@ -1068,6 +1077,7 @@ public class Creature : MonoBehaviour
     Transform originalCardTransform;
     internal void SetOriginalCard(CardInHand cardSelected)
     {
+        Debug.Log("Setting original card to " + cardSelected);
         originalCard = cardSelected;
         originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.canvasMain.transform);
         originalCardTransform.transform.position = this.transform.position;

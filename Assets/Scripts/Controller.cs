@@ -919,7 +919,8 @@ public class Controller : NetworkBehaviour
 
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().ownedCreatureID, instantiatedCreature.GetComponent<Creature>());
-        SetStateToNothingSelected();
+        cardSelectedSent.transform.parent = null;
+        SetStateToNothingSelected(); 
     }
 
     private void HandleSpellInHandSelected(Vector3Int cellSent)
@@ -1124,7 +1125,7 @@ public class Controller : NetworkBehaviour
         cardsInHand.Remove(cardToRemove);
         if (cardToRemove != null)
         {
-            cardToRemove.transform.parent = null;
+            //cardToRemove.transform.parent = null;
         }
     }
 
