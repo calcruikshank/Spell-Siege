@@ -968,6 +968,7 @@ public class Controller : NetworkBehaviour
                 instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
                 OnSpellCast();
                 SetStateToNothingSelected();
+                return;
             }
             if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0)
             {
@@ -979,6 +980,7 @@ public class Controller : NetworkBehaviour
                 instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
                 OnSpellCast();
                 SetStateToNothingSelected();
+                return;
             }
         }
     }
@@ -1142,7 +1144,10 @@ public class Controller : NetworkBehaviour
         cardsInHand.Remove(cardToRemove);
         if (cardToRemove != null)
         {
-            //cardToRemove.transform.parent = null;
+            if (cardToRemove.cardType != CardInHand.CardType.Creature)
+            {
+                 cardToRemove.transform.parent = null;
+            }
         }
     }
 
