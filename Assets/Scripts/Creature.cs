@@ -452,6 +452,10 @@ public class Creature : MonoBehaviour
     public void Die()
     {
         OnDeath();
+        if (this.playerOwningCreature.creatureSelected == this)
+        {
+            playerOwningCreature.SetStateToNothingSelected();
+        }
         GameManager.singleton.CreatureDied(this);
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);
@@ -839,7 +843,7 @@ public class Creature : MonoBehaviour
         OnETB();
     }
 
-    void SetStateToIdle()
+    public void SetStateToIdle()
     {
         Debug.Log(GameManager.singleton.gameManagerTick + " tick");
         tileCurrentlyOn.RemoveCreatureFromTile(this);
