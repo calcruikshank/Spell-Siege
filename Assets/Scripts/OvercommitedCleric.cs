@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class OvercommitedCleric : Creature
 {
+    public Creature creatureToHEal = new Creature();
     protected override void HandleFriendlyCreaturesList()
     {
         float lowestHealthCreatureValue = -1;
-        Creature creatureToTarget = new Creature();
+        creatureToHEal = new Creature();
         base.HandleFriendlyCreaturesList();
         for (int i = 0; i < friendlyCreaturesWithinRange.Count; i++)
         {
             if (lowestHealthCreatureValue == -1 && friendlyCreaturesWithinRange[i].CurrentHealth < friendlyCreaturesWithinRange[i].MaxHealth)
             {
-                lowestHealthCreatureValue = friendlyCreaturesWithinRange[i].CurrentHealth;
+                lowestHealthCreatureValue = friendlyCreaturesWithinRange[i].CurrentHealth; creatureToHEal = friendlyCreaturesWithinRange[i];
             }
             if (friendlyCreaturesWithinRange[i])
             {
@@ -22,14 +23,14 @@ public class OvercommitedCleric : Creature
                     if (lowestHealthCreatureValue > friendlyCreaturesWithinRange[i].CurrentHealth)
                     {
                         lowestHealthCreatureValue = friendlyCreaturesWithinRange[i].CurrentHealth;
-                        creatureToTarget = friendlyCreaturesWithinRange[i];
+                        creatureToHEal = friendlyCreaturesWithinRange[i];
                     }
                 }
             }
         }
-        if (creatureToTarget != null)
+        if (creatureToHEal != null)
         {
-            creatureToTarget.Heal(this.CurrentAttack);
+            creatureToHEal.Heal(this.CurrentAttack);
         }
     }
 }
