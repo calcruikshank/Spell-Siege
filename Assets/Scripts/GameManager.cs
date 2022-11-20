@@ -40,7 +40,6 @@ public class GameManager : NetworkBehaviour
 
     public int tickTimer;
     public int tickTimerThreshold = 10;
-    public int creatureGuidCounter;
     public int allCreatureGuidCounter;
 
     public int endingX;
@@ -184,4 +183,5 @@ public class GameManager : NetworkBehaviour
             kvp.Value.OtherCreatureDied(creatureSent);
         }
     }
+
 }

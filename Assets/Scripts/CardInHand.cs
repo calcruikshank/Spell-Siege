@@ -175,7 +175,7 @@ public class CardInHand : MonoBehaviour
             SetToNotPurchasable();
             return;
         }
-        tempGenericMana = tempBlackMana + tempBlueMana + tempGreenMana + tempRedMana + tempRedMana;
+        tempGenericMana = tempBlackMana + tempBlueMana + tempGreenMana + tempWhiteMana + tempRedMana;
         if (tempGenericMana < genericManaCost)
         {
             SetToNotPurchasable();

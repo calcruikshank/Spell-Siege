@@ -452,7 +452,6 @@ public class Creature : MonoBehaviour
     }
     public void Die()
     {
-        GameManager.singleton.allCreaturesOnField.Remove(creatureID);
         OnDeath();
         GameManager.singleton.CreatureDied(this);
         lrGameObject.SetActive(false);
@@ -613,10 +612,9 @@ public class Creature : MonoBehaviour
                         {
                             if (currentPathIndex != 0)
                             {
+                                SetStateToIdle();
                                 if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
                                 {
-                                    SetStateToIdle();
-                                    return;
                                 }
                             }
                         }
@@ -634,10 +632,9 @@ public class Creature : MonoBehaviour
                         {
                             if (currentPathIndex != 0)
                             {
+                                SetStateToIdle();
                                 if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
                                 {
-                                    SetStateToIdle();
-                                    return;
                                 }
                             }
                         }
@@ -662,7 +659,6 @@ public class Creature : MonoBehaviour
                 if (currentPathIndex >= pathVectorList.Count - 1)
                 {
                      SetStateToIdle();
-
                 }
                 else
                 {
@@ -841,13 +837,12 @@ public class Creature : MonoBehaviour
         this.playerOwningCreature = controller;
         this.transform.GetComponent<MeshRenderer>().material.color = controller.col;
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
-        ownedCreatureID = GameManager.singleton.creatureGuidCounter;
-        GameManager.singleton.creatureGuidCounter++;
         OnETB();
     }
 
     void SetStateToIdle()
     {
+        Debug.Log(GameManager.singleton.gameManagerTick + " tick");
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         lr.enabled = false;
         actualPosition = targetedPosition;

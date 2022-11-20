@@ -159,6 +159,7 @@ public class Controller : NetworkBehaviour
         SetStateToNothingSelected();
     }
 
+
     void GrabAllObjectsFromGameManager()
     {
         GameManager.singleton.tick += OnTick;
