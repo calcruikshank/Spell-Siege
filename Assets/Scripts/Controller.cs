@@ -936,7 +936,7 @@ public class Controller : NetworkBehaviour
         instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
 
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
-        creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().ownedCreatureID, instantiatedCreature.GetComponent<Creature>());
+        creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
         cardSelectedSent.transform.parent = null;
         SetStateToNothingSelected(); 
     }

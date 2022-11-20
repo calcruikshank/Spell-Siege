@@ -39,7 +39,6 @@ public class Creature : MonoBehaviour
 
     [HideInInspector] public List<BaseTile> allTilesWithinRange;
     [HideInInspector] public int creatureID;
-    [HideInInspector] public int ownedCreatureID;
     public CreatureState creatureState;
     [HideInInspector]
     public enum CreatureState
@@ -101,6 +100,9 @@ public class Creature : MonoBehaviour
     private void Awake()
     {
         creatureState = CreatureState.Summoned;
+        creatureID = GameManager.singleton.allCreatureGuidCounter;
+        GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
+        GameManager.singleton.allCreatureGuidCounter++;
     }
 
     protected virtual void Start()
@@ -121,9 +123,6 @@ public class Creature : MonoBehaviour
         SetTravType();
         pathfinder1 = new Pathfinding();
         pathfinder2 = new Pathfinding();
-        creatureID = GameManager.singleton.allCreatureGuidCounter;
-        GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
-        GameManager.singleton.allCreatureGuidCounter++;
         CurrentHealth = MaxHealth;
         CurrentAttack = Attack;
         UpdateCreatureHUD();
@@ -1179,7 +1178,7 @@ public class Creature : MonoBehaviour
         {
             pathVectorList = null;
         }
-        this.playerOwningCreature.creaturesOwned.Remove(this.ownedCreatureID);
+        this.playerOwningCreature.creaturesOwned.Remove(this.creatureID);
         OnMouseExit();
         creatureState = CreatureState.Dead;
     }
