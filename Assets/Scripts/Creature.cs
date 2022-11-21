@@ -180,7 +180,8 @@ public class Creature : MonoBehaviour
                 Move();
                 ChooseTarget();
                 HandleAttackRate();
-                HandleAbilityRate(); 
+                CheckForCreaturesWithinRange();
+                HandleAbilityRate();
                 DrawLine();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
@@ -188,6 +189,7 @@ public class Creature : MonoBehaviour
             case CreatureState.Idle:
                 ChooseTarget();
                 DrawLine();
+                CheckForCreaturesWithinRange();
                 HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
@@ -197,6 +199,7 @@ public class Creature : MonoBehaviour
             case CreatureState.Summoned:
                 ChooseTarget();
                 DrawLine();
+                CheckForCreaturesWithinRange();
                 HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
@@ -526,23 +529,7 @@ public class Creature : MonoBehaviour
         GameManager.singleton.SpawnLevelUpPrefab(this.transform.position);
         UpdateCreatureHUD();
     }
-    private void OnTick()
-    {
-        switch (creatureState)
-        {
-            case CreatureState.Moving:
-                CheckForCreaturesWithinRange();
-                break;
-            case CreatureState.Idle:
-                CheckForCreaturesWithinRange();
-                break;
-            case CreatureState.Summoned:
-                CheckForCreaturesWithinRange();
-                break;
-            case CreatureState.Dead:
-                break;
-        }
-    }
+    
 
     [HideInInspector] public List<BaseTile> pathVectorList = new List<BaseTile>();
     int currentPathIndex;
