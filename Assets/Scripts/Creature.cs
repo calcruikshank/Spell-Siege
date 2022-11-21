@@ -178,16 +178,16 @@ public class Creature : MonoBehaviour
         {
             case CreatureState.Moving:
                 Move();
-                CheckForCreaturesWithinRange();
                 ChooseTarget();
                 HandleAttackRate();
-                HandleAbilityRate(); DrawLine();
+                HandleAbilityRate(); 
+                DrawLine();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
                 break;
             case CreatureState.Idle:
-                CheckForCreaturesWithinRange();
-                ChooseTarget(); DrawLine();
+                ChooseTarget();
+                DrawLine();
                 HandleAttackRate();
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
@@ -195,7 +195,6 @@ public class Creature : MonoBehaviour
                 CheckForFollowTarget();
                 break;
             case CreatureState.Summoned:
-                CheckForCreaturesWithinRange();
                 ChooseTarget();
                 DrawLine();
                 HandleAttackRate();
@@ -510,7 +509,7 @@ public class Creature : MonoBehaviour
         HandleFriendlyCreaturesList();
         //GiveCounter(1);
     }
-    void GiveCounter(int numOfCounters)
+    public void GiveCounter(int numOfCounters)
     {
         if (this.transform == null)
         {
@@ -520,13 +519,29 @@ public class Creature : MonoBehaviour
         {
             MaxHealth++;
             CurrentHealth++;
+            CurrentAttack++;
             Attack++;
         }
+
         GameManager.singleton.SpawnLevelUpPrefab(this.transform.position);
         UpdateCreatureHUD();
     }
     private void OnTick()
     {
+        switch (creatureState)
+        {
+            case CreatureState.Moving:
+                CheckForCreaturesWithinRange();
+                break;
+            case CreatureState.Idle:
+                CheckForCreaturesWithinRange();
+                break;
+            case CreatureState.Summoned:
+                CheckForCreaturesWithinRange();
+                break;
+            case CreatureState.Dead:
+                break;
+        }
     }
 
     [HideInInspector] public List<BaseTile> pathVectorList = new List<BaseTile>();
@@ -615,9 +630,9 @@ public class Creature : MonoBehaviour
                         {
                             if (currentPathIndex != 0)
                             {
-                                SetStateToIdle();
                                 if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
                                 {
+                                    SetStateToIdle();
                                 }
                             }
                         }
@@ -635,9 +650,9 @@ public class Creature : MonoBehaviour
                         {
                             if (currentPathIndex != 0)
                             {
-                                SetStateToIdle();
                                 if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
                                 {
+                                    SetStateToIdle();
                                 }
                             }
                         }
@@ -697,14 +712,15 @@ public class Creature : MonoBehaviour
 
     void DrawLine()
     {
-        if (targetToFollow != null)
+        Transform targetToDrawLineTo;
+        if (currentTargetedCreature != null)
         {
-            DrawLineToTargetedCreature(targetToFollow.actualPosition);
+            targetToDrawLineTo = currentTargetedCreature.transform;
+            DrawLineToTargetedCreature(targetToDrawLineTo.transform.position);
         }
-        if (structureToFollow != null)
+        if (currentTargetedStructure != null)
         {
-
-            DrawLineToTargetedCreature(BaseMapTileState.singleton.GetWorldPositionOfCell( structureToFollow.tileCurrentlyOn.tilePosition ));
+            DrawLineToTargetedCreature(BaseMapTileState.singleton.GetWorldPositionOfCell(currentTargetedStructure.tileCurrentlyOn.tilePosition));
         }
     }
     BaseTile lastTileFollowCreatureWasOn;
@@ -780,11 +796,12 @@ public class Creature : MonoBehaviour
         }
         if (tempLineRendererBetweenCreaturesGameObject != null)
         {
+            Debug.Log("drawing line");
             tempLineRendererBetweenCreaturesGameObject.SetActive(true);
             tempLineRendererBetweenCreatures.enabled = true;
             List<Vector3> tempPositions = new List<Vector3>();
-            tempPositions.Add(new Vector3(this.actualPosition.x, this.actualPosition.y + .1f, this.actualPosition.z));
-            tempPositions.Add(new Vector3(positionSent.x, positionSent.y + .1f, positionSent.z));
+            tempPositions.Add(new Vector3(this.actualPosition.x, this.actualPosition.y + .2f, this.actualPosition.z));
+            tempPositions.Add(new Vector3(positionSent.x, positionSent.y + .2f, positionSent.z));
             tempLineRendererBetweenCreatures.SetPositions(tempPositions.ToArray());
         }
     }
@@ -1136,7 +1153,10 @@ public class Creature : MonoBehaviour
     public virtual void OnHealed() { }
     public virtual void OtherCreatureDied(Creature creatureThatDied)
     {
-
+        if (creatureThatDied == targetToFollow)
+        {
+            targetToFollow = null;
+        }
     }
     public virtual void OnOwnerCastSpell()
     {
@@ -1200,6 +1220,10 @@ public class Creature : MonoBehaviour
             {
                 targetToFollow = creatureToFollow;
             }
+            if (IsCreatureWithinRange(targetToFollow))
+            {
+                return;
+            }
             SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition));
         }
     }
@@ -1213,6 +1237,10 @@ public class Creature : MonoBehaviour
         if (structureToFollowSent.playerOwningStructure != this.playerOwningCreature)
         {
             structureToFollow = structureToFollowSent;
+            if (IsStructureInRange(structureToFollow))
+            {
+                return;
+            }
             SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollow.tileCurrentlyOn.tilePosition));
         }
     }
