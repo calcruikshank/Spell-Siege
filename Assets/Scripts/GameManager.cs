@@ -188,6 +188,13 @@ public class GameManager : NetworkBehaviour
             kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureID]);
         }
     }
+    internal void CreatureEntered(int creatureID)
+    {
+        foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
+        {
+            kvp.Value.OtherCreatureEntered(allCreaturesOnField[creatureID]);
+        }
+    }
 
     [ServerRpc]
     private void KillCreatureServerRpc(int creatureSent)

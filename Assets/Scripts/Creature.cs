@@ -214,6 +214,7 @@ public class Creature : MonoBehaviour
                 break;
         }
     }
+
     internal void IncreaseAttackByX(float v)
     {
         CurrentAttack += v;
@@ -1142,7 +1143,10 @@ public class Creature : MonoBehaviour
 
     #region Overridables
     public virtual void Garrison() { }
-    public virtual void OnETB() { }
+    public virtual void OnETB() 
+    {
+        GameManager.singleton.CreatureEntered(creatureID);
+    }
     public virtual void OnDeath() { }
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
@@ -1152,6 +1156,9 @@ public class Creature : MonoBehaviour
         {
             targetToFollow = null;
         }
+    }
+    public virtual void OtherCreatureEntered(Creature creature)
+    {
     }
     public virtual void OnOwnerCastSpell()
     {
