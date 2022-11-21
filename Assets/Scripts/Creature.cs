@@ -128,6 +128,10 @@ public class Creature : MonoBehaviour
         UpdateCreatureHUD();
     }
 
+    private void OnTick()
+    {
+    }
+
     protected virtual void SetTravType()
     {
     }
@@ -458,7 +462,7 @@ public class Creature : MonoBehaviour
         {
             playerOwningCreature.SetStateToNothingSelected();
         }
-        GameManager.singleton.CreatureDied(this);
+        GameManager.singleton.CreatureDied(this.creatureID);
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);
         rangeLrGO.SetActive(false);
@@ -514,10 +518,6 @@ public class Creature : MonoBehaviour
     }
     public void GiveCounter(int numOfCounters)
     {
-        if (this.transform == null)
-        {
-            return;
-        }
         for (int i = 0; i < numOfCounters; i++)
         {
             MaxHealth++;
@@ -700,6 +700,14 @@ public class Creature : MonoBehaviour
     void DrawLine()
     {
         Transform targetToDrawLineTo;
+        if (!currentTargetedCreature && !currentTargetedStructure)
+        {
+            if (tempLineRendererBetweenCreaturesGameObject != null)
+            {
+                tempLineRendererBetweenCreaturesGameObject.SetActive(false);
+                tempLineRendererBetweenCreatures.enabled = false;
+            }
+        }
         if (currentTargetedCreature != null)
         {
             targetToDrawLineTo = currentTargetedCreature.transform;
@@ -708,6 +716,7 @@ public class Creature : MonoBehaviour
         if (currentTargetedStructure != null)
         {
             DrawLineToTargetedCreature(BaseMapTileState.singleton.GetWorldPositionOfCell(currentTargetedStructure.tileCurrentlyOn.tilePosition));
+
         }
     }
     BaseTile lastTileFollowCreatureWasOn;
@@ -783,7 +792,6 @@ public class Creature : MonoBehaviour
         }
         if (tempLineRendererBetweenCreaturesGameObject != null)
         {
-            Debug.Log("drawing line");
             tempLineRendererBetweenCreaturesGameObject.SetActive(true);
             tempLineRendererBetweenCreatures.enabled = true;
             List<Vector3> tempPositions = new List<Vector3>();
@@ -1206,10 +1214,13 @@ public class Creature : MonoBehaviour
             if (creatureToFollow.playerOwningCreature != this.playerOwningCreature)
             {
                 targetToFollow = creatureToFollow;
-            }
-            if (IsCreatureWithinRange(targetToFollow))
-            {
-                return;
+                if (targetToFollow != null)
+                {
+                    if (IsCreatureWithinRange(targetToFollow))
+                    {
+                        return;
+                    }
+                }
             }
             SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition));
         }

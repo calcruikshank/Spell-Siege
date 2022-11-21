@@ -7,6 +7,9 @@ public class DemonicVulture : Creature
     public override void OtherCreatureDied(Creature creatureThatDied)
     {
         base.OtherCreatureDied(creatureThatDied);
-        GiveCounter(1);
+        if (this != null)
+        {
+            GiveCounter(1);
+        }
     }
 }

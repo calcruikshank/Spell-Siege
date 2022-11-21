@@ -238,6 +238,8 @@ public class Controller : NetworkBehaviour
             return;
         }
 
+
+        HandleVisualBugs();
         currentLocalHoverCellPosition = grid.WorldToCell(mousePosition);
         mousePosition = mousePositionScript.GetMousePositionWorldPoint();
         if (currentLocalHoverCellPosition != previousCellPosition)
@@ -352,6 +354,22 @@ public class Controller : NetworkBehaviour
             return;
         }
 
+    }
+
+    private void HandleVisualBugs()
+    {
+        if (state == State.CreatureSelected && locallySelectedCreature == null)
+        {
+            locallySelectedCreature = creatureSelected;
+        }
+        if (state == State.CreatureSelected && locallySelectedCreature != null)
+        {
+            VisualPathfinderOnCreatureSelected(locallySelectedCreature);
+        }
+        if (state == State.NothingSelected && locallySelectedCreature != null)
+        {
+            SetVisualsToNothingSelectedLocally();
+        }
     }
 
     public void SetVisualsToNothingSelectedLocally()

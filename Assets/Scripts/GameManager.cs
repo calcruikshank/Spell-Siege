@@ -39,7 +39,7 @@ public class GameManager : NetworkBehaviour
 
 
     public int tickTimer;
-    public int tickTimerThreshold = 10;
+    int tickTimerThreshold = 1;
     public int allCreatureGuidCounter;
 
     public int endingX;
@@ -176,12 +176,41 @@ public class GameManager : NetworkBehaviour
     {
     }
 
-    internal void CreatureDied(Creature creatureSent)
+    internal void CreatureDied(int creatureID)
     {
+        if (IsLocalPlayer)
+        {
+            allCreaturesOnField.Remove(creatureID);
+            KillCreatureServerRpc(creatureID);
+        }
         foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
         {
-            kvp.Value.OtherCreatureDied(creatureSent);
+            kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureID]);
         }
     }
 
+    [ServerRpc]
+    private void KillCreatureServerRpc(int creatureSent)
+    {
+        KillCreatureClientRpc(creatureSent);
+    }
+    [ClientRpc]
+    private void KillCreatureClientRpc(int creatureSent)
+    {
+        LocalCheckToSeeIfCreatureIsDead(creatureSent);
+    }
+
+    private void LocalCheckToSeeIfCreatureIsDead(int creatureSent)
+    {
+        if (!IsLocalPlayer)
+        {
+            if (allCreaturesOnField.ContainsKey(creatureSent))
+            {
+                if (allCreaturesOnField[creatureSent] != null)
+                {
+                    allCreaturesOnField[creatureSent].Kill();
+                }
+            }
+        }
+    }
 }

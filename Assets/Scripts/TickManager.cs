@@ -23,11 +23,11 @@ public class TickManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.singleton.tickTimer > GameManager.singleton.tickTimerThreshold && hasPaused == false)
-        {
-            hasPaused = true;
+        //if (GameManager.singleton.tickTimer > GameManager.singleton.tickTimerThreshold && hasPaused == false)
+        //{
+         //   hasPaused = true;
 
-            tickTookTooLong?.Invoke();
-        }
+         //   tickTookTooLong?.Invoke();
+        //}
     }
 }
