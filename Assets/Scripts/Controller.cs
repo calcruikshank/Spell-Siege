@@ -203,28 +203,28 @@ public class Controller : NetworkBehaviour
             case State.PlacingCastle:
                 break;
             case State.NothingSelected:
-                HandleDrawCards();
                 HandleMana();
+                HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
             case State.CreatureInHandSelected:
-                HandleDrawCards();
                 HandleMana();
+                HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
             case State.SpellInHandSelected:
-                HandleDrawCards();
                 HandleMana();
+                HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
             case State.StructureInHandSeleced:
-                HandleDrawCards();
                 HandleMana();
+                HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
             case State.CreatureSelected:
-                HandleDrawCards();
                 HandleMana();
+                HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
         }
@@ -1114,6 +1114,7 @@ public class Controller : NetworkBehaviour
 
     public void DrawCard()
     {
+        
         if (cardsInDeck.Count <= 0)
         {
             return;

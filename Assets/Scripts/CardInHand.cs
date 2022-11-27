@@ -48,11 +48,11 @@ public class CardInHand : MonoBehaviour
 
     private void Awake()
     {
+        SetCard();
+        UpdateMana();
     }
     void Start()
     {
-        SetCard();
-        UpdateMana();
     }
 
     void SetCard()
