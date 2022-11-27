@@ -554,8 +554,8 @@ MonoBehaviour:
   numOfTargetables: 1
   allTilesWithinRange: []
   creatureID: 0
-  ownedCreatureID: 0
   creatureState: 0
+  creatureType: 0
   playerOwningCreature: {fileID: 0}
   thisTraversableType: 2
   currentCellPosition: {x: 0, y: 0, z: 0}
@@ -564,6 +564,9 @@ MonoBehaviour:
   actualPosition: {x: 0, y: 0, z: 0}
   visualAttackParticle: {fileID: 6003523913816622651, guid: 3f80c0f2c84ba644d8cc959b3f4f0f50, type: 3}
   pathVectorList: []
+  lifelink: 0
+  deathtouch: 0
+  taunt: 0
   targetToFollow: {fileID: 0}
   structureToFollow: {fileID: 0}
 --- !u!114 &239429507096817703
@@ -630,7 +633,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
