@@ -212,10 +212,10 @@ public class BaseTile : MonoBehaviour
     private void MakeTextObjectForTileCost(Transform parentToSet)
     {
         GameObject instantiatedText = Instantiate(new GameObject("text", typeof(TextMeshPro)), parentToSet);
-        instantiatedText.transform.localPosition = new Vector3(0, .01f, 0);
+        instantiatedText.transform.localPosition = new Vector3(0, .01f, -.2f);
         costText = instantiatedText.GetComponent<TextMeshPro>();
         costText.fontSize = 20;
-        costText.color = playerOwningTile.col;
+        costText.color = Color.white;
         costText.alignment = TextAlignmentOptions.Center;
         costText.alignment = TextAlignmentOptions.Midline;
     }
@@ -248,7 +248,8 @@ public class BaseTile : MonoBehaviour
     Transform instantiatedManaSymbol;
     public void SetBeingHarvested()
     {
-        isBeingHarvested = true;
+        costText.gameObject.SetActive(false);
+           isBeingHarvested = true;
         instantiatedManaSymbol.GetComponent<SpriteRenderer>().color = opaqueColor;
     }
     public void SetNotBeingHarvested()
