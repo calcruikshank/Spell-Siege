@@ -414,7 +414,7 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    bool ShowingPurchasableHarvestTiles = false;
+    public bool ShowingPurchasableHarvestTiles = false;
 
     bool keepClicked = false;
     private void HandleSpacebarPressed()

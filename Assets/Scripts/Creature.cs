@@ -1105,17 +1105,21 @@ public class Creature : MonoBehaviour
 
     private void OnMouseOver()
     {
-        originalCardTransform.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .5f, this.transform.position.z);
-        originalCardTransform.gameObject.SetActive(true);
         rangeLr.enabled = true;
-
         if (playerOwningCreature.locallySelectedCard != null)
         {
-            if (playerOwningCreature.locallySelectedCard.cardType != CardInHand.CardType.Spell)
-            {
-                playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
-            }
+                if (playerOwningCreature.locallySelectedCard.cardType != CardInHand.CardType.Spell)
+                {
+                    playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
+                }
         }
+        if (playerOwningCreature.ShowingPurchasableHarvestTiles && playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn) && !tileCurrentlyOn.isBeingHarvested)
+        {
+            originalCardTransform.gameObject.SetActive(false);
+            return;
+        }
+        originalCardTransform.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .5f, this.transform.position.z);
+        originalCardTransform.gameObject.SetActive(true);
     }
 
     private void OnMouseExit()
