@@ -6,6 +6,7 @@ public class DragonWhisperer : Creature
 {
     public override void OnETB()
     {
+        base.OnETB();
         foreach (CardInHand cardindeck in playerOwningCreature.cardsInHand)
         {
             if (cardindeck.GameObjectToInstantiate.GetComponent<Creature>() != null)

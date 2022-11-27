@@ -53,6 +53,8 @@ public class GameManager : NetworkBehaviour
     public Transform blackManaSymbol;
     public Transform whiteManaSymbol;
 
+    public Transform purchasableGlow;
+
 
     [SerializeField] TextMeshPro damageText;
     Transform instantiatedDamageText;

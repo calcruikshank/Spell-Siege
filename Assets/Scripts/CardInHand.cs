@@ -29,6 +29,8 @@ public class CardInHand : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI genericManaText;
 
+    Transform purchasableGlow;
+
     BaseTile.ManaType manaType;
 
     public Controller playerOwningCard;
@@ -43,6 +45,10 @@ public class CardInHand : MonoBehaviour
     }
     public CardType cardType;
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+    }
     void Start()
     {
         SetCard();
@@ -57,8 +63,10 @@ public class CardInHand : MonoBehaviour
         this.whiteManaCost = card.whiteManaCost;
         this.blackManaCost = card.blackManaCost;
         this.genericManaCost = card.genericManaCost;
+
         keywords = this.GetComponentInChildren<Keywords>();
         keywords.InjectDependencies(card);
+
     }
     public void UpdateMana()
     {
@@ -133,6 +141,12 @@ public class CardInHand : MonoBehaviour
 
     internal void CheckToSeeIfPurchasable(PlayerResources resources)
     {
+        if (purchasableGlow == null)
+        {
+            purchasableGlow = Instantiate(GameManager.singleton.purchasableGlow, this.transform);
+            purchasableGlow.SetAsFirstSibling();
+            purchasableGlow.gameObject.SetActive(false);
+        }
         int tempBlueMana;
         int tempRedMana;
         int tempGreenMana;
@@ -191,11 +205,19 @@ public class CardInHand : MonoBehaviour
 
     private void SetToPurchasable()
     {
+        if (purchasableGlow != null)
+        {
+            purchasableGlow.gameObject.SetActive(true);
+        }
         isPurchasable = true;
     }
 
     private void SetToNotPurchasable()
     {
+        if (purchasableGlow != null)
+        {
+            purchasableGlow.gameObject.SetActive(false);
+        }
         isPurchasable = false;
     }
     GameObject visualVersion;
