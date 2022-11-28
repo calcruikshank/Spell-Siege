@@ -320,7 +320,13 @@ public class Controller : NetworkBehaviour
         }
         if (Input.GetMouseButtonDown(0))
         {
-            cellPositionSentToClients = grid.WorldToCell(mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Vector3 mousePositionWorldPoint;
+            if (Physics.Raycast(ray, out RaycastHit raycastHit, Mathf.Infinity, mousePositionScript.baseTileMap))
+            {
+                mousePositionWorldPoint = raycastHit.point;
+                cellPositionSentToClients = grid.WorldToCell(mousePositionWorldPoint);
+            }
 
             if (state == State.NothingSelected)
             {

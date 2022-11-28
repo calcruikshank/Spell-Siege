@@ -6,7 +6,7 @@ public class MousePositionScript : MonoBehaviour
 {
     Camera mainCamera;
     Vector3 mousePositionWorldPoint;
-    [SerializeField] LayerMask baseTileMap;
+    [SerializeField] public LayerMask baseTileMap;
     // Start is called before the first frame update
     void Start()
     {
