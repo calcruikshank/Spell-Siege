@@ -249,7 +249,7 @@ public class BaseTile : MonoBehaviour
     public void SetBeingHarvested()
     {
         costText.gameObject.SetActive(false);
-           isBeingHarvested = true;
+        isBeingHarvested = true;
         instantiatedManaSymbol.GetComponent<SpriteRenderer>().color = opaqueColor;
     }
     public void SetNotBeingHarvested()
