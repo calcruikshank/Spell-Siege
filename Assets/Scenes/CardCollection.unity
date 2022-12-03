@@ -1641,20 +1641,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24ca2385cb9c969469c471c4b098f999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allCardsInGame:
-  - {fileID: 5255841600039758024, guid: a5e55e4c6dc8f16458776c4eba7c3e33, type: 3}
-  - {fileID: 5255841600039758024, guid: 0d4fac986963f3341ae936fd1dd6f654, type: 3}
-  - {fileID: 5255841600039758024, guid: 74925e6ecbf343841b0307779dc3021c, type: 3}
-  - {fileID: 5255841600039758024, guid: 33196ad8a87031045969443ccdcd30f2, type: 3}
-  - {fileID: 7354926551894329227, guid: 5e8c5e3fd5f21614d9c5e679632eea61, type: 3}
-  - {fileID: 5255841600039758024, guid: a537093ed9ea8cb4fa6b52c94ea281da, type: 3}
-  - {fileID: 5255841600039758024, guid: 47020441a673f9042ad04542f6d74166, type: 3}
-  - {fileID: 5255841600039758024, guid: 5b89c2ae167118447ae9dc50def990d7, type: 3}
-  - {fileID: 5255841600039758024, guid: 45ee776fa49641948979e1ea3356dcfd, type: 3}
-  - {fileID: 5255841600039758024, guid: 385e4dc85ccef4249b19c086c2e9f803, type: 3}
-  - {fileID: 5255841600039758024, guid: 1f5352562734f6542abb868c3e7ff3ab, type: 3}
-  instantiatedCardInHand: []
-  content: {fileID: 538942816}
 --- !u!1001 &216068082
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9466,6 +9452,53 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3547208078945826346, guid: b774c493591ac974aa3866d0642434c3, type: 3}
   m_PrefabInstance: {fileID: 1257878436}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1271483173
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1271483174}
+  - component: {fileID: 1271483175}
+  m_Layer: 0
+  m_Name: CardCollection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1271483174
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271483173}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1271483175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271483173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9179b59882fe0e419fb93ba5760b911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allCardsInGame: []
+  instantiatedCardInHand: []
+  content: {fileID: 0}
 --- !u!1001 &1277966976
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10191,6 +10224,7 @@ GameObject:
   - component: {fileID: 1415188987}
   - component: {fileID: 1415188986}
   - component: {fileID: 1415188985}
+  - component: {fileID: 1415188988}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -10264,6 +10298,39 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1415188988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415188984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
 --- !u!1001 &1421814902
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14701,6 +14768,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2097762285}
   - component: {fileID: 2097762284}
+  - component: {fileID: 2097762286}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -14785,6 +14853,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &2097762286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097762283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 1
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
 --- !u!1001 &2100326613
 PrefabInstance:
   m_ObjectHideFlags: 0
