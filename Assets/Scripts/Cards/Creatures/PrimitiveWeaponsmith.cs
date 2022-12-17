@@ -4,5 +4,35 @@ using UnityEngine;
 
 public class PrimitiveWeaponsmith : Creature
 {
+    List<Creature> creaturesThatHaveExtraRange = new List<Creature>();
+    protected override void CheckForCreaturesWithinRange()
+    {
+        base.CheckForCreaturesWithinRange();
+
+        GivePlusOneRange();
+
+    }
+
+    private void GivePlusOneRange()
+    {
+        if (creaturesThatHaveExtraRange != null)
+        {
+            foreach (Creature friendly in creaturesThatHaveExtraRange)
+            {
+                if (!friendlyCreaturesWithinRange.Contains(friendly))
+                {
+                    friendly.SubtractOneRange();
+                }
+            }
+        }
+        foreach (Creature friendly in friendlyCreaturesWithinRange)
+        {
+            if (!creaturesThatHaveExtraRange.Contains(friendly))
+            {
+                friendly.AddOneRange();
+            }
+        }
+        creaturesThatHaveExtraRange = friendlyCreaturesWithinRange;
+    }
 
 }

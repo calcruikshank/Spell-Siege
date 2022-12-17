@@ -20,10 +20,13 @@ public class Creature : MonoBehaviour
     public float CurrentAttack;
     float AttackRate = 4;
     protected float abilityRate = 4;
+
+
     protected float AttackRateTimer;
     protected float abilityRateTimer;
     [HideInInspector] public float CurrentHealth;
     [SerializeField] public float MaxHealth;
+
 
     [SerializeField] TextMeshPro attackText;
 
@@ -870,6 +873,18 @@ public class Creature : MonoBehaviour
     }
 
     #region range
+
+
+    internal void AddOneRange()
+    {
+        this.range++;
+        CalculateAllTilesWithinRange();
+    }
+    internal void SubtractOneRange()
+    {
+        this.range--;
+        CalculateAllTilesWithinRange();
+    }
     void CalculateAllTilesWithinRange()
     {
         List<Vector3Int> extents = new List<Vector3Int>();
