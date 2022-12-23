@@ -20,7 +20,7 @@ public class TargetedSpell : MonoBehaviour
     {
         if (instantiatedObject != null)
         {
-            instantiatedObject = Instantiate(GOToInstantiate, creatureTargeted.actualPosition, Quaternion.identity);
+            instantiatedObject = Instantiate(GOToInstantiate, new Vector3((float)creatureTargeted.actualPositionX, (float)creatureTargeted.actualPositionY, (float)creatureTargeted.actualPositionZ), Quaternion.identity);
         }
         SpecificSpellAbility();
     }

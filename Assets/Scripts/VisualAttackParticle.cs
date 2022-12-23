@@ -27,9 +27,9 @@ public class VisualAttackParticle : MonoBehaviour
         }
         if (targetedCreature != null)
         {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, targetedCreature.actualPosition, speed * Time.deltaTime);
+            this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3((float)targetedCreature.actualPositionX, (float)targetedCreature.actualPositionY, (float)targetedCreature.actualPositionZ), speed * Time.deltaTime);
 
-            if (Vector3.Distance(this.transform.position, targetedCreature.actualPosition) < .02f && shutDown == false)
+            if (Vector3.Distance(this.transform.position, new Vector3((float)targetedCreature.actualPositionX, (float)targetedCreature.actualPositionY, (float)targetedCreature.actualPositionZ)) < .02f && shutDown == false)
             {
                 targetedCreature.TakeDamage(amountofdamage);
                 if (deathtouch)

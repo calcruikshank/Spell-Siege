@@ -7,6 +7,8 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Unity.Mathematics;
+using Unity.Mathematics.FixedPoint;
 
 public class Creature : MonoBehaviour
 {
@@ -94,7 +96,9 @@ public class Creature : MonoBehaviour
     [HideInInspector] public BaseTile tileCurrentlyOn;
     [HideInInspector] public BaseTile previousTilePosition;
 
-    public Vector3 actualPosition;
+    public Unity.Mathematics.FixedPoint.fp actualPositionX;
+    public Unity.Mathematics.FixedPoint.fp actualPositionY;
+    public Unity.Mathematics.FixedPoint.fp actualPositionZ;
     Vector3 targetedPosition;
     Vector3[] positions;
 
@@ -120,7 +124,9 @@ public class Creature : MonoBehaviour
         SetupLR();
         SetupLR2();
         SetRangeLineRenderer();
-        actualPosition = this.transform.position;
+        actualPositionX = (fp)this.transform.position.x;
+        actualPositionY = (fp)this.transform.position.y;
+        actualPositionZ = (fp)this.transform.position.z;
 
         CalculateAllTilesWithinRange();
         SetTravType();
@@ -572,7 +578,7 @@ public class Creature : MonoBehaviour
         List<Vector3> lrList = new List<Vector3>();
         //targetPosition = positionToTarget;
 
-        lrList.Add(actualPosition);
+        lrList.Add(new Vector3((float)actualPositionX, (float)actualPositionY, (float)actualPositionZ));
         for (int i = currentPathIndex; i < pathVectorList.Count; i++)
         {
             lrList.Add(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[i].tilePosition));
@@ -621,7 +627,7 @@ public class Creature : MonoBehaviour
                         {
                             if (currentPathIndex != 0)
                             {
-                                if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
+                                if (Vector3.Distance(new Vector3((float)actualPositionX, (float)actualPositionY, (float)actualPositionZ), new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, (float)actualPositionY, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
                                 {
                                     SetStateToIdle();
                                 }
@@ -641,7 +647,7 @@ public class Creature : MonoBehaviour
                         {
                             if (currentPathIndex != 0)
                             {
-                                if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
+                                if (Vector3.Distance(new Vector3((float)actualPositionX, (float)actualPositionY, (float)actualPositionZ), new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, (float)actualPositionY, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02)
                                 {
                                     SetStateToIdle();
                                 }
@@ -657,13 +663,16 @@ public class Creature : MonoBehaviour
             }
             targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
 
-            if (Vector3.Distance(actualPosition, targetedPosition) > .02f)
+            if (Vector3.Distance(new Vector3((float)actualPositionX, (float)actualPositionY, (float)actualPositionZ), targetedPosition) > .02)
             {
-                actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedPosition.x, actualPosition.y, targetedPosition.z), speed * Time.fixedDeltaTime);
+
+                actualPositionX = (fp)Mathf.MoveTowards((float)actualPositionX, targetedPosition.x, speed * Time.fixedDeltaTime);
+                actualPositionY = (fp)Mathf.MoveTowards((float)actualPositionY, targetedPosition.y, speed * Time.fixedDeltaTime);
+                actualPositionZ = (fp)Mathf.MoveTowards((float)actualPositionZ, targetedPosition.z, speed * Time.fixedDeltaTime);
                 SetLRPoints();
             }
 
-            if (Vector3.Distance(actualPosition, targetedPosition) <= .02f)
+            if (Vector3.Distance(new Vector3((float)actualPositionX, (float)actualPositionY, (float)actualPositionZ), targetedPosition) <= .02)
             {
                 if (currentPathIndex >= pathVectorList.Count - 1)
                 {
@@ -683,7 +692,7 @@ public class Creature : MonoBehaviour
             }
         }
 
-        currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
+        currentCellPosition = grid.WorldToCell(new Vector3((float)actualPositionX, 0, (float)actualPositionZ));
         if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
         {
             tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
@@ -799,7 +808,7 @@ public class Creature : MonoBehaviour
             tempLineRendererBetweenCreaturesGameObject.SetActive(true);
             tempLineRendererBetweenCreatures.enabled = true;
             List<Vector3> tempPositions = new List<Vector3>();
-            tempPositions.Add(new Vector3(this.actualPosition.x, this.actualPosition.y + .2f, this.actualPosition.z));
+            tempPositions.Add(new Vector3((float)actualPositionX, (float)actualPositionY + .2f, (float)actualPositionZ));
             tempPositions.Add(new Vector3(positionSent.x, positionSent.y + .2f, positionSent.z));
             tempLineRendererBetweenCreatures.SetPositions(tempPositions.ToArray());
         }
@@ -840,15 +849,15 @@ public class Creature : MonoBehaviour
 
     protected void VisualMove()
     {
-        this.transform.position = actualPosition;
+        this.transform.position = new Vector3((float)actualPositionX, (float)actualPositionY , (float)actualPositionZ);
         return;
         float valueToAdd = 0f;
         positions[0] = this.transform.position;
         lr.SetPositions(positions);
         lr.startColor = playerOwningCreature.col;
         lr.endColor = playerOwningCreature.col;
-        float distanceFromActualPosition = (this.transform.position - actualPosition).magnitude;
-        this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3(targetedPosition.x, actualPosition.y, targetedPosition.z), speed * Time.deltaTime);
+        float distanceFromActualPosition = (this.transform.position - new Vector3((float)actualPositionX, (float)actualPositionY, (float)actualPositionZ)).magnitude;
+        this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3(targetedPosition.x, (float)actualPositionY, targetedPosition.z), speed * Time.deltaTime);
     }
 
     internal void SetToPlayerOwningCreature(Controller controller)
@@ -864,8 +873,10 @@ public class Creature : MonoBehaviour
         Debug.Log(GameManager.singleton.gameManagerTick + " tick");
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         lr.enabled = false;
-        actualPosition = targetedPosition;
-        this.transform.position = actualPosition;
+        actualPositionX = (fp)targetedPosition.x;
+        actualPositionY = (fp)targetedPosition.y;
+        actualPositionZ = (fp)targetedPosition.z;
+        this.transform.position = new Vector3((float)actualPositionX, (float)actualPositionY, (float)actualPositionZ);
         currentCellPosition = grid.WorldToCell(new Vector3(this.transform.position.x, 0, this.transform.position.z));
         tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
         tileCurrentlyOn.AddCreatureToTile(this);
