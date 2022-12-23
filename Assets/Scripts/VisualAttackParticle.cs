@@ -38,14 +38,8 @@ public class VisualAttackParticle : MonoBehaviour
                 }
 
                
-                if (this.GetComponentInChildren<ParticleSystem>() != null)
-                {
-                    foreach (ParticleSystem ps in this.GetComponentsInChildren<ParticleSystem>())
-                    {
-                        ps.Stop();
-                    }
-                }
                 shutDown = true;
+                Destroy(this.gameObject);
             }
         }
         if (targetedStructure != null)
@@ -54,11 +48,9 @@ public class VisualAttackParticle : MonoBehaviour
             if (Vector3.Distance(this.transform.position, new Vector3(targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z)) < .02f && shutDown == false)
             {
                 targetedStructure.TakeDamage(amountofdamage);
-                if (this.GetComponentInChildren<ParticleSystem>() != null)
-                {
-                    this.GetComponentInChildren<ParticleSystem>().Stop();
-                }
+
                 shutDown = true;
+                Destroy(this.gameObject);
             }
         }
         if (targetedStructure == null && targetedCreature == null)
@@ -69,6 +61,7 @@ public class VisualAttackParticle : MonoBehaviour
             }
             
             shutDown = true;
+            Destroy(this.gameObject);
         }
     }
 
