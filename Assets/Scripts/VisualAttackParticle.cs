@@ -14,6 +14,8 @@ public class VisualAttackParticle : MonoBehaviour
     public void SetTarget(Creature creatureToTarget, float attack)
     {
         targetedCreature = creatureToTarget;
+        Vector3 direction = creatureToTarget.transform.position - this.transform.position;
+        this.transform.forward = direction;
         amountofdamage = attack;
     }
 
@@ -35,9 +37,13 @@ public class VisualAttackParticle : MonoBehaviour
                     targetedCreature.Kill();
                 }
 
+               
                 if (this.GetComponentInChildren<ParticleSystem>() != null)
                 {
-                    this.GetComponent<ParticleSystem>().Stop();
+                    foreach (ParticleSystem ps in this.GetComponentsInChildren<ParticleSystem>())
+                    {
+                        ps.Stop();
+                    }
                 }
                 shutDown = true;
             }
@@ -50,7 +56,7 @@ public class VisualAttackParticle : MonoBehaviour
                 targetedStructure.TakeDamage(amountofdamage);
                 if (this.GetComponentInChildren<ParticleSystem>() != null)
                 {
-                    this.GetComponent<ParticleSystem>().Stop();
+                    this.GetComponentInChildren<ParticleSystem>().Stop();
                 }
                 shutDown = true;
             }
@@ -68,7 +74,9 @@ public class VisualAttackParticle : MonoBehaviour
 
     internal void SetTargetStructure(Structure structureToAttack, float attack)
     {
-        targetedStructure = structureToAttack;
+        targetedStructure = structureToAttack; 
+        Vector3 direction = structureToAttack.transform.position - this.transform.position;
+        this.transform.forward = direction;
         amountofdamage = attack;
     }
 
