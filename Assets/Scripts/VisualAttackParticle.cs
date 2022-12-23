@@ -37,9 +37,10 @@ public class VisualAttackParticle : MonoBehaviour
                     targetedCreature.Kill();
                 }
 
-               
+
+
+                TurnOff();
                 shutDown = true;
-                Destroy(this.gameObject);
             }
         }
         if (targetedStructure != null)
@@ -49,19 +50,15 @@ public class VisualAttackParticle : MonoBehaviour
             {
                 targetedStructure.TakeDamage(amountofdamage);
 
+                TurnOff();
                 shutDown = true;
-                Destroy(this.gameObject);
             }
         }
         if (targetedStructure == null && targetedCreature == null)
         {
-            if (this.GetComponentInChildren<ParticleSystem>() != null) 
-            {
-                this.GetComponentInChildren<ParticleSystem>().Stop();
-            }
-            
+
+            TurnOff();
             shutDown = true;
-            Destroy(this.gameObject);
         }
     }
 
@@ -77,5 +74,30 @@ public class VisualAttackParticle : MonoBehaviour
     internal void SetDeathtouch(Creature creatureToAttack, float attack)
     {
         deathtouch = true;
+    }
+
+    public void TurnOff()
+    {
+        if (this.GetComponentInChildren<ParticleSystem>() != null)
+        {
+            foreach (ParticleSystem ps in this.GetComponentsInChildren<ParticleSystem>())
+            {
+                ps.Stop();
+            }
+        }
+        if (this.GetComponentInChildren<MeshRenderer>() != null)
+        {
+            foreach (MeshRenderer mr in this.GetComponentsInChildren<MeshRenderer>())
+            {
+                mr.enabled = false;
+            }
+        }
+        if (this.GetComponentInChildren<Light>() != null)
+        {
+            foreach (Light l in this.GetComponentsInChildren<Light>())
+            {
+                l.enabled = false;
+            }
+        }
     }
 }
