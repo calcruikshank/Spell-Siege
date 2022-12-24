@@ -135,6 +135,17 @@ public class Creature : MonoBehaviour
         CurrentHealth = MaxHealth;
         CurrentAttack = Attack;
         UpdateCreatureHUD();
+
+        TickManager.tickTookTooLong += CatchUp;
+    }
+
+    private void CatchUp(int numberOfTicksPast)
+    {
+        Debug.Log(numberOfTicksPast);
+        for (int i = 0; i < numberOfTicksPast; i++)
+        {
+            FixedUpdate();
+        }
     }
 
     private void OnTick()

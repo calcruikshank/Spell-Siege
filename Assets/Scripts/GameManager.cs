@@ -39,7 +39,7 @@ public class GameManager : NetworkBehaviour
 
 
     public int tickTimer;
-    int tickTimerThreshold = 1;
+    int tickTimerThreshold = 10;
     public int allCreatureGuidCounter;
 
     public int endingX;
@@ -109,6 +109,7 @@ public class GameManager : NetworkBehaviour
         tickTimer++;
         if (tickTimer >= tickTimerThreshold && playersThatHaveBeenReceived.Count == playerList.Count)
         {
+            numOfFixedUpdatesItTookToReceiveAllPlayers = tickTimer;
             tickTimer = 0;
             playersThatHaveBeenReceived.Clear();
             tick.Invoke();
@@ -166,6 +167,8 @@ public class GameManager : NetworkBehaviour
 
 
     [SerializeField] Transform healParticle;
+    public int  numOfFixedUpdatesItTookToReceiveAllPlayers;
+
     internal void SpawnHealText(Vector3 positionSent, float amount)
     {
         Transform instantiatedHealthText = Instantiate(damageText.transform, positionSent, Quaternion.identity);
