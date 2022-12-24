@@ -102,6 +102,7 @@ public class Creature : MonoBehaviour
     Vector3 targetedPosition;
     Vector3[] positions;
 
+    public List<Vector3> previousPositions = new List<Vector3>();
     List<Vector3> rangePositions = new List<Vector3>();
     protected Grid grid;
     private void Awake()
@@ -110,7 +111,9 @@ public class Creature : MonoBehaviour
         creatureID = GameManager.singleton.allCreatureGuidCounter;
         GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
         GameManager.singleton.allCreatureGuidCounter++;
+        TickManager.tickTookTooLong += CatchUp;
     }
+
 
     protected virtual void Start()
     {
@@ -222,6 +225,7 @@ public class Creature : MonoBehaviour
             case CreatureState.Dead:
                 break;
         }
+        previousPositions.Add(new Vector3((float)actualPositionX, (float)actualPositionY, (float)actualPositionZ)) ;
     }
 
     internal void IncreaseAttackByX(float v)
@@ -545,9 +549,13 @@ public class Creature : MonoBehaviour
     int currentPathIndex;
 
 
-
     public virtual void SetMove(Vector3 positionToTarget)
     {
+        if (numOFTimesToCatchUp > 0)
+        {
+            this.transform.position = previousPositions[previousPositions.Count - numOFTimesToCatchUp - 1];
+        }
+        Debug.Log(numOFTimesToCatchUp + " num of times to catch up " + transform.position);
         rangeLr.enabled = false;
         playerOwningCreature.SetVisualsToNothingSelectedLocally();
         Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(positionToTarget.x, 0, positionToTarget.z));
@@ -570,7 +578,12 @@ public class Creature : MonoBehaviour
         SetLRPoints();
         currentPathIndex = 0;
         creatureState = CreatureState.Moving;
+        for (int i = 0; i < numOFTimesToCatchUp; i++)
+        {
+            Move();
+        }
 
+        previousPositions.Clear();
     }
 
     protected void SetLRPoints()
@@ -793,6 +806,14 @@ public class Creature : MonoBehaviour
         }*/
     }
 
+    public int numOFTimesToCatchUp = 0;
+    private void CatchUp(int numberOfTicksPast)
+    {
+        for (int i = 0; i < numberOfTicksPast; i++)
+        {
+            numOFTimesToCatchUp = numberOfTicksPast;
+        }
+    }
 
     LineRenderer tempLineRendererBetweenCreatures;
 
@@ -1042,6 +1063,11 @@ public class Creature : MonoBehaviour
 
 
         SetNewPositionsForRangeLr(rangePositions);
+    }
+
+    internal void CallFixedUpdate()
+    {
+        FixedUpdate();
     }
 
     public bool lifelink = false;

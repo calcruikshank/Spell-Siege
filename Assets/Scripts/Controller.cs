@@ -299,6 +299,7 @@ public class Controller : NetworkBehaviour
             {
                 SetVisualsToNothingSelectedLocally();
                 tempRightClicksToSend.Add(true); //handle setting the state to nothing selected
+                SetStateToNothingSelected();
             }
         }
         if (Input.GetMouseButtonUp(0))
@@ -313,6 +314,7 @@ public class Controller : NetworkBehaviour
                         {
                             AddToTickQueueLocal(grid.WorldToCell(mousePosition));
                             SetVisualsToNothingSelectedLocally();
+                            LocalLeftClick(grid.WorldToCell(mousePosition));
                         }
                     }
                 }
@@ -334,6 +336,7 @@ public class Controller : NetworkBehaviour
                 if (!CheckForRaycast())
                 {
                     AddToTickQueueLocal(cellPositionSentToClients);
+                    LocalLeftClick(cellPositionSentToClients);
                     if (locallySelectedCard != null)
                     {
                         Destroy(locallySelectedCard.gameObject);
@@ -345,6 +348,7 @@ public class Controller : NetworkBehaviour
                 if (!CheckForRaycast())
                 {
                     AddToTickQueueLocal(cellPositionSentToClients);
+                    LocalLeftClick(cellPositionSentToClients);
                 }
             }
             if (state == State.NothingSelected)
@@ -354,6 +358,7 @@ public class Controller : NetworkBehaviour
                     if (CheckToSeeIfClickedHarvestTileCanBePurchased(cellPositionSentToClients))
                     {
                         AddToPuchaseTileQueueLocal(cellPositionSentToClients);
+                        PurchaseHarvestTile(cellPositionSentToClients);
                     }
                 }
             }
@@ -640,34 +645,43 @@ public class Controller : NetworkBehaviour
     void OnTick()
     {
         tick++;
-        //order matters here bigtime later set this up in the enum
+        hasTickedSinceSendingLastMessage = true;
+        if (!IsOwner)
+        {
+            //order matters here bigtime later set this up in the enum
 
-        for (int i = 0; i < localTilePositionPurchasedToSend.Count; i++)
-        {
-            PurchaseHarvestTile(localTilePositionPurchasedToSend[i]);
+            for (int i = 0; i < localTilePositionPurchasedToSend.Count; i++)
+            {
+                PurchaseHarvestTile(localTilePositionPurchasedToSend[i]);
+                TickManager.singleton.anyPlayerMadeInput = true;
+            }
+            for (int i = 0; i < IndecesOfCardsInHandQueue.Count; i++)
+            {
+                LocalSelectCardWithIndex(IndecesOfCardsInHandQueue[i]);
+                TickManager.singleton.anyPlayerMadeInput = true;
+            }
+            for (int i = 0; i < indecesOfCreaturesInQueue.Count; i++)
+            {
+                SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[indecesOfCreaturesInQueue[i]]);
+                TickManager.singleton.anyPlayerMadeInput = true;
+            }
+            for (int i = 0; i < rightClicksToEnact.Count; i++)
+            {
+                SetStateToNothingSelected();
+                TickManager.singleton.anyPlayerMadeInput = true;
+            }
+            for (int i = 0; i < clickQueueForTick.Count; i++)
+            {
+                LocalLeftClick(clickQueueForTick[i]);
+                TickManager.singleton.anyPlayerMadeInput = true;
+            }
         }
-        for (int i = 0; i < IndecesOfCardsInHandQueue.Count; i++)
-        {
-            LocalSelectCardWithIndex(IndecesOfCardsInHandQueue[i]);
-        }
-        for (int i = 0; i < indecesOfCreaturesInQueue.Count; i++)
-        {
-            SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[indecesOfCreaturesInQueue[i]]);
-        }
-        for (int i = 0; i < rightClicksToEnact.Count; i++)
-        {
-            SetStateToNothingSelected();
-            rightClicksToEnact.Clear();
-        }
-        for (int i = 0; i < clickQueueForTick.Count; i++)
-        {
-            LocalLeftClick(clickQueueForTick[i]);
-        }
+        
         localTilePositionPurchasedToSend.Clear();
         clickQueueForTick.Clear();
+        rightClicksToEnact.Clear();
         IndecesOfCardsInHandQueue.Clear();
         indecesOfCreaturesInQueue.Clear();
-        hasTickedSinceSendingLastMessage = true;
     }
 
     private void PurchaseHarvestTile(Vector3Int vector3Int)
@@ -802,6 +816,7 @@ public class Controller : NetworkBehaviour
                     locallySelectedCard.transform.localEulerAngles = Vector3.zero;
                     raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject.SetActive(false);
                     AddIndexOfCardInHandToTickQueueLocal(raycastHitCardInHand.transform.GetComponent<CardInHand>().indexOfCard);
+                    LocalSelectCardWithIndex(raycastHitCardInHand.transform.GetComponent<CardInHand>().indexOfCard);
                     return true;
                 }
             }
@@ -819,6 +834,8 @@ public class Controller : NetworkBehaviour
                     SetVisualsToNothingSelectedLocally();
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
+
+                    SetToCreatureOnFieldSelected(raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
                     return true;
                 }
                 if (state == State.SpellInHandSelected || state == State.StructureInHandSeleced)
@@ -827,6 +844,7 @@ public class Controller : NetworkBehaviour
                     {
                         SetVisualsToNothingSelectedLocally();
                         AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
+                        SetToCreatureOnFieldSelected(raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
                         return true;
                     }
                 }
@@ -834,6 +852,7 @@ public class Controller : NetworkBehaviour
                 {
                     SetVisualsToNothingSelectedLocally();
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
+                    SetToCreatureOnFieldSelected(raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
                     return true;
                 }
             }

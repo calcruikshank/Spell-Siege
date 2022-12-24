@@ -39,7 +39,8 @@ public class GameManager : NetworkBehaviour
 
 
     public int tickTimer;
-    int tickTimerThreshold = 1;
+    public int numOfFixedUpdatesItTookToReceiveAllPlayers;
+    public int tickTimerThreshold = 1;
     public int allCreatureGuidCounter;
 
     public int endingX;
@@ -107,11 +108,13 @@ public class GameManager : NetworkBehaviour
     private void FixedUpdate()
     {
         tickTimer++;
+        numOfFixedUpdatesItTookToReceiveAllPlayers++;
         if (tickTimer >= tickTimerThreshold && playersThatHaveBeenReceived.Count == playerList.Count)
         {
-            tickTimer = 0;
+            numOfFixedUpdatesItTookToReceiveAllPlayers = tickTimer;
             playersThatHaveBeenReceived.Clear();
             tick.Invoke();
+            tickTimer = 0;
             gameManagerTick++;
             //tickTimeAverage = totalTickTime / gameManagerTick;
             //allPlayersReceived = true;
