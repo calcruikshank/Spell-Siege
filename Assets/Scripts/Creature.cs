@@ -12,7 +12,7 @@ public class Creature : MonoBehaviour
 {
     [SerializeField] Transform colorIndicator;
     [SerializeField] float speed = 1f; //move speed
-    [SerializeField] int range; //num of tiles that can attack
+    [SerializeField] public int range; //num of tiles that can attack
     [SerializeField] float UsageRate = 1f; // the rate at which the minion can use abilities/ attack 
 
 
@@ -58,7 +58,7 @@ public class Creature : MonoBehaviour
         Dragon, //On The turn created
         Elf,
         Goblin,
-        Reptile, 
+        Reptile,
         Human,
         Angel,
         Wizard,
@@ -367,7 +367,7 @@ public class Creature : MonoBehaviour
     }
 
 
-    [SerializeField] Transform visualAttackParticle;
+    [SerializeField] public Transform visualAttackParticle;
 
 
     protected virtual void HandleFriendlyCreaturesList()
@@ -399,29 +399,20 @@ public class Creature : MonoBehaviour
         }
     }
 
-    
+
     protected virtual void VisualAttackAnimation(Creature creatureToAttack)
     {
         if (visualAttackParticle != null)
         {
-            if (range != 1)
+            Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
+            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, Attack);
+            if (deathtouch)
             {
-                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
-                instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, Attack);
-                if (deathtouch)
-                {
-                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, Attack);
-                }
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, Attack);
             }
-            else
+            if (range == 1)
             {
-                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity);
-                instantiatedParticle.transform.LookAt(creatureToAttack.transform);
-                if (deathtouch)
-                {
-                    instantiatedParticle.GetComponent<MeleeVisualAttack>().SetDeathtouch(creatureToAttack, Attack);
-                }
-                instantiatedParticle.GetComponent<MeleeVisualAttack>().SetTarget(creatureToAttack, Attack);
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetRange(1);
             }
             OnAttack();
         }
@@ -430,17 +421,13 @@ public class Creature : MonoBehaviour
     {
         if (visualAttackParticle != null)
         {
-            if (range != 1)
+            Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
+            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, Attack);
+            if (range == 1)
             {
-                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
-                instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, Attack);
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetRange(1);
             }
-            else
-            {
-                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity);
-                instantiatedParticle.transform.LookAt(structureToAttack.transform);
-                instantiatedParticle.GetComponent<MeleeVisualAttack>().SetTargetStructure(structureToAttack, Attack);
-            }
+            OnAttack();
         }
     }
 
@@ -475,7 +462,7 @@ public class Creature : MonoBehaviour
         Destroy(this.gameObject);
     }
 
-    
+
     void HandleAttackRate()
     {
         if (canAttack)
@@ -535,7 +522,7 @@ public class Creature : MonoBehaviour
         GameManager.singleton.SpawnLevelUpPrefab(this.transform.position);
         UpdateCreatureHUD();
     }
-    
+
 
     [HideInInspector] public List<BaseTile> pathVectorList = new List<BaseTile>();
     int currentPathIndex;
@@ -569,7 +556,7 @@ public class Creature : MonoBehaviour
         currentPathIndex = 0;
         creatureState = CreatureState.Moving;
 
-        
+
         Debug.Log(actualPosition);
     }
 
@@ -677,7 +664,7 @@ public class Creature : MonoBehaviour
             {
                 if (currentPathIndex >= pathVectorList.Count - 1)
                 {
-                     SetStateToIdle();
+                    SetStateToIdle();
                 }
                 else
                 {
@@ -707,7 +694,7 @@ public class Creature : MonoBehaviour
         }
 
         CheckForCreaturesInPath();
-        
+
 
     }
 
@@ -1133,10 +1120,10 @@ public class Creature : MonoBehaviour
         rangeLr.enabled = true;
         if (playerOwningCreature.locallySelectedCard != null)
         {
-                if (playerOwningCreature.locallySelectedCard.cardType != CardInHand.CardType.Spell)
-                {
-                    playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
-                }
+            if (playerOwningCreature.locallySelectedCard.cardType != CardInHand.CardType.Spell)
+            {
+                playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
+            }
         }
         if (playerOwningCreature.ShowingPurchasableHarvestTiles && playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn) && !tileCurrentlyOn.isBeingHarvested)
         {
@@ -1172,7 +1159,7 @@ public class Creature : MonoBehaviour
 
     #region Overridables
     public virtual void Garrison() { }
-    public virtual void OnETB() 
+    public virtual void OnETB()
     {
         GameManager.singleton.CreatureEntered(creatureID);
     }

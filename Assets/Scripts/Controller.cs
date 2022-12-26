@@ -336,10 +336,6 @@ public class Controller : NetworkBehaviour
                 if (!CheckForRaycast())
                 {
                     AddToTickQueueLocal(cellPositionSentToClients);
-                    if (locallySelectedCard != null)
-                    {
-                        Destroy(locallySelectedCard.gameObject);
-                    }
                 }
             }
             else
@@ -726,8 +722,10 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null)
             {
+                SetVisualsToNothingSelectedLocally();
                 if (raycastHitCardInHand.transform.GetComponent<CardInHand>().isPurchasable)
                 {
+                    SetVisualsToNothingSelectedLocally();
                     locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
                     locallySelectedCardInHandToTurnOff.TurnOffVisualCard();
                     locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
@@ -747,6 +745,7 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
+                SetVisualsToNothingSelectedLocally();
                 if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected && locallySelectedCreature == null)
                 {
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
@@ -906,11 +905,9 @@ public class Controller : NetworkBehaviour
                 if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
                 {
                     creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
-                    SetVisualsToNothingSelectedLocally();
                 }
                 else
                 {
-                    SetVisualsToNothingSelectedLocally();
                     creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
 
                     for (int i = 0; i < 20; i++)
@@ -1221,11 +1218,7 @@ public class Controller : NetworkBehaviour
     {
         if (locallySelectedCard != null)
         {
-            if (locallySelectedCardInHandToTurnOff != null)
-            {
-                locallySelectedCardInHandToTurnOff.gameObject.SetActive(true);
-            }
-            Destroy(locallySelectedCard.gameObject);
+            SetVisualsToNothingSelectedLocally();
         }
         cardSelected = null;
         creatureSelected = null;

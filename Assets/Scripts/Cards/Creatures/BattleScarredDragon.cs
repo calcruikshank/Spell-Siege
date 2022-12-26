@@ -22,7 +22,7 @@ public class BattleScarredDragon : FlyingCreature
             {
                 if (!friendlyCreaturesWithinRange.Contains(friendly))
                 {
-                    friendly.IncreaseAttackByX(-friendly.CurrentAttack);
+                    friendly.IncreaseAttackByX(-friendly.Attack);
                 }
             }
         }
@@ -30,7 +30,7 @@ public class BattleScarredDragon : FlyingCreature
         {
             if (!creaturesDoubled.Contains(friendly))
             {
-                friendly.IncreaseAttackByX(friendly.CurrentAttack);
+                friendly.IncreaseAttackByX(friendly.Attack);
             }
         }
         creaturesDoubled = friendlyCreaturesWithinRange;
@@ -40,7 +40,7 @@ public class BattleScarredDragon : FlyingCreature
     {
         foreach (Creature friendly in creaturesDoubled)
         {
-            friendly.IncreaseAttackByX(-friendly.CurrentAttack);
+            friendly.IncreaseAttackByX(-friendly.Attack);
         }
         base.OnDeath();
 

@@ -45,7 +45,7 @@ public class VisualAttackParticle : MonoBehaviour
         }
         if (targetedStructure != null)
         {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3( targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z), 10f * Time.deltaTime); 
+            this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3(targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z), 10f * Time.deltaTime);
             if (Vector3.Distance(this.transform.position, new Vector3(targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z)) < .02f && shutDown == false)
             {
                 targetedStructure.TakeDamage(amountofdamage);
@@ -64,7 +64,7 @@ public class VisualAttackParticle : MonoBehaviour
 
     internal void SetTargetStructure(Structure structureToAttack, float attack)
     {
-        targetedStructure = structureToAttack; 
+        targetedStructure = structureToAttack;
         Vector3 direction = structureToAttack.transform.position - this.transform.position;
         this.transform.forward = direction;
         amountofdamage = attack;
@@ -97,6 +97,32 @@ public class VisualAttackParticle : MonoBehaviour
             foreach (Light l in this.GetComponentsInChildren<Light>())
             {
                 l.enabled = false;
+            }
+        }
+    }
+    int range = 0;
+    internal void SetRange(int v)
+    {
+        if (v == 1)
+        {
+            range = v;
+            if (targetedCreature != null)
+            {
+                targetedCreature.TakeDamage(amountofdamage);
+                if (deathtouch)
+                {
+                    targetedCreature.Kill();
+                }
+
+
+
+                shutDown = true;
+            }
+            if (targetedStructure != null)
+            {
+                targetedStructure.TakeDamage(amountofdamage);
+
+                shutDown = true;
             }
         }
     }

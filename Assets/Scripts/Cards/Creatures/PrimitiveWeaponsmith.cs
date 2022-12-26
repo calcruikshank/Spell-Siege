@@ -29,6 +29,11 @@ public class PrimitiveWeaponsmith : Creature
         {
             if (!creaturesThatHaveExtraRange.Contains(friendly))
             {
+                if (friendly.range == 1)
+                {
+                    friendly.visualAttackParticle = this.visualAttackParticle;
+                }
+
                 friendly.AddOneRange();
             }
         }
