@@ -13,7 +13,7 @@ public class Controller : NetworkBehaviour
     public enum State
     {
         NothingSelected,
-        CreatureSelected,
+        //CreatureSelected,
         CreatureInHandSelected,
         SpellInHandSelected,
         StructureInHandSeleced,
@@ -100,6 +100,8 @@ public class Controller : NetworkBehaviour
     public List<ActionStruct> finalOrder = new List<ActionStruct>();
 
     public List<ActionStruct> localOrder = new List<ActionStruct>();
+
+    public bool creaturePathLockedIn = false;
 
     [Serializable]
     public enum ActionTaken
@@ -229,10 +231,6 @@ public class Controller : NetworkBehaviour
                 HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
-            case State.CreatureSelected:
-                HandleMana();
-                HandleDrawCards();
-                TriggerAllCreatureAbilities();
                 break;
         }
     }
@@ -246,7 +244,6 @@ public class Controller : NetworkBehaviour
         }
 
 
-        HandleVisualBugs();
         currentLocalHoverCellPosition = grid.WorldToCell(mousePosition);
         mousePosition = mousePositionScript.GetMousePositionWorldPoint();
         if (currentLocalHoverCellPosition != previousCellPosition)
@@ -254,7 +251,7 @@ public class Controller : NetworkBehaviour
             highlightMap.SetTile(previousCellPosition, null);
             highlightMap.SetTile(currentLocalHoverCellPosition, highlightTile);
             previousCellPosition = currentLocalHoverCellPosition;
-            if (locallySelectedCreature != null)
+            if (locallySelectedCreature != null && !creaturePathLockedIn)
             {
                 VisualPathfinderOnCreatureSelected(locallySelectedCreature);
             }
@@ -311,7 +308,10 @@ public class Controller : NetworkBehaviour
                         if (!CheckForRaycast())
                         {
                             AddToTickQueueLocal(grid.WorldToCell(mousePosition));
-                            SetVisualsToNothingSelectedLocally();
+                        }
+                        if (locallySelectedCreature != null)
+                        {
+                            LockInVisualPathfinder();
                         }
                     }
                 }
@@ -319,6 +319,10 @@ public class Controller : NetworkBehaviour
         }
         if (Input.GetMouseButtonDown(0))
         {
+            if (locallySelectedCreature != null)
+            {
+                LockInVisualPathfinder();
+            }
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Vector3 mousePositionWorldPoint;
             if (Physics.Raycast(ray, out RaycastHit raycastHit, Mathf.Infinity, mousePositionScript.baseTileMap))
@@ -329,7 +333,6 @@ public class Controller : NetworkBehaviour
 
             if (state == State.NothingSelected)
             {
-                SetVisualsToNothingSelectedLocally();
                 if (!CheckForRaycast())
                 {
                     AddToTickQueueLocal(cellPositionSentToClients);
@@ -361,20 +364,9 @@ public class Controller : NetworkBehaviour
 
     }
 
-    private void HandleVisualBugs()
+    private void LockInVisualPathfinder()
     {
-        if (state == State.CreatureSelected && locallySelectedCreature == null)
-        {
-            locallySelectedCreature = creatureSelected;
-        }
-        if (state == State.CreatureSelected && locallySelectedCreature != null)
-        {
-            VisualPathfinderOnCreatureSelected(locallySelectedCreature);
-        }
-        if (state == State.NothingSelected && locallySelectedCreature != null)
-        {
-            SetVisualsToNothingSelectedLocally();
-        }
+        creaturePathLockedIn = true;
     }
 
     public void SetVisualsToNothingSelectedLocally()
@@ -411,9 +403,6 @@ public class Controller : NetworkBehaviour
                 HandleTurn();
                 break;
             case State.StructureInHandSeleced:
-                HandleTurn();
-                break;
-            case State.CreatureSelected:
                 HandleTurn();
                 break;
         }
@@ -517,13 +506,19 @@ public class Controller : NetworkBehaviour
     #region regionOfTicks
     void AddToTickQueueLocal(Vector3Int positionSent)
     {
-        //locallySelectedCreature = null;
+        Vector3 positionOfCreature = new Vector3();
+        if (locallySelectedCreature && IsOwner)
+        {
+            positionOfCreature = locallySelectedCreature.actualPosition;
 
-        localOrder.Add(new ActionStruct(ActionTaken.LeftClickBaseMap, positionSent));
+            creatureSelected = locallySelectedCreature;
+            HandleCreatureOnBoardSelected(positionSent, positionOfCreature);
+        }
+        localOrder.Add(new ActionStruct(ActionTaken.LeftClickBaseMap, positionSent, positionOfCreature));
     }
     private void AddToPuchaseTileQueueLocal(Vector3Int cellPositionSentToClients)
     {
-        localOrder.Add(new ActionStruct(ActionTaken.TilePurchased, cellPositionSentToClients));
+        localOrder.Add(new ActionStruct(ActionTaken.TilePurchased, cellPositionSentToClients, Vector3.zero));
     }
     void AddIndexOfCardInHandToTickQueueLocal(int index)
     {
@@ -589,7 +584,7 @@ public class Controller : NetworkBehaviour
 
             if (actionGrabbed.actionType == ActionTaken.LeftClickBaseMap)
             {
-                LocalLeftClick((Vector3Int)actionGrabbed.actionInputVector);
+                LocalLeftClick(actionGrabbed.actionInputVector, actionGrabbed.positionOfCreature);
             }
             if (actionGrabbed.actionType == ActionTaken.RightClick)
             {
@@ -634,7 +629,7 @@ public class Controller : NetworkBehaviour
 
     #endregion
 
-    void LocalLeftClick(Vector3Int positionSent)
+    void LocalLeftClick(Vector3Int positionSent, Vector3 positionOfCreatureSent)
     {
         switch (state)
         {
@@ -651,9 +646,6 @@ public class Controller : NetworkBehaviour
                 break;
             case State.StructureInHandSeleced:
                 HandleStructureInHandSelected(positionSent);
-                break;
-            case State.CreatureSelected:
-                HandleCreatureOnBoardSelected(positionSent);
                 break;
         }
     }
@@ -736,7 +728,6 @@ public class Controller : NetworkBehaviour
             {
                 if (raycastHitCardInHand.transform.GetComponent<CardInHand>().isPurchasable)
                 {
-                    SetVisualsToNothingSelectedLocally();
                     locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
                     locallySelectedCardInHandToTurnOff.TurnOffVisualCard();
                     locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
@@ -756,10 +747,10 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
-                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected && state != State.CreatureSelected)
+                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected && locallySelectedCreature == null)
                 {
-                    SetVisualsToNothingSelectedLocally();
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
+                    creaturePathLockedIn = false;
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
                     return true;
                 }
@@ -767,14 +758,12 @@ public class Controller : NetworkBehaviour
                 {
                     if (cardSelected.GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
                     {
-                        SetVisualsToNothingSelectedLocally();
                         AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
                         return true;
                     }
                 }
-                if (state == State.CreatureSelected)
+                if (locallySelectedCreature != null)
                 {
-                    SetVisualsToNothingSelectedLocally();
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
                     return true;
                 }
@@ -785,6 +774,7 @@ public class Controller : NetworkBehaviour
 
     private void VisualPathfinderOnCreatureSelected(Creature creature)
     {
+        if (creaturePathLockedIn) return;
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType == BaseTile.traversableType.Untraversable || creature.thisTraversableType == Creature.travType.Walking && BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType != BaseTile.traversableType.TraversableByAll)
         {
             creature.HidePathfinderLR();
@@ -833,8 +823,9 @@ public class Controller : NetworkBehaviour
         }
 
     }
-    void HandleCreatureOnBoardSelected(Vector3Int positionSent)
+    void HandleCreatureOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent)
     {
+        MoveCreatureServerRpc(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
         targetedCellPosition = positionSent;
         #region creatureSelected
         if (creatureSelected != null)
@@ -844,10 +835,13 @@ public class Controller : NetworkBehaviour
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
             {
                 creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile);
+                SetVisualsToNothingSelectedLocally();
             }
             else
             {
-                creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition));
+                SetVisualsToNothingSelectedLocally();
+                creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
+
             }
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition) == creatureSelected.tileCurrentlyOn) //this makes sure you can double click to stop the creature and also have it selected
             {
@@ -859,6 +853,56 @@ public class Controller : NetworkBehaviour
         }
         #endregion
     }
+
+    [ServerRpc]
+    private void MoveCreatureServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        MoveCreatureClientRpc(positionSent, positionOfCreatureSent, creatureID);
+    }
+    [ClientRpc]
+    private void MoveCreatureClientRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        MoveNonOwnedCreature(positionSent, positionOfCreatureSent, creatureID);
+    }
+
+    public void MoveNonOwnedCreature(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        creatureSelected = GameManager.singleton.allCreaturesOnField[creatureID];
+        if (!IsOwner)
+        {
+            targetedCellPosition = positionSent;
+            #region creatureSelected
+            if (creatureSelected != null)
+            {
+                creatureSelected.targetToFollow = null;
+                creatureSelected.structureToFollow = null;
+                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
+                {
+                    creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile);
+                    SetVisualsToNothingSelectedLocally();
+                }
+                else
+                {
+                    SetVisualsToNothingSelectedLocally();
+                    creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        creatureSelected.Move();
+                    }
+                }
+                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition) == creatureSelected.tileCurrentlyOn) //this makes sure you can double click to stop the creature and also have it selected
+                {
+                    SetToCreatureOnFieldSelected(creatureSelected);
+                    return;
+                }
+                creatureSelected = null;
+                SetStateToNothingSelected();
+            }
+        }
+        #endregion
+    }
+
 
     public Dictionary<int, Creature> creaturesOwned = new Dictionary<int, Creature>();
     void HandleCreatureInHandSelected(Vector3Int cellSent)
@@ -904,7 +948,7 @@ public class Controller : NetworkBehaviour
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
         cardSelectedSent.transform.parent = null;
-        SetStateToNothingSelected(); 
+        SetStateToNothingSelected();
     }
 
     private void HandleSpellInHandSelected(Vector3Int cellSent)
@@ -1062,7 +1106,7 @@ public class Controller : NetworkBehaviour
 
     public void DrawCard()
     {
-        
+
         if (cardsInDeck.Count <= 0)
         {
             return;
@@ -1072,7 +1116,7 @@ public class Controller : NetworkBehaviour
             return;
         }
         CardInHand cardAddingToHand = cardsInDeck[cardsInDeck.Count - 1]; //todo this might cause problems when dealing with shuffling cards back into the deck
-        
+
         cardAddingToHand.indexOfCard = cardsInDeck.Count - 1;
         cardsInDeck.RemoveAt(cardsInDeck.Count - 1);
 
@@ -1114,7 +1158,7 @@ public class Controller : NetworkBehaviour
         {
             if (cardToRemove.cardType != CardInHand.CardType.Creature)
             {
-                 cardToRemove.transform.parent = null;
+                cardToRemove.transform.parent = null;
             }
         }
     }
@@ -1123,12 +1167,6 @@ public class Controller : NetworkBehaviour
     int indexOfCardInHandSelected;
     public void SetToCreatureOnFieldSelected(Creature creatureSelectedSent)
     {
-        if (state == State.CreatureSelected)
-        {
-            creatureSelected.SetTargetToFollow(creatureSelectedSent);
-            SetStateToNothingSelected();
-            return;
-        }
         if (state == State.SpellInHandSelected)
         {
             if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
@@ -1139,7 +1177,6 @@ public class Controller : NetworkBehaviour
             return;
         }
         creatureSelected = creatureSelectedSent;
-        state = State.CreatureSelected;
     }
 
     private void CastSpellOnTargetedCreature(Creature creatureSelectedSent)
@@ -1149,7 +1186,7 @@ public class Controller : NetworkBehaviour
         instantiatedSpell.GetComponent<TargetedSpell>().InjectDependencies(creatureSelectedSent, this);
         RemoveCardFromHand(cardSelected);
         OnSpellCast();
-        
+
         SetStateToNothingSelected();
     }
 
@@ -1298,7 +1335,7 @@ public class Controller : NetworkBehaviour
     public virtual void OnSpellCast()
     {
         spellCounter++;
-       
+
     }
 
     internal CardInHand GetRandomCreatureInHand()
