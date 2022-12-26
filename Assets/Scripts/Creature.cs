@@ -1239,7 +1239,7 @@ public class Creature : MonoBehaviour
     }
 
     public Creature targetToFollow;
-    internal void SetTargetToFollow(Creature creatureToFollow)
+    internal void SetTargetToFollow(Creature creatureToFollow, Vector3 originalCreaturePosition)
     {
         if (structureToFollow != null)
         {
@@ -1258,11 +1258,11 @@ public class Creature : MonoBehaviour
                     }
                 }
             }
-            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), actualPosition);
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
         }
     }
     public Structure structureToFollow;
-    internal void SetStructureToFollow(Structure structureToFollowSent)
+    internal void SetStructureToFollow(Structure structureToFollowSent, Vector3 originalCreaturePosition)
     {
         if (targetToFollow != null)
         {
@@ -1275,7 +1275,7 @@ public class Creature : MonoBehaviour
             {
                 return;
             }
-            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollow.tileCurrentlyOn.tilePosition), actualPosition);
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
         }
     }
 

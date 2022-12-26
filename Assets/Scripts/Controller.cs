@@ -764,12 +764,39 @@ public class Controller : NetworkBehaviour
                 }
                 if (locallySelectedCreature != null)
                 {
-                    AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
+                    TargetACreature(raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private void TargetACreature(Creature creatureToTarget)
+    {
+        if (IsOwner)
+        {
+            locallySelectedCreature.SetTargetToFollow(creatureToTarget, locallySelectedCreature.actualPosition);
+            TargetACreatureServerRpc(locallySelectedCreature.creatureID, creatureToTarget.creatureID, locallySelectedCreature.actualPosition);
+        }
+    }
+
+    [ServerRpc]
+    private void TargetACreatureServerRpc(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
+    {
+        TargetACreatureClientRpc(selectedCreatureID, creatureToTargetID, actualPosition);
+    }
+    [ClientRpc]
+    private void TargetACreatureClientRpc(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
+    {
+        TargetACreatureLocal(selectedCreatureID, creatureToTargetID, actualPosition);
+    }
+    private void TargetACreatureLocal(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
+    {
+        if (!IsOwner)
+        {
+            GameManager.singleton.allCreaturesOnField[selectedCreatureID].SetTargetToFollow(GameManager.singleton.allCreaturesOnField[creatureToTargetID], actualPosition);
+        }
     }
 
     private void VisualPathfinderOnCreatureSelected(Creature creature)
@@ -834,7 +861,7 @@ public class Controller : NetworkBehaviour
             creatureSelected.structureToFollow = null;
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
             {
-                creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile);
+                creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
                 SetVisualsToNothingSelectedLocally();
             }
             else
@@ -878,7 +905,7 @@ public class Controller : NetworkBehaviour
                 creatureSelected.structureToFollow = null;
                 if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
                 {
-                    creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile);
+                    creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
                     SetVisualsToNothingSelectedLocally();
                 }
                 else
