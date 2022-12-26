@@ -39,7 +39,7 @@ public class GameManager : NetworkBehaviour
 
 
     public int tickTimer;
-    int tickTimerThreshold = 6;
+    int tickTimerThreshold = 0;
     public int allCreatureGuidCounter;
 
     public int endingX;

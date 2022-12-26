@@ -76,14 +76,6 @@ public class Controller : NetworkBehaviour
     public int tick = 0; //this is for determining basically everything
     public float tickTimer = 0f;
     float tickThreshold = .12f;
-    public List<Vector3Int> clickQueueForTick = new List<Vector3Int>();
-    List<Vector3Int> tempLocalPositionsToSend = new List<Vector3Int>();
-    List<bool> tempRightClicksToSend = new List<bool>();
-    List<bool> rightClicksToEnact = new List<bool>();
-    List<Vector3Int> tempLocalTilePositionPurchased = new List<Vector3Int>();
-    List<Vector3Int> localTilePositionPurchasedToSend = new List<Vector3Int>();
-    List<int> tempLocalIndecesOfCardsInHand = new List<int>();
-    public List<int> IndecesOfCardsInHandQueue = new List<int>();
 
     public bool hasTickedSinceSendingLastMessage = true;
     public Creature locallySelectedCreature;
@@ -104,6 +96,21 @@ public class Controller : NetworkBehaviour
 
 
     public int spellCounter = 0;
+
+    public List<ActionStruct> finalOrder = new List<ActionStruct>();
+
+    public List<ActionStruct> localOrder = new List<ActionStruct>();
+
+    [Serializable]
+    public enum ActionTaken
+    {
+        LeftClickBaseMap,
+        SelectedCreature,
+        SelectedCardInHand,
+        RightClick,
+        TilePurchased
+    }
+
     public override void OnNetworkSpawn()
     {
 
@@ -264,14 +271,6 @@ public class Controller : NetworkBehaviour
             tickTimer = 0f;
             SendAllInputsInQueue();
         }
-        if (!hasTickedSinceSendingLastMessage && !GameManager.singleton.playerList.Contains(this)) //attempts to resend on a failed rpc
-        {
-            Debug.LogError("Failed sending message attempting to try again at tick " + tick);
-            hasTickedSinceSendingLastMessage = false;
-            tickTimer = 0f;
-            SendAllInputsInQueue();
-        }
-
         if (locallySelectedCard != null)
         {
             if (locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled == true)
@@ -298,7 +297,7 @@ public class Controller : NetworkBehaviour
             if (instantiatedCaste != null)
             {
                 SetVisualsToNothingSelectedLocally();
-                tempRightClicksToSend.Add(true); //handle setting the state to nothing selected
+                localOrder.Add(new ActionStruct(ActionTaken.RightClick, true));
             }
         }
         if (Input.GetMouseButtonUp(0))
@@ -519,119 +518,62 @@ public class Controller : NetworkBehaviour
     void AddToTickQueueLocal(Vector3Int positionSent)
     {
         //locallySelectedCreature = null;
-        tempLocalPositionsToSend.Add(positionSent);
+
+        localOrder.Add(new ActionStruct(ActionTaken.LeftClickBaseMap, positionSent));
     }
     private void AddToPuchaseTileQueueLocal(Vector3Int cellPositionSentToClients)
     {
-        tempLocalTilePositionPurchased.Add(cellPositionSentToClients);
+        localOrder.Add(new ActionStruct(ActionTaken.TilePurchased, cellPositionSentToClients));
     }
     void AddIndexOfCardInHandToTickQueueLocal(int index)
     {
-        tempLocalIndecesOfCardsInHand.Add(index);
+        localOrder.Add(new ActionStruct(ActionTaken.SelectedCardInHand, index));
     }
-
-    List<int> tempIndexOfCreatureOnBoard = new List<int>();
     void AddIndexOfCreatureOnBoard(int index)
     {
-        tempIndexOfCreatureOnBoard.Add(index);
-    }
-    void AddToTickQueue(Vector3Int positionSent)
-    {
-        clickQueueForTick.Add(positionSent);
-    }
-    List<int> indecesOfCreaturesInQueue = new List<int>();
-    void AddToCreatureOnBoardQueue(int index)
-    {
-        indecesOfCreaturesInQueue.Add(index);
-    }
-    void AddToIndexQueue(int indexSent)
-    {
-        IndecesOfCardsInHandQueue.Add(indexSent);
+        localOrder.Add(new ActionStruct(ActionTaken.SelectedCreature, index));
     }
 
     void SendAllInputsInQueue()
     {
         Message message = new Message();
-        message.leftClicksWorldPos = tempLocalPositionsToSend;
-        message.guidsForCards = tempLocalIndecesOfCardsInHand;
-        message.guidsForCreatures = tempIndexOfCreatureOnBoard;
-        message.localTilePositionsToBePurchased = tempLocalTilePositionPurchased;
-        message.hasClickedRightClick = tempRightClicksToSend;
         //message.timeBetweenLastTick = timeBetweenLastTick;
         //set guids of struct
+
+        if (localOrder.Count > 0)
+        {
+            message.ActionsInOrder = localOrder;
+        }
+
+
         string messageString = JsonUtility.ToJson(message);
+
         SendMessageServerRpc(messageString);
-        for (int i = 0; i < tempLocalTilePositionPurchased.Count; i++)
+
+        for (int i = 0; i < localOrder.Count; i++)
         {
-            localTilePositionPurchasedToSend.Add(tempLocalTilePositionPurchased[i]);
+            finalOrder.Add(localOrder[i]);
         }
-        for (int i = 0; i < tempLocalPositionsToSend.Count; i++)
-        {
-            clickQueueForTick.Add(tempLocalPositionsToSend[i]);
-        }
-        for (int i = 0; i < tempLocalIndecesOfCardsInHand.Count; i++)
-        {
-            IndecesOfCardsInHandQueue.Add(tempLocalIndecesOfCardsInHand[i]);
-        }
-        for (int i = 0; i < tempIndexOfCreatureOnBoard.Count; i++)
-        {
-            indecesOfCreaturesInQueue.Add(tempIndexOfCreatureOnBoard[i]);
-        }
-        for (int i = 0; i < tempRightClicksToSend.Count; i++)
-        {
-            rightClicksToEnact.Add(tempRightClicksToSend[i]);
-        }
-        tempLocalPositionsToSend.Clear();
-        tempLocalIndecesOfCardsInHand.Clear();
-        tempIndexOfCreatureOnBoard.Clear();
-        tempLocalTilePositionPurchased.Clear();
-        tempRightClicksToSend.Clear();
+
         if (!GameManager.singleton.playersThatHaveBeenReceived.Contains(this))
         {
             GameManager.singleton.AddToPlayersThatHaveBeenReceived(this);
         }
+        localOrder.Clear();
     }
 
     void TranslateToFuntionalStruct(string jsonOfMessage)
     {
         Message receievedMessage = JsonUtility.FromJson<Message>(jsonOfMessage);
 
-        //timeBetweenLastTick = receievedMessage.timeBetweenLastTick;
-        if (receievedMessage.localTilePositionsToBePurchased.Count > 0)
+
+        foreach (ActionStruct c in receievedMessage.ActionsInOrder)
         {
-            for (int i = 0; i < receievedMessage.localTilePositionsToBePurchased.Count; i++)
-            {
-                localTilePositionPurchasedToSend.Add(receievedMessage.localTilePositionsToBePurchased[i]);
-            }
+            finalOrder.Add(c);
         }
-        if (receievedMessage.guidsForCards.Count > 0)
-        {
-            for (int i = 0; i < receievedMessage.guidsForCards.Count; i++)
-            {
-                AddToIndexQueue(receievedMessage.guidsForCards[i]);
-            }
-        }
-        if (receievedMessage.guidsForCreatures.Count > 0)
-        {
-            for (int i = 0; i < receievedMessage.guidsForCreatures.Count; i++)
-            {
-                AddToCreatureOnBoardQueue(receievedMessage.guidsForCreatures[i]);
-            }
-        }
-        if (receievedMessage.leftClicksWorldPos.Count > 0)
-        {
-            for (int i = 0; i < receievedMessage.leftClicksWorldPos.Count; i++)
-            {
-                AddToTickQueue(receievedMessage.leftClicksWorldPos[i]);
-            }
-        }
-        if (receievedMessage.hasClickedRightClick.Count > 0)
-        {
-            for (int i = 0; i < receievedMessage.hasClickedRightClick.Count; i++)
-            {
-                rightClicksToEnact.Add(receievedMessage.hasClickedRightClick[i]);
-            }
-        }
+
+
+
         if (!GameManager.singleton.playersThatHaveBeenReceived.Contains(this))
         {
             GameManager.singleton.AddToPlayersThatHaveBeenReceived(this);
@@ -640,33 +582,33 @@ public class Controller : NetworkBehaviour
     void OnTick()
     {
         tick++;
-        //order matters here bigtime later set this up in the enum
 
-        for (int i = 0; i < localTilePositionPurchasedToSend.Count; i++)
+        for (int i = 0; i < finalOrder.Count; i++)
         {
-            PurchaseHarvestTile(localTilePositionPurchasedToSend[i]);
+            ActionStruct actionGrabbed = finalOrder[i];
+
+            if (actionGrabbed.actionType == ActionTaken.LeftClickBaseMap)
+            {
+                LocalLeftClick((Vector3Int)actionGrabbed.actionInputVector);
+            }
+            if (actionGrabbed.actionType == ActionTaken.RightClick)
+            {
+                SetStateToNothingSelected();
+            }
+            if (actionGrabbed.actionType == ActionTaken.SelectedCardInHand)
+            {
+                LocalSelectCardWithIndex((int)actionGrabbed.actionInputInt);
+            }
+            if (actionGrabbed.actionType == ActionTaken.SelectedCreature)
+            {
+                SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[(int)actionGrabbed.actionInputInt]);
+            }
+            if (actionGrabbed.actionType == ActionTaken.TilePurchased)
+            {
+                PurchaseHarvestTile((Vector3Int)actionGrabbed.actionInputVector);
+            }
         }
-        for (int i = 0; i < IndecesOfCardsInHandQueue.Count; i++)
-        {
-            LocalSelectCardWithIndex(IndecesOfCardsInHandQueue[i]);
-        }
-        for (int i = 0; i < indecesOfCreaturesInQueue.Count; i++)
-        {
-            SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[indecesOfCreaturesInQueue[i]]);
-        }
-        for (int i = 0; i < rightClicksToEnact.Count; i++)
-        {
-            SetStateToNothingSelected();
-            rightClicksToEnact.Clear();
-        }
-        for (int i = 0; i < clickQueueForTick.Count; i++)
-        {
-            LocalLeftClick(clickQueueForTick[i]);
-        }
-        localTilePositionPurchasedToSend.Clear();
-        clickQueueForTick.Clear();
-        IndecesOfCardsInHandQueue.Clear();
-        indecesOfCreaturesInQueue.Clear();
+        finalOrder.Clear();
         hasTickedSinceSendingLastMessage = true;
     }
 

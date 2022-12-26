@@ -542,7 +542,6 @@ public class Creature : MonoBehaviour
 
     public virtual void SetMove(Vector3 positionToTarget)
     {
-        Debug.Log(this.transform.position);
         rangeLr.enabled = false;
         playerOwningCreature.SetVisualsToNothingSelectedLocally();
         Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(positionToTarget.x, 0, positionToTarget.z));

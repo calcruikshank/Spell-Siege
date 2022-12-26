@@ -6,10 +6,5 @@ using UnityEngine;
 [Serializable]
 public class Message 
 {
-    public List<Vector3Int> localTilePositionsToBePurchased = new List<Vector3Int>();
-    public List<Vector3Int> leftClicksWorldPos = new List<Vector3Int>();
-    public List<int> guidsForCards = new List<int>();
-    public List<int> guidsForCreatures = new List<int>();
-    public List<bool> hasClickedRightClick = new List<bool>();
-    //public float timeBetweenLastTick = 0f;
+    public List<ActionStruct> ActionsInOrder = new List<ActionStruct>();
 }
