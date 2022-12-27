@@ -396,7 +396,28 @@ public class Creature : MonoBehaviour
     }
 
 
-    protected virtual void VisualAttackAnimation(Creature creatureToAttack)
+    public virtual void VisualAttackAnimation(Creature creatureToAttack)
+    {
+        if (playerOwningCreature.IsOwner)
+        {
+            if (visualAttackParticle != null)
+            {
+                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, Attack);
+                if (deathtouch)
+                {
+                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, Attack);
+                }
+                if (range == 1)
+                {
+                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetRange(1);
+                }
+                OnAttack();
+            }
+            playerOwningCreature.AttackCreatureServerRpc(this.creatureID, creatureToAttack.creatureID);
+        }
+    }
+    public virtual void VisualAttackAnimationLocal(Creature creatureToAttack)
     {
         if (visualAttackParticle != null)
         {
@@ -413,7 +434,25 @@ public class Creature : MonoBehaviour
             OnAttack();
         }
     }
-    protected virtual void VisualAttackAnimationOnStructure(Structure structureToAttack)
+    public virtual void VisualAttackAnimationOnStructure(Structure structureToAttack)
+    {
+        if (playerOwningCreature.IsOwner)
+        {
+            if (visualAttackParticle != null)
+            {
+                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, Attack);
+                if (range == 1)
+                {
+                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetRange(1);
+                }
+                OnAttack();
+            }
+
+            playerOwningCreature.AttackStructureServerRpc(this.creatureID, structureToAttack.tileCurrentlyOn.tilePosition);
+        }
+    }
+    public virtual void VisualAttackAnimationOnStructureLocal(Structure structureToAttack)
     {
         if (visualAttackParticle != null)
         {
@@ -431,6 +470,7 @@ public class Creature : MonoBehaviour
     {
         GameManager.singleton.SpawnDamageText(new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), attack);
         if (indestructible) return;
+
         this.CurrentHealth -= attack;
         UpdateCreatureHUD();
         if (this.CurrentHealth <= 0)
@@ -446,15 +486,15 @@ public class Creature : MonoBehaviour
     }
     public void Die()
     {
+        GameManager.singleton.CreatureDied(this.creatureID);
         OnDeath();
+        lrGameObject.SetActive(false);
+        lrGameObject2.SetActive(false);
+        rangeLrGO.SetActive(false);
         if (this.playerOwningCreature.locallySelectedCreature == this)
         {
             playerOwningCreature.SetStateToNothingSelected();
         }
-        GameManager.singleton.CreatureDied(this.creatureID);
-        lrGameObject.SetActive(false);
-        lrGameObject2.SetActive(false);
-        rangeLrGO.SetActive(false);
         Destroy(this.gameObject);
     }
 
@@ -1163,7 +1203,7 @@ public class Creature : MonoBehaviour
     {
         GameManager.singleton.CreatureEntered(creatureID);
     }
-    public virtual void OnDeath() 
+    public virtual void OnDeath()
     {
         SetStateToDead();
     }

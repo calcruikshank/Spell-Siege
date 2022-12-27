@@ -428,6 +428,42 @@ public class Controller : NetworkBehaviour
         }
     }
 
+    [ServerRpc]
+    internal void AttackCreatureServerRpc(int creatureID1, int creatureID2)
+    {
+        AttackCreatureClientRpc(creatureID1, creatureID2);
+    }
+    [ServerRpc]
+    internal void AttackStructureServerRpc(int creatureID, Vector3Int tilePosition)
+    {
+        AttackStructureClientRpc(creatureID, tilePosition);
+    }
+    [ClientRpc]
+    internal void AttackCreatureClientRpc(int creatureID1, int creatureID2)
+    {
+        if (!IsOwner)
+        {
+            if (GameManager.singleton.allCreaturesOnField.ContainsKey(creatureID1) && GameManager.singleton.allCreaturesOnField.ContainsKey(creatureID2))
+            {
+                GameManager.singleton.allCreaturesOnField[creatureID1].VisualAttackAnimationLocal(GameManager.singleton.allCreaturesOnField[creatureID2]);
+            }
+            
+        }
+    }
+    [ClientRpc]
+    internal void AttackStructureClientRpc(int creatureID, Vector3Int tilePosition)
+    {
+        if (!IsOwner)
+        {
+
+            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePosition).structureOnTile != null && GameManager.singleton.allCreaturesOnField.ContainsKey(creatureID))
+            {
+                GameManager.singleton.allCreaturesOnField[creatureID].VisualAttackAnimationOnStructureLocal(BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePosition).structureOnTile);
+            }
+        }
+    }
+
+
     private void ShowHarvestedTiles()
     {
         foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
@@ -445,6 +481,7 @@ public class Controller : NetworkBehaviour
         }
         ShowingPurchasableHarvestTiles = false;
     }
+
 
     private void HandleTurn()
     {
@@ -1118,6 +1155,7 @@ public class Controller : NetworkBehaviour
                         manaCap++;
                         RemoveCardFromHand(cardSelected);
                         SetStateToNothingSelected();
+                        SetVisualsToNothingSelectedLocally(); //todo change where this is to local by chekcing if you can place structure locally
                         return;
                     }
                 }
@@ -1268,6 +1306,7 @@ public class Controller : NetworkBehaviour
         RemoveCardFromHand(cardSelected);
         OnSpellCast();
 
+        SetVisualsToNothingSelectedLocally();
         SetStateToNothingSelected();
     }
 
