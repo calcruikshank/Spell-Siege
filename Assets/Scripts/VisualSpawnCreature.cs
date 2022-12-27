@@ -5,7 +5,9 @@ using UnityEngine;
 public class VisualSpawnCreature : MonoBehaviour
 {
     float timeElapsed;
-    float lerpDuration = .6f;
+    float lerpDuration = .1f;
+
+    [SerializeField] Transform particleHit;
     Vector3 startValue = new Vector3();
 
     Vector3 endValue = new Vector3();
@@ -16,6 +18,8 @@ public class VisualSpawnCreature : MonoBehaviour
     {
         startValue = this.transform.position;
         endValue = new Vector3(this.transform.position.x, .2f, this.transform.position.z);
+        Instantiate(particleHit, this.transform.position, Quaternion.identity);
+        Destroy(this.gameObject);
     }
     void Update()
     {
@@ -28,7 +32,6 @@ public class VisualSpawnCreature : MonoBehaviour
         }
         else
         {
-            Destroy(this.gameObject);
         }
     }
 }
