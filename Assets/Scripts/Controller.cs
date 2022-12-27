@@ -287,7 +287,10 @@ public class Controller : NetworkBehaviour
                     tmp.color = imageColor;
                 }
             }
-            locallySelectedCard.transform.position = new Vector3(mousePosition.x, mousePosition.y + 1f, mousePosition.z);
+            var screenPoint = Input.mousePosition;
+            screenPoint.z = Camera.main.transform.position.y - 3; //distance of the plane from the camera
+            Vector3 cardPosition = Camera.main.ScreenToWorldPoint(screenPoint);
+            locallySelectedCard.transform.position = new Vector3(cardPosition.x, cardPosition.y, cardPosition.z);
         }
         if (Input.GetMouseButtonDown(1))
         {
@@ -510,8 +513,23 @@ public class Controller : NetworkBehaviour
             creatureSelected = locallySelectedCreature;
             HandleCreatureOnBoardSelected(positionSent, positionOfCreature);
         }
+
+
+
+        //visual section for spawning creatures
+        if (locallySelectedCard != null && locallySelectedCard.cardType == CardInHand.CardType.Creature)
+        {
+            if (CheckToSeeIfCanSpawnCreature(positionSent))
+            {
+                localOrder.Add(new ActionStruct(ActionTaken.LeftClickBaseMap, positionSent, positionOfCreature));
+                SpawnVisualCreatureOnTile(positionSent);
+            }
+            return;
+        }
         localOrder.Add(new ActionStruct(ActionTaken.LeftClickBaseMap, positionSent, positionOfCreature));
     }
+
+
     private void AddToPuchaseTileQueueLocal(Vector3Int cellPositionSentToClients)
     {
         localOrder.Add(new ActionStruct(ActionTaken.TilePurchased, cellPositionSentToClients, Vector3.zero));
@@ -929,26 +947,46 @@ public class Controller : NetworkBehaviour
 
 
     public Dictionary<int, Creature> creaturesOwned = new Dictionary<int, Creature>();
+
+
     void HandleCreatureInHandSelected(Vector3Int cellSent)
+    {
+        if (CheckToSeeIfCanSpawnCreature(cellSent))
+        {
+            SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+            CastCreatureOnTile(cardSelected, cellSent);
+        }
+    }
+    private bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
     {
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent) == null)
         {
             //show error
-            return;
+            return false;
         }
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).traverseType == BaseTile.traversableType.SwimmingAndFlying && cardSelected.GameObjectToInstantiate.GetComponent<Creature>().thisTraversableType == Creature.travType.Walking)
         {
-            return;
+            return false;
         }
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).playerOwningTile == this)
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).structureOnTile == null && BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).CreatureOnTile() == null)
             {
-
-                SpendManaToCast(cardSelected.GetComponent<CardInHand>());
-                CastCreatureOnTile(cardSelected, cellSent);
+                SetVisualsToNothingSelectedLocally();
+                return true;
             }
         }
+        return false;
+    }
+    private void SpawnVisualCreatureOnTile(Vector3Int positionSent)
+    {
+        Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(positionSent);
+
+        GameObject localVisualCreture = Instantiate(locallySelectedCard.GameObjectToInstantiate, new Vector3(positionToSpawn.x, locallySelectedCard.transform.position.y, positionToSpawn.z), Quaternion.identity).gameObject;
+        Destroy(localVisualCreture.GetComponent<Creature>());
+        localVisualCreture.GetComponent<MeshRenderer>().material.color = col;
+        localVisualCreture.AddComponent<VisualSpawnCreature>();
+        Destroy(locallySelectedCard.gameObject);
     }
 
     public void CastCreatureOnTile(CardInHand cardSelectedSent, Vector3Int cellSent)
@@ -1218,7 +1256,7 @@ public class Controller : NetworkBehaviour
     {
         if (locallySelectedCard != null)
         {
-            SetVisualsToNothingSelectedLocally();
+            //SetVisualsToNothingSelectedLocally();
         }
         cardSelected = null;
         creatureSelected = null;

@@ -1198,10 +1198,6 @@ public class Creature : MonoBehaviour
 
     }
 
-    private void OnDestroy()
-    {
-        SetStateToDead();
-    }
     void SetStateToDead()
     {
         if (targetToFollow != null)
