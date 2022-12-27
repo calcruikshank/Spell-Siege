@@ -86,7 +86,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    [ServerRpc (RequireOwnership = false)]
+    [ServerRpc(RequireOwnership = false)]
     void SpawnPlayersServerRpc()
     {
         SpawnPlayersClientRpc();
@@ -183,15 +183,16 @@ public class GameManager : NetworkBehaviour
 
     internal void CreatureDied(int creatureID)
     {
-        if (IsLocalPlayer)
-        {
-            allCreaturesOnField.Remove(creatureID);
-            KillCreatureServerRpc(creatureID);
-        }
         foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
         {
             kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureID]);
         }
+        if (allCreaturesOnField.ContainsKey(creatureID))
+        {
+            allCreaturesOnField.Remove(creatureID);
+        }
+        KillCreatureServerRpc(creatureID);
+
     }
     internal void CreatureEntered(int creatureID)
     {
@@ -201,7 +202,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void KillCreatureServerRpc(int creatureSent)
     {
         KillCreatureClientRpc(creatureSent);
@@ -214,14 +215,12 @@ public class GameManager : NetworkBehaviour
 
     private void LocalCheckToSeeIfCreatureIsDead(int creatureSent)
     {
-        if (!IsLocalPlayer)
+        Debug.Log("Killing creature");
+        if (allCreaturesOnField.ContainsKey(creatureSent))
         {
-            if (allCreaturesOnField.ContainsKey(creatureSent))
+            if (allCreaturesOnField[creatureSent] != null)
             {
-                if (allCreaturesOnField[creatureSent] != null)
-                {
-                    allCreaturesOnField[creatureSent].Kill();
-                }
+                allCreaturesOnField[creatureSent].Kill();
             }
         }
     }
