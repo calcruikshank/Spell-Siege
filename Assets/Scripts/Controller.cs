@@ -978,16 +978,14 @@ public class Controller : NetworkBehaviour
         }
         return false;
     }
-
-    [SerializeField] Transform spawnCreaturePrefab;
     private void SpawnVisualCreatureOnTile(Vector3Int positionSent)
     {
         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(positionSent);
 
-        //GameObject localVisualCreture = Instantiate(locallySelectedCard.GameObjectToInstantiate, new Vector3(positionToSpawn.x, locallySelectedCard.transform.position.y, positionToSpawn.z), Quaternion.identity).gameObject;
-        //Destroy(localVisualCreture.GetComponent<Creature>());
-        //localVisualCreture.GetComponent<MeshRenderer>().material.color = col;
-        Instantiate(spawnCreaturePrefab, new Vector3(positionToSpawn.x, positionToSpawn.y + .2f, positionToSpawn.z), Quaternion.identity);
+        GameObject localVisualCreture = Instantiate(locallySelectedCard.GameObjectToInstantiate, new Vector3(positionToSpawn.x, locallySelectedCard.transform.position.y, positionToSpawn.z), Quaternion.identity).gameObject;
+        Destroy(localVisualCreture.GetComponent<Creature>());
+        localVisualCreture.GetComponent<MeshRenderer>().material.color = col;
+        localVisualCreture.AddComponent<VisualSpawnCreature>();
         Destroy(locallySelectedCard.gameObject);
     }
 

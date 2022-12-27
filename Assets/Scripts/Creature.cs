@@ -560,10 +560,6 @@ public class Creature : MonoBehaviour
         Debug.Log(actualPosition);
     }
 
-    private void OnDestroy()
-    {
-        SetStateToDead();
-    }
     public void SetMoveRpc()
     {
     }
