@@ -763,9 +763,9 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
-                SetVisualsToNothingSelectedLocally();
                 if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected && locallySelectedCreature == null)
                 {
+                    SetVisualsToNothingSelectedLocally();
                     locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
                     creaturePathLockedIn = false;
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
@@ -773,6 +773,7 @@ public class Controller : NetworkBehaviour
                 }
                 if (state == State.SpellInHandSelected || state == State.StructureInHandSeleced)
                 {
+                    SetVisualsToNothingSelectedLocally();
                     if (cardSelected.GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
                     {
                         AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
@@ -791,6 +792,7 @@ public class Controller : NetworkBehaviour
 
     private void TargetACreature(Creature creatureToTarget)
     {
+        Debug.Log("targetig creature");
         if (IsOwner)
         {
             locallySelectedCreature.SetTargetToFollow(creatureToTarget, locallySelectedCreature.actualPosition);
@@ -951,11 +953,8 @@ public class Controller : NetworkBehaviour
 
     void HandleCreatureInHandSelected(Vector3Int cellSent)
     {
-        if (CheckToSeeIfCanSpawnCreature(cellSent))
-        {
-            SpendManaToCast(cardSelected.GetComponent<CardInHand>());
-            CastCreatureOnTile(cardSelected, cellSent);
-        }
+        SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+        CastCreatureOnTile(cardSelected, cellSent);
     }
     private bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
     {
@@ -978,15 +977,27 @@ public class Controller : NetworkBehaviour
         }
         return false;
     }
+
+    [SerializeField] Transform visualSpawnEffect; GameObject localVisualCreture;
+    GameObject instantiatedSpawnPArticle;
     private void SpawnVisualCreatureOnTile(Vector3Int positionSent)
     {
         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(positionSent);
 
-        GameObject localVisualCreture = Instantiate(locallySelectedCard.GameObjectToInstantiate, new Vector3(positionToSpawn.x, locallySelectedCard.transform.position.y, positionToSpawn.z), Quaternion.identity).gameObject;
+        localVisualCreture = Instantiate(locallySelectedCard.GameObjectToInstantiate, new Vector3(positionToSpawn.x, -2f, positionToSpawn.z), Quaternion.identity).gameObject;
         Destroy(localVisualCreture.GetComponent<Creature>());
         localVisualCreture.GetComponent<MeshRenderer>().material.color = col;
         localVisualCreture.AddComponent<VisualSpawnCreature>();
+        localVisualCreture.transform.localScale *= .5f;
+
+        foreach (TextMeshPro tmp in localVisualCreture.GetComponentsInChildren<TextMeshPro>())
+        {
+            tmp.enabled = false;
+        }
+        instantiatedSpawnPArticle = Instantiate(visualSpawnEffect, new Vector3(positionToSpawn.x, positionToSpawn.y + .2f, positionToSpawn.z), Quaternion.identity).gameObject;
         Destroy(locallySelectedCard.gameObject);
+
+        locallySelectedCardInHandToTurnOff.gameObject.SetActive(false);
     }
 
     public void CastCreatureOnTile(CardInHand cardSelectedSent, Vector3Int cellSent)
@@ -1011,6 +1022,14 @@ public class Controller : NetworkBehaviour
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
         cardSelectedSent.transform.parent = null;
         SetStateToNothingSelected();
+        if (instantiatedSpawnPArticle != null)
+        {
+            Destroy(instantiatedSpawnPArticle);
+        }
+        if (localVisualCreture != null)
+        {
+            Destroy(localVisualCreture);
+        }
     }
 
     private void HandleSpellInHandSelected(Vector3Int cellSent)

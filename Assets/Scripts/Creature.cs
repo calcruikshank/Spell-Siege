@@ -103,10 +103,6 @@ public class Creature : MonoBehaviour
     protected Grid grid;
     private void Awake()
     {
-        creatureState = CreatureState.Summoned;
-        creatureID = GameManager.singleton.allCreatureGuidCounter;
-        GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
-        GameManager.singleton.allCreatureGuidCounter++;
     }
 
     protected virtual void Start()
@@ -850,6 +846,10 @@ public class Creature : MonoBehaviour
 
     internal void SetToPlayerOwningCreature(Controller controller)
     {
+        creatureState = CreatureState.Summoned;
+        creatureID = GameManager.singleton.allCreatureGuidCounter;
+        GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
+        GameManager.singleton.allCreatureGuidCounter++;
         this.playerOwningCreature = controller;
         this.transform.GetComponent<MeshRenderer>().material.color = controller.col;
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
@@ -1163,7 +1163,10 @@ public class Creature : MonoBehaviour
     {
         GameManager.singleton.CreatureEntered(creatureID);
     }
-    public virtual void OnDeath() { }
+    public virtual void OnDeath() 
+    {
+        SetStateToDead();
+    }
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
     public virtual void OtherCreatureDied(Creature creatureThatDied)

@@ -139,14 +139,16 @@ MonoBehaviour:
   allVertextPointsInTilesOwned: []
   tick: 0
   tickTimer: 0
-  clickQueueForTick: []
-  IndecesOfCardsInHandQueue: 
   hasTickedSinceSendingLastMessage: 1
   locallySelectedCreature: {fileID: 0}
   playerHud: {fileID: 8061840716336608874, guid: ff649b0ea61d66149a0f91d41f2ab955, type: 3}
   harvestedTiles: []
   spellCounter: 0
+  finalOrder: []
+  localOrder: []
+  creaturePathLockedIn: 0
   ShowingPurchasableHarvestTiles: 0
+  visualSpawnEffect: {fileID: 8362349209469777723, guid: 1835dbeede209484cb976155d1b75638, type: 3}
 --- !u!114 &8164691875682251415
 MonoBehaviour:
   m_ObjectHideFlags: 0
