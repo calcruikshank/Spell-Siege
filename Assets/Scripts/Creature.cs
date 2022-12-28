@@ -446,15 +446,15 @@ public class Creature : MonoBehaviour
     }
     public void Die()
     {
-        OnDeath();
+        GameManager.singleton.CreatureDied(this.creatureID);
         if (this.playerOwningCreature.locallySelectedCreature == this)
         {
             playerOwningCreature.SetStateToNothingSelected();
         }
-        GameManager.singleton.CreatureDied(this.creatureID);
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);
         rangeLrGO.SetActive(false);
+        OnDeath();
         Destroy(this.gameObject);
     }
 

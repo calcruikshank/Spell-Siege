@@ -191,7 +191,11 @@ public class GameManager : NetworkBehaviour
         {
             allCreaturesOnField.Remove(creatureID);
         }
-        KillCreatureServerRpc(creatureID);
+        if (IsLocalPlayer)
+        {
+            Debug.Log("Local player");
+        }
+        //KillCreatureServerRpc(creatureID);
 
     }
     internal void CreatureEntered(int creatureID)

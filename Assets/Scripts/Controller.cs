@@ -610,6 +610,7 @@ public class Controller : NetworkBehaviour
             }
             if (actionGrabbed.actionType == ActionTaken.SelectedCreature)
             {
+                Debug.Log(GameManager.singleton.allCreaturesOnField[(int)actionGrabbed.actionInputInt]);
                 SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[(int)actionGrabbed.actionInputInt]);
             }
             if (actionGrabbed.actionType == ActionTaken.TilePurchased)
@@ -955,6 +956,7 @@ public class Controller : NetworkBehaviour
     {
         SpendManaToCast(cardSelected.GetComponent<CardInHand>());
         CastCreatureOnTile(cardSelected, cellSent);
+        SetStateToNothingSelected();
     }
     private bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
     {
@@ -984,16 +986,16 @@ public class Controller : NetworkBehaviour
     {
         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(positionSent);
 
-        localVisualCreture = Instantiate(locallySelectedCard.GameObjectToInstantiate, new Vector3(positionToSpawn.x, -2f, positionToSpawn.z), Quaternion.identity).gameObject;
-        Destroy(localVisualCreture.GetComponent<Creature>());
-        localVisualCreture.GetComponent<MeshRenderer>().material.color = col;
-        localVisualCreture.AddComponent<VisualSpawnCreature>();
-        localVisualCreture.transform.localScale *= .5f;
+        //localVisualCreture = Instantiate(locallySelectedCard.GameObjectToInstantiate, new Vector3(positionToSpawn.x, -2f, positionToSpawn.z), Quaternion.identity).gameObject;
+        //Destroy(localVisualCreture.GetComponent<Creature>());
+        //localVisualCreture.GetComponent<MeshRenderer>().material.color = col;
+        //localVisualCreture.AddComponent<VisualSpawnCreature>();
+        //localVisualCreture.transform.localScale *= .5f;
 
-        foreach (TextMeshPro tmp in localVisualCreture.GetComponentsInChildren<TextMeshPro>())
+        /*foreach (TextMeshPro tmp in localVisualCreture.GetComponentsInChildren<TextMeshPro>())
         {
             tmp.enabled = false;
-        }
+        }*/
         instantiatedSpawnPArticle = Instantiate(visualSpawnEffect, new Vector3(positionToSpawn.x, positionToSpawn.y + .2f, positionToSpawn.z), Quaternion.identity).gameObject;
         Destroy(locallySelectedCard.gameObject);
 
@@ -1004,7 +1006,6 @@ public class Controller : NetworkBehaviour
     {
         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
         GameObject instantiatedCreature = Instantiate(cardSelectedSent.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-        RemoveCardFromHand(cardSelectedSent);
         if (environmentMap.GetInstantiatedObject(cellSent))
         {
             GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
@@ -1021,16 +1022,13 @@ public class Controller : NetworkBehaviour
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
         cardSelectedSent.transform.parent = null;
-        SetStateToNothingSelected();
+        RemoveCardFromHand(cardSelectedSent);
         if (instantiatedSpawnPArticle != null)
         {
             Destroy(instantiatedSpawnPArticle);
         }
-        if (localVisualCreture != null)
-        {
-            Destroy(localVisualCreture);
-        }
     }
+
 
     private void HandleSpellInHandSelected(Vector3Int cellSent)
     {
@@ -1265,9 +1263,8 @@ public class Controller : NetworkBehaviour
         SpendManaToCast(cardSelected.GetComponent<CardInHand>());
         GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, creatureSelectedSent.tileCurrentlyOn.tilePosition, Quaternion.identity);
         instantiatedSpell.GetComponent<TargetedSpell>().InjectDependencies(creatureSelectedSent, this);
-        RemoveCardFromHand(cardSelected);
         OnSpellCast();
-
+        RemoveCardFromHand(cardSelected);
         SetStateToNothingSelected();
     }
 
