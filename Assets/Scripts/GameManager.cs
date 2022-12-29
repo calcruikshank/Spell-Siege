@@ -183,19 +183,14 @@ public class GameManager : NetworkBehaviour
 
     internal void CreatureDied(int creatureID)
     {
-        foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
+        if (allCreaturesOnField[creatureID] != null)
         {
-            kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureID]);
+            foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
+            {
+                kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureID]);
+            }
+            //KillCreatureServerRpc(creatureID);
         }
-        if (allCreaturesOnField.ContainsKey(creatureID))
-        {
-            allCreaturesOnField.Remove(creatureID);
-        }
-        if (IsLocalPlayer)
-        {
-            Debug.Log("Local player");
-        }
-        //KillCreatureServerRpc(creatureID);
 
     }
     internal void CreatureEntered(int creatureID)
@@ -220,11 +215,19 @@ public class GameManager : NetworkBehaviour
     private void LocalCheckToSeeIfCreatureIsDead(int creatureSent)
     {
         Debug.Log("Killing creature");
-        if (allCreaturesOnField.ContainsKey(creatureSent))
+        if (allCreaturesOnField[creatureSent] != null)
         {
-            if (allCreaturesOnField[creatureSent] != null)
+            localDestroyCreature(creatureSent);
+        }
+    }
+
+    private void localDestroyCreature(int creatureSent)
+    {
+        if (allCreaturesOnField[creatureSent] != null)
+        {
+            foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
             {
-                allCreaturesOnField[creatureSent].Kill();
+                kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureSent]);
             }
         }
     }

@@ -298,9 +298,4 @@ public class BaseTile : MonoBehaviour
         instantiatedManaSymbol.gameObject.SetActive(true);
     }
 
-    internal void SetHarvestCost(int harvestCostSent)
-    {
-        this.harvestCost = harvestCostSent;
-        costText.text = harvestCost.ToString();
-    }
 }

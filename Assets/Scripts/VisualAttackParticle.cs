@@ -103,6 +103,7 @@ public class VisualAttackParticle : MonoBehaviour
     int range = 0;
     internal void SetRange(int v)
     {
+        return;
         if (v == 1)
         {
             range = v;

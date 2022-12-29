@@ -57,7 +57,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 80; //todo make this 800
+    int turnThreshold = 1200; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] List<CardInHand> demonDeck = new List<CardInHand>();
@@ -102,6 +102,9 @@ public class Controller : NetworkBehaviour
     public List<ActionStruct> localOrder = new List<ActionStruct>();
 
     public bool creaturePathLockedIn = false;
+
+
+    bool canPurchaseHarvestTile = false;
 
     [Serializable]
     public enum ActionTaken
@@ -207,6 +210,7 @@ public class Controller : NetworkBehaviour
 
     public void StartTurnPhase()
     {
+        HandleHarvestTiles();
         switch (state)
         {
             case State.PlacingCastle:
@@ -231,7 +235,28 @@ public class Controller : NetworkBehaviour
                 HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
-                break;
+        }
+    }
+
+    private void HandleHarvestTiles()
+    {
+
+        if (canPurchaseHarvestTile == true)
+        {
+
+        }
+        canPurchaseHarvestTile = true;
+
+        if (IsOwner)
+        {
+            ShowHarvestedTiles();
+            foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
+            {
+                if (ShowingPurchasableHarvestTiles)
+                {
+                    ShowHarvestedTiles();
+                }
+            }
         }
     }
 
@@ -257,10 +282,6 @@ public class Controller : NetworkBehaviour
             }
         }
 
-        if (state != State.PlacingCastle)
-        {
-            HandleSpacebarPressed();
-        }
         tickTimer += Time.deltaTime;
         if (hasTickedSinceSendingLastMessage)
         {
@@ -409,30 +430,16 @@ public class Controller : NetworkBehaviour
 
     public bool ShowingPurchasableHarvestTiles = false;
 
-    bool keepClicked = false;
-    private void HandleSpacebarPressed()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            keepClicked = false;
-            CameraControl.Singleton.ReturnHome(new Vector3(instantiatedCaste.transform.position.x, instantiatedCaste.transform.position.y, instantiatedCaste.transform.position.z - 7));
-            ShowHarvestedTiles();
-        }
-        if (!keepClicked)
-        {
-            if (Input.GetKeyUp(KeyCode.Space))
-            {
-                CameraControl.Singleton.CancelReturnHome();
-                HideHarvestedTiles();
-            }
-        }
-    }
+    
 
     private void ShowHarvestedTiles()
     {
         foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
         {
-            bt.Value.ShowHarvestIcon();
+            if (harvestedTiles.Contains(bt.Value) || canPurchaseHarvestTile)
+            {
+                bt.Value.ShowHarvestIcon();
+            }
         }
         ShowingPurchasableHarvestTiles = true;
     }
@@ -483,6 +490,7 @@ public class Controller : NetworkBehaviour
 
     private void HandleMana()
     {
+        ClearMana();
         AddToMana();
     }
 
@@ -492,8 +500,7 @@ public class Controller : NetworkBehaviour
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent))
             {
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent).harvestCost == 0) return false;
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent).playerOwningTile == this && BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent).harvestCost <= totalMana)
+                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent).playerOwningTile == this && canPurchaseHarvestTile)
                 {
                     return true;
                 }
@@ -506,7 +513,7 @@ public class Controller : NetworkBehaviour
     void AddToTickQueueLocal(Vector3Int positionSent)
     {
         Vector3 positionOfCreature = new Vector3();
-        if (locallySelectedCreature && IsOwner)
+        if (locallySelectedCreature && IsOwner && state != State.SpellInHandSelected)
         {
             positionOfCreature = locallySelectedCreature.actualPosition;
 
@@ -610,7 +617,6 @@ public class Controller : NetworkBehaviour
             }
             if (actionGrabbed.actionType == ActionTaken.SelectedCreature)
             {
-                Debug.Log(GameManager.singleton.allCreaturesOnField[(int)actionGrabbed.actionInputInt]);
                 SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[(int)actionGrabbed.actionInputInt]);
             }
             if (actionGrabbed.actionType == ActionTaken.TilePurchased)
@@ -628,16 +634,19 @@ public class Controller : NetworkBehaviour
         {
             return;
         }
-        SpendGenericMana(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).harvestCost);
-        manaCap++;
+
+        canPurchaseHarvestTile = false;
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int));
-        IncreaseCostOfHarvestTiles();
+
+
+        HideHarvestedTiles();
+        //IncreaseCostOfHarvestTiles();
     }
 
-    int harvestCost = 3;
+    //int harvestCost = 3;
     private void IncreaseCostOfHarvestTiles()
     {
-        harvestCost = harvestedTiles.Count * 3;
+        //harvestCost = harvestedTiles.Count * 3;
 
         //AddToMaxMana(baseTileSent.manaType);
     }
@@ -683,10 +692,11 @@ public class Controller : NetworkBehaviour
         instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
         AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
-        IncreaseCostOfHarvestTiles();
+        //IncreaseCostOfHarvestTiles();
         AddToMana();
         SetStateToWaiting();
         GameManager.singleton.AddPlayerToReady(this);
+        canPurchaseHarvestTile = true;
     }
 
     private void AddStructureToTile(Structure structure, Vector3Int positionSent)
@@ -698,15 +708,31 @@ public class Controller : NetworkBehaviour
 
     private void AddTileToHarvestedTilesList(BaseTile baseTileSent)
     {
+        if (baseTileSent.manaType == BaseTile.ManaType.Green)
+        {
+            resources.greenManaCap++;
+        }
+        if (baseTileSent.manaType == BaseTile.ManaType.Black)
+        {
+            resources.blackManaCap++;
+        }
+        if (baseTileSent.manaType == BaseTile.ManaType.White)
+        {
+            resources.whiteManaCap++;
+        }
+        if (baseTileSent.manaType == BaseTile.ManaType.Blue)
+        {
+            resources.blueManaCap++;
+        }
+        if (baseTileSent.manaType == BaseTile.ManaType.Red)
+        {
+            resources.redManaCap++;
+        }
         harvestedTiles.Add(baseTileSent);
         baseTileSent.SetBeingHarvested();
-        foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
-        {
-            if (!harvestedTiles.Contains(bt.Value))
-            {
-                bt.Value.SetHarvestCost(harvestCost);
-            }
-        }
+
+
+        resourcesChanged.Invoke(resources);
     }
 
     CardInHand locallySelectedCardInHandToTurnOff;
@@ -721,15 +747,13 @@ public class Controller : NetworkBehaviour
                 {
                     if (locallySelectedCard == null || locallySelectedCard.cardType != CardInHand.CardType.Spell)
                     {
-                        if (!keepClicked)
+                        if (!ShowingPurchasableHarvestTiles)
                         {
-                            keepClicked = true;
                             ShowHarvestedTiles();
                             return true;
                         }
-                        if (keepClicked)
+                        if (ShowingPurchasableHarvestTiles)
                         {
-                            keepClicked = false;
                             HideHarvestedTiles();
                             return true;
                         }
@@ -798,6 +822,7 @@ public class Controller : NetworkBehaviour
         {
             locallySelectedCreature.SetTargetToFollow(creatureToTarget, locallySelectedCreature.actualPosition);
             TargetACreatureServerRpc(locallySelectedCreature.creatureID, creatureToTarget.creatureID, locallySelectedCreature.actualPosition);
+            creatureToTarget.HidePathfinderLR();
         }
     }
 
@@ -1029,7 +1054,6 @@ public class Controller : NetworkBehaviour
         }
     }
 
-
     private void HandleSpellInHandSelected(Vector3Int cellSent)
     {
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent) == null)
@@ -1057,6 +1081,7 @@ public class Controller : NetworkBehaviour
                 GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
                 instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
                 OnSpellCast();
+                SetVisualsToNothingSelectedLocally();
                 SetStateToNothingSelected();
                 return;
             }
@@ -1069,6 +1094,7 @@ public class Controller : NetworkBehaviour
                 GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
                 instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
                 OnSpellCast();
+                SetVisualsToNothingSelectedLocally();
                 SetStateToNothingSelected();
                 return;
             }
@@ -1113,8 +1139,8 @@ public class Controller : NetworkBehaviour
                             SetOwningTile(bt.tilePosition);
                         }
                         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
-                        manaCap++;
                         RemoveCardFromHand(cardSelected);
+                        SetVisualsToNothingSelectedLocally();
                         SetStateToNothingSelected();
                         return;
                     }
@@ -1260,11 +1286,12 @@ public class Controller : NetworkBehaviour
 
     private void CastSpellOnTargetedCreature(Creature creatureSelectedSent)
     {
+        RemoveCardFromHand(cardSelected);
+        Debug.Log(cardSelected + " card selected send to casting spell on target creature");
         SpendManaToCast(cardSelected.GetComponent<CardInHand>());
         GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, creatureSelectedSent.tileCurrentlyOn.tilePosition, Quaternion.identity);
         instantiatedSpell.GetComponent<TargetedSpell>().InjectDependencies(creatureSelectedSent, this);
         OnSpellCast();
-        RemoveCardFromHand(cardSelected);
         SetStateToNothingSelected();
     }
 
@@ -1286,46 +1313,39 @@ public class Controller : NetworkBehaviour
         state = State.Waiting;
     }
 
+    public void ClearMana()
+    {
+        resources.blueMana = 0;
+        resources.greenMana = 0;
+        resources.redMana = 0;
+        resources.blackMana = 0;
+        resources.whiteMana = 0;
 
-    int manaCap = 5;
+        resourcesChanged.Invoke(resources);
+    }
     public void AddToMana()
     {
         for (int i = 0; i < harvestedTiles.Count; i++)
         {
             if (harvestedTiles[i].manaType == BaseTile.ManaType.Blue)
             {
-                if (resources.blueMana < manaCap)
-                {
-                    resources.blueMana++;
-                }
+                resources.blueMana++;
             }
             if (harvestedTiles[i].manaType == BaseTile.ManaType.Black)
             {
-                if (resources.blackMana < manaCap)
-                {
-                    resources.blackMana++;
-                }
+                resources.blackMana++;
             }
             if (harvestedTiles[i].manaType == BaseTile.ManaType.Red)
             {
-                if (resources.redMana < manaCap)
-                {
-                    resources.redMana++;
-                }
+                resources.redMana++;
             }
             if (harvestedTiles[i].manaType == BaseTile.ManaType.White)
             {
-                if (resources.whiteMana < manaCap)
-                {
-                    resources.whiteMana++;
-                }
+                resources.whiteMana++;
             }
             if (harvestedTiles[i].manaType == BaseTile.ManaType.Green)
             {
-                if (resources.greenMana < manaCap)
-                {
-                    resources.greenMana++;
-                }
+                resources.greenMana++;
             }
         }
 
@@ -1336,38 +1356,23 @@ public class Controller : NetworkBehaviour
 
         if (manaTypeSent == BaseTile.ManaType.Black)
         {
-            if (resources.blackMana < manaCap)
-            {
-                resources.blackMana++;
-            }
+            resources.blackMana++;
         }
         if (manaTypeSent == BaseTile.ManaType.Blue)
         {
-            if (resources.blueMana < manaCap)
-            {
-                resources.blueMana++;
-            }
+            resources.blueMana++;
         }
         if (manaTypeSent == BaseTile.ManaType.Red)
         {
-            if (resources.redMana < manaCap)
-            {
-                resources.redMana++;
-            }
+            resources.redMana++;
         }
         if (manaTypeSent == BaseTile.ManaType.Green)
         {
-            if (resources.greenMana < manaCap)
-            {
-                resources.greenMana++;
-            }
+            resources.greenMana++;
         }
         if (manaTypeSent == BaseTile.ManaType.White)
         {
-            if (resources.whiteMana < manaCap)
-            {
-                resources.whiteMana++;
-            }
+            resources.whiteMana++;
         }
 
         resourcesChanged.Invoke(resources);
@@ -1442,6 +1447,13 @@ public struct PlayerResources
     public int whiteMana;
     public int blackMana;
     public int greenMana;
+
+
+    public int blueManaCap;
+    public int redManaCap;
+    public int whiteManaCap;
+    public int blackManaCap;
+    public int greenManaCap;
 
 }
 

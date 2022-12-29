@@ -457,8 +457,6 @@ public class Creature : MonoBehaviour
         OnDeath();
         Destroy(this.gameObject);
     }
-
-
     void HandleAttackRate()
     {
         if (canAttack)
