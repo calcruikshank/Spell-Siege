@@ -57,7 +57,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 1200; //todo make this 800
+    int turnThreshold = 80; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] List<CardInHand> demonDeck = new List<CardInHand>();
@@ -817,12 +817,12 @@ public class Controller : NetworkBehaviour
 
     private void TargetACreature(Creature creatureToTarget)
     {
-        Debug.Log("targetig creature");
         if (IsOwner)
         {
             locallySelectedCreature.SetTargetToFollow(creatureToTarget, locallySelectedCreature.actualPosition);
             TargetACreatureServerRpc(locallySelectedCreature.creatureID, creatureToTarget.creatureID, locallySelectedCreature.actualPosition);
-            creatureToTarget.HidePathfinderLR();
+            SetVisualsToNothingSelectedLocally();
+            SetStateToNothingSelected();
         }
     }
 
@@ -841,6 +841,7 @@ public class Controller : NetworkBehaviour
         if (!IsOwner)
         {
             GameManager.singleton.allCreaturesOnField[selectedCreatureID].SetTargetToFollow(GameManager.singleton.allCreaturesOnField[creatureToTargetID], actualPosition);
+            SetStateToNothingSelected();
         }
     }
 
@@ -902,8 +903,6 @@ public class Controller : NetworkBehaviour
         #region creatureSelected
         if (creatureSelected != null)
         {
-            creatureSelected.targetToFollow = null;
-            creatureSelected.structureToFollow = null;
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
             {
                 creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
@@ -946,8 +945,6 @@ public class Controller : NetworkBehaviour
             #region creatureSelected
             if (creatureSelected != null)
             {
-                creatureSelected.targetToFollow = null;
-                creatureSelected.structureToFollow = null;
                 if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
                 {
                     creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);

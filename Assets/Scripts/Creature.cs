@@ -198,7 +198,6 @@ public class Creature : MonoBehaviour
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
-                CheckForFollowTarget();
                 break;
             case CreatureState.Summoned:
                 ChooseTarget();
@@ -208,7 +207,6 @@ public class Creature : MonoBehaviour
                 HandleAbilityRate();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
-                CheckForFollowTarget();
                 break;
             case CreatureState.Dead:
                 break;
@@ -221,7 +219,7 @@ public class Creature : MonoBehaviour
         UpdateCreatureHUD();
     }
 
-    bool IsCreatureWithinRange(Creature creatureSent)
+    public bool IsCreatureWithinRange(Creature creatureSent)
     {
         return allTilesWithinRange.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(creatureSent.currentCellPosition));
     }
@@ -526,7 +524,7 @@ public class Creature : MonoBehaviour
     public virtual void SetMove(Vector3 positionToTarget, Vector3 originalPosition)
     {
         actualPosition = originalPosition;
-
+        HidePathfinderLR();
         rangeLr.enabled = false;
         Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(positionToTarget.x, 0, positionToTarget.z));
 
@@ -580,72 +578,6 @@ public class Creature : MonoBehaviour
     {
         if (pathVectorList != null)
         {
-            if (targetToFollow != null)
-            {
-                if (targetToFollow.tileCurrentlyOn != lastTileFollowCreatureWasOn)
-                {
-                    lastTileFollowCreatureWasOn = targetToFollow.tileCurrentlyOn;
-
-                    if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.OnlyFlying)
-                    {
-                        if (thisTraversableType == travType.Walking || thisTraversableType == travType.SwimmingAndWalking || thisTraversableType == travType.Swimming)
-                        {
-                            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition), actualPosition);
-                            return;
-                        }
-                    }
-                    if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.SwimmingAndFlying)
-                    {
-                        if (thisTraversableType == travType.Walking)
-                        {
-                            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition), actualPosition);
-                            return;
-                        }
-                    }
-                    SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition), actualPosition);
-                }
-                if (targetToFollow.playerOwningCreature != this.playerOwningCreature)
-                {
-                    if (pathVectorList.Count > 1)
-                    {
-                        if (IsCreatureWithinRange(targetToFollow))
-                        {
-                            if (currentPathIndex != 0)
-                            {
-                                if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
-                                {
-                                    SetStateToIdle();
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
-            if (structureToFollow != null)
-            {
-                if (structureToFollow.playerOwningStructure != this.playerOwningCreature)
-                {
-                    if (pathVectorList.Count > 1)
-                    {
-                        if (IsStructureInRange(structureToFollow))
-                        {
-                            if (currentPathIndex != 0)
-                            {
-                                if (Vector3.Distance(actualPosition, new Vector3(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).x, actualPosition.y, BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex - 1].tilePosition).z)) <= .02f)
-                                {
-                                    SetStateToIdle();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (pathVectorList.Count == 0)
-            {
-                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition), actualPosition);
-                return;
-            }
             targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
 
             if (Vector3.Distance(actualPosition, targetedPosition) > .02f)
@@ -687,7 +619,7 @@ public class Creature : MonoBehaviour
             tileCurrentlyOn.AddCreatureToTile(this);
         }
 
-        CheckForCreaturesInPath();
+        //CheckForCreaturesInPath();
 
 
     }
@@ -715,65 +647,6 @@ public class Creature : MonoBehaviour
         }
     }
     BaseTile lastTileFollowCreatureWasOn;
-    private void CheckForFollowTarget()
-    {
-        if (targetToFollow == null)
-        {
-            if (tempLineRendererBetweenCreatures != null)
-            {
-                tempLineRendererBetweenCreatures.enabled = false;
-            }
-        }
-        if (targetToFollow != null)
-        {
-            if (pathVectorList.Count > 0)
-            {
-                if (!pathVectorList[pathVectorList.Count - 1].neighborTiles.Contains(targetToFollow.tileCurrentlyOn))
-                {
-                    SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition), actualPosition);
-                }
-            }
-        }
-
-        /*if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != null)
-        {
-            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).CreatureOnTile() != this)
-            {
-                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition).neighborTiles[1].tilePosition));
-            }
-        }
-        if (targetToFollow != null)
-        {
-            if (!creaturesWithinRange.Contains(targetToFollow))
-            {
-                if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.OnlyFlying)
-                {
-                    if (thisTraversableType == travType.Walking || thisTraversableType == travType.SwimmingAndWalking || thisTraversableType == travType.Swimming)
-                    {
-                        return;
-                    }
-                }
-                if (targetToFollow.tileCurrentlyOn.traverseType == BaseTile.traversableType.SwimmingAndFlying)
-                {
-                    if (thisTraversableType == travType.Walking)
-                    {
-                        return;
-                    }
-                }
-                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
-            }
-            if (targetToFollow.pathVectorList.Count > 0)
-            {
-                if (targetToFollow.pathVectorList.Count > targetToFollow.currentPathIndex)
-                {
-                    /*if (!allTilesWithinRange.Contains(targetToFollow.pathVectorList[targetToFollow.currentPathIndex + 1]))
-                    {
-                        SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetToFollow.tileCurrentlyOn.tilePosition));
-                    }
-                }
-            }
-        }*/
-    }
 
 
     LineRenderer tempLineRendererBetweenCreatures;
@@ -859,6 +732,8 @@ public class Creature : MonoBehaviour
         Debug.Log(GameManager.singleton.gameManagerTick + " tick");
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         lr.enabled = false;
+
+        HidePathfinderLR();
         actualPosition = targetedPosition;
         this.transform.position = actualPosition;
         currentCellPosition = grid.WorldToCell(new Vector3(this.transform.position.x, 0, this.transform.position.z));
@@ -1242,7 +1117,10 @@ public class Creature : MonoBehaviour
                     }
                 }
             }
-            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
+            if (!IsCreatureWithinRange(creatureToFollow))
+            {
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
+            }
         }
     }
     public Structure structureToFollow;
