@@ -401,10 +401,10 @@ public class Creature : MonoBehaviour
         if (visualAttackParticle != null)
         {
             Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
-            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, Attack);
+            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, CurrentAttack);
             if (deathtouch)
             {
-                instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, Attack);
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, CurrentAttack);
             }
             if (range == 1)
             {
@@ -418,7 +418,7 @@ public class Creature : MonoBehaviour
         if (visualAttackParticle != null)
         {
             Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
-            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, Attack);
+            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, CurrentAttack);
             if (range == 1)
             {
                 instantiatedParticle.GetComponent<VisualAttackParticle>().SetRange(1);
