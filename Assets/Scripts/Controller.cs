@@ -57,7 +57,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 80; //todo make this 800
+    int turnThreshold = 1200; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] List<CardInHand> demonDeck = new List<CardInHand>();
@@ -106,6 +106,8 @@ public class Controller : NetworkBehaviour
 
     bool canPurchaseHarvestTile = false;
 
+    [SerializeField] Color[] colorsToPickFrom;
+
     [Serializable]
     public enum ActionTaken
     {
@@ -124,32 +126,36 @@ public class Controller : NetworkBehaviour
     void Start()
     {
         GrabAllObjectsFromGameManager();
-        col = Color.red;
-        col = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-        transparentCol = col;
-        transparentCol.a = .5f;
-        SpawnHUDAndHideOnAllNonOwners();
-        instantiatedPlayerUI.gameObject.SetActive(false);
+        
         cardsInDeck = new List<CardInHand>();
 
         if (NetworkManager.Singleton.IsHost && IsOwner)
         {
             cardsInDeck = dragonDeck;
+            col = colorsToPickFrom[0];
         }
         if (!IsHost && IsOwner)
         {
             cardsInDeck = demonDeck;
+            col = colorsToPickFrom[1];
         }
 
         if (!IsOwner && IsHost)
         {
             cardsInDeck = demonDeck;
+            col = colorsToPickFrom[1];
         }
         if (!IsOwner && !IsHost)
         {
             cardsInDeck = dragonDeck;
+            col = colorsToPickFrom[0];
         }
+        col.a = 1;
+        transparentCol = col;
+        transparentCol.a = .5f;
+        SpawnHUDAndHideOnAllNonOwners();
         cardsInDeck = GameManager.singleton.Shuffle(cardsInDeck);
+        instantiatedPlayerUI.gameObject.SetActive(false);
         turn += OnTurn;
         resources = new PlayerResources();
         resourcesChanged += UpdateHudForResourcesChanged;
@@ -1432,6 +1438,33 @@ public class Controller : NetworkBehaviour
             }
         }
         return creatureSelectedInHand;
+    }
+
+
+
+
+
+
+
+    [ServerRpc]
+    internal void AttackCreatureServerRpc(int creatureAttacking, int creatureBeingAttacked)
+    {
+        AttackCreatureClientRpc(creatureAttacking, creatureBeingAttacked);
+    }
+    [ClientRpc]
+    internal void AttackCreatureClientRpc (int creatureAttacking, int creatureBeingAttacked)
+    {
+        GameManager.singleton.allCreaturesOnField[creatureAttacking].LocalAttackCreature(GameManager.singleton.allCreaturesOnField[creatureBeingAttacked]);
+    }
+    [ServerRpc]
+    internal void AttackStructureServerRpc(int creatureAttacking, Vector3Int positionOfStructure)
+    {
+        AttackStructureClientRpc(creatureAttacking, positionOfStructure);
+    }
+    [ClientRpc]
+    internal void AttackStructureClientRpc(int creatureAttacking, Vector3Int positionOfStructure)
+    {
+        GameManager.singleton.allCreaturesOnField[creatureAttacking].LocalAttackStructure(BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionOfStructure).structureOnTile);
     }
 }
 

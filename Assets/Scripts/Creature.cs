@@ -396,6 +396,14 @@ public class Creature : MonoBehaviour
 
     protected virtual void VisualAttackAnimation(Creature creatureToAttack)
     {
+        if (playerOwningCreature.IsOwner)
+        {
+            playerOwningCreature.AttackCreatureServerRpc(this.creatureID, creatureToAttack.creatureID);
+
+        }
+    }
+    public void LocalAttackCreature(Creature creatureToAttack)
+    {
         if (visualAttackParticle != null)
         {
             Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
@@ -411,7 +419,16 @@ public class Creature : MonoBehaviour
             OnAttack();
         }
     }
+
+
     protected virtual void VisualAttackAnimationOnStructure(Structure structureToAttack)
+    {
+        if (playerOwningCreature.IsOwner)
+        {
+            playerOwningCreature.AttackStructureServerRpc(this.creatureID, structureToAttack.currentCellPosition);
+        }
+    }
+    public void LocalAttackStructure(Structure structureToAttack)
     {
         if (visualAttackParticle != null)
         {
@@ -1036,7 +1053,7 @@ public class Creature : MonoBehaviour
     {
         GameManager.singleton.CreatureEntered(creatureID);
     }
-    public virtual void OnDeath() 
+    public virtual void OnDeath()
     {
         SetStateToDead();
     }
@@ -1118,6 +1135,10 @@ public class Creature : MonoBehaviour
                 }
             }
             if (!IsCreatureWithinRange(creatureToFollow))
+            {
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
+            }
+            if (creatureToFollow.playerOwningCreature == this.playerOwningCreature)
             {
                 SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
             }

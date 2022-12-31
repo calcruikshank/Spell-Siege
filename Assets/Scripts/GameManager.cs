@@ -189,7 +189,6 @@ public class GameManager : NetworkBehaviour
             {
                 kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureID]);
             }
-            //KillCreatureServerRpc(creatureID);
         }
 
     }
@@ -198,37 +197,6 @@ public class GameManager : NetworkBehaviour
         foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
         {
             kvp.Value.OtherCreatureEntered(allCreaturesOnField[creatureID]);
-        }
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void KillCreatureServerRpc(int creatureSent)
-    {
-        KillCreatureClientRpc(creatureSent);
-    }
-    [ClientRpc]
-    private void KillCreatureClientRpc(int creatureSent)
-    {
-        LocalCheckToSeeIfCreatureIsDead(creatureSent);
-    }
-
-    private void LocalCheckToSeeIfCreatureIsDead(int creatureSent)
-    {
-        Debug.Log("Killing creature");
-        if (allCreaturesOnField[creatureSent] != null)
-        {
-            localDestroyCreature(creatureSent);
-        }
-    }
-
-    private void localDestroyCreature(int creatureSent)
-    {
-        if (allCreaturesOnField[creatureSent] != null)
-        {
-            foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
-            {
-                kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureSent]);
-            }
         }
     }
 }
