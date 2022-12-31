@@ -494,6 +494,17 @@ public class Controller : NetworkBehaviour
         DrawCard();
     }
 
+    [ServerRpc]
+    internal void DieServerRpc(int creatureToDie)
+    {
+        DieClientRpc(creatureToDie);
+    }
+    [ClientRpc]
+    internal void DieClientRpc(int creatureToDie)
+    {
+        GameManager.singleton.allCreaturesOnField[creatureToDie].LocalDie();
+    }
+
     private void HandleMana()
     {
         ClearMana();
@@ -698,15 +709,8 @@ public class Controller : NetworkBehaviour
         instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
         AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
-        //IncreaseCostOfHarvestTiles();
         SetStateToWaiting();
         GameManager.singleton.AddPlayerToReady(this);
-        canPurchaseHarvestTile = true;
-
-        if (IsOwner)
-        {
-            ShowHarvestedTiles();
-        }
     }
 
     private void AddStructureToTile(Structure structure, Vector3Int positionSent)

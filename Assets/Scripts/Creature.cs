@@ -461,6 +461,13 @@ public class Creature : MonoBehaviour
     }
     public void Die()
     {
+        if (this.playerOwningCreature.IsOwner)
+        {
+            playerOwningCreature.DieServerRpc(this.creatureID);
+        }
+    }
+    public void LocalDie()
+    {
         GameManager.singleton.CreatureDied(this.creatureID);
         if (this.playerOwningCreature.locallySelectedCreature == this)
         {
@@ -472,6 +479,7 @@ public class Creature : MonoBehaviour
         OnDeath();
         Destroy(this.gameObject);
     }
+
     void HandleAttackRate()
     {
         if (canAttack)
