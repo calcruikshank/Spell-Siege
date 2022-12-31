@@ -381,6 +381,7 @@ public class Controller : NetworkBehaviour
                 {
                     if (CheckToSeeIfClickedHarvestTileCanBePurchased(cellPositionSentToClients))
                     {
+                        canPurchaseHarvestTile = false;
                         AddToPuchaseTileQueueLocal(cellPositionSentToClients);
                     }
                 }

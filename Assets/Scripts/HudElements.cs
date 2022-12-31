@@ -34,7 +34,7 @@ public class HudElements : MonoBehaviour
 
 
 
-        blueManaCap.text = playerResources.blackManaCap.ToString();
+        blueManaCap.text = playerResources.blueManaCap.ToString();
         blackManaCap.text = playerResources.blackManaCap.ToString();
         whiteManaCap.text = playerResources.whiteManaCap.ToString();
         redManaCap.text = playerResources.redManaCap.ToString();
