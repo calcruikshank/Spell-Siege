@@ -18,8 +18,9 @@ public class TargetedSpell : MonoBehaviour
 
     private void Cast()
     {
-        if (instantiatedObject != null)
+        if (GOToInstantiate != null)
         {
+            Debug.Log("instantiating spell object");
             instantiatedObject = Instantiate(GOToInstantiate, creatureTargeted.actualPosition, Quaternion.identity);
         }
         SpecificSpellAbility();
