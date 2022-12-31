@@ -699,10 +699,14 @@ public class Controller : NetworkBehaviour
         AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
         //IncreaseCostOfHarvestTiles();
-        AddToMana();
         SetStateToWaiting();
         GameManager.singleton.AddPlayerToReady(this);
         canPurchaseHarvestTile = true;
+
+        if (IsOwner)
+        {
+            ShowHarvestedTiles();
+        }
     }
 
     private void AddStructureToTile(Structure structure, Vector3Int positionSent)
@@ -717,22 +721,27 @@ public class Controller : NetworkBehaviour
         if (baseTileSent.manaType == BaseTile.ManaType.Green)
         {
             resources.greenManaCap++;
+            resources.greenMana++;
         }
         if (baseTileSent.manaType == BaseTile.ManaType.Black)
         {
             resources.blackManaCap++;
+            resources.blackMana++;
         }
         if (baseTileSent.manaType == BaseTile.ManaType.White)
         {
             resources.whiteManaCap++;
+            resources.whiteMana++;
         }
         if (baseTileSent.manaType == BaseTile.ManaType.Blue)
         {
             resources.blueManaCap++;
+            resources.blueMana++;
         }
         if (baseTileSent.manaType == BaseTile.ManaType.Red)
         {
             resources.redManaCap++;
+            resources.redMana++;
         }
         harvestedTiles.Add(baseTileSent);
         baseTileSent.SetBeingHarvested();

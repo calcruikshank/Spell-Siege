@@ -40,7 +40,9 @@ public class HudElements : MonoBehaviour
         redManaCap.text = playerResources.redManaCap.ToString();
         greenManaCap.text = playerResources.greenManaCap.ToString();
 
-        if (playerResources.blackManaCap <= 0)
+
+
+        /*if (playerResources.blackManaCap <= 0)
         {
             blackManaCap.gameObject.SetActive(false);
         }
@@ -148,7 +150,7 @@ public class HudElements : MonoBehaviour
         if (playerResources.blueMana > 0)
         {
             blueMana.gameObject.SetActive(true);
-        }
+        }*/
     }
 
     public void UpdateDrawSlider(float valueSent)
