@@ -7,7 +7,7 @@ public class TargetedSpell : MonoBehaviour
 {
     Controller playerCastingSpell;
     protected Creature creatureTargeted;
-    GameObject instantiatedObject;
+    public GameObject instantiatedObject;
     [SerializeField] GameObject GOToInstantiate;
     public void InjectDependencies(Creature creatureTargeted, Controller playerCasting)
     {
@@ -21,7 +21,7 @@ public class TargetedSpell : MonoBehaviour
         if (GOToInstantiate != null)
         {
             Debug.Log("instantiating spell object");
-            instantiatedObject = Instantiate(GOToInstantiate, creatureTargeted.actualPosition, Quaternion.identity);
+            instantiatedObject = Instantiate(GOToInstantiate, new Vector3(creatureTargeted.actualPosition.x, .4f, creatureTargeted.actualPosition.z), Quaternion.identity);
         }
         SpecificSpellAbility();
     }
