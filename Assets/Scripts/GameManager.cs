@@ -57,6 +57,8 @@ public class GameManager : NetworkBehaviour
 
 
     [SerializeField] TextMeshPro damageText;
+
+    [SerializeField] public Transform onDeathEffect;
     Transform instantiatedDamageText;
     Transform instantiatedHealthText;
     private void Awake()

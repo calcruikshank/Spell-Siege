@@ -468,6 +468,7 @@ public class Creature : MonoBehaviour
     }
     public void LocalDie()
     {
+        Instantiate(GameManager.singleton.onDeathEffect, new Vector3(actualPosition.x, .4f, actualPosition.z), Quaternion.identity);
         GameManager.singleton.CreatureDied(this.creatureID);
         if (this.playerOwningCreature.locallySelectedCreature == this)
         {
