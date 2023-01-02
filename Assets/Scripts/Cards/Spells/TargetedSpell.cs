@@ -16,7 +16,7 @@ public class TargetedSpell : MonoBehaviour
         Cast();
     }
 
-    private void Cast()
+    protected virtual void Cast()
     {
         if (GOToInstantiate != null)
         {
