@@ -77,7 +77,6 @@ public class Controller : NetworkBehaviour
     public float tickTimer = 0f;
     float tickThreshold = .12f;
 
-    public bool hasTickedSinceSendingLastMessage = true;
     public Creature locallySelectedCreature;
 
     PlayerResources resources;
@@ -180,7 +179,6 @@ public class Controller : NetworkBehaviour
 
     void GrabAllObjectsFromGameManager()
     {
-        GameManager.singleton.tick += OnTick;
         canvasMain = FindObjectOfType<Canvas>();
         highlightTile = GameManager.singleton.highlightTile;
         highlightMap = GameManager.singleton.highlightMap;// set these = to gamemanage.singleton.highlightmap TODO
@@ -289,12 +287,6 @@ public class Controller : NetworkBehaviour
         }
 
         tickTimer += Time.deltaTime;
-        if (hasTickedSinceSendingLastMessage)
-        {
-            hasTickedSinceSendingLastMessage = false;
-            tickTimer = 0f;
-            SendAllInputsInQueue();
-        }
         if (locallySelectedCard != null)
         {
             if (locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled == true)
@@ -386,9 +378,11 @@ public class Controller : NetworkBehaviour
                     }
                 }
             }
-            return;
         }
-
+        if (localOrder.Count > 0)
+        {
+            SendAllInputsInQueue();
+        }
     }
 
     private void LockInVisualPathfinder()
@@ -579,20 +573,11 @@ public class Controller : NetworkBehaviour
             message.ActionsInOrder = localOrder;
         }
 
-
         string messageString = JsonUtility.ToJson(message);
 
+        Debug.Log(messageString);
         SendMessageServerRpc(messageString);
 
-        for (int i = 0; i < localOrder.Count; i++)
-        {
-            finalOrder.Add(localOrder[i]);
-        }
-
-        if (!GameManager.singleton.playersThatHaveBeenReceived.Contains(this))
-        {
-            GameManager.singleton.AddToPlayersThatHaveBeenReceived(this);
-        }
         localOrder.Clear();
     }
 
@@ -606,12 +591,7 @@ public class Controller : NetworkBehaviour
             finalOrder.Add(c);
         }
 
-
-
-        if (!GameManager.singleton.playersThatHaveBeenReceived.Contains(this))
-        {
-            GameManager.singleton.AddToPlayersThatHaveBeenReceived(this);
-        }
+        OnTick();
     }
     void OnTick()
     {
@@ -643,7 +623,6 @@ public class Controller : NetworkBehaviour
             }
         }
         finalOrder.Clear();
-        hasTickedSinceSendingLastMessage = true;
     }
 
     private void PurchaseHarvestTile(Vector3Int vector3Int)
@@ -965,15 +944,21 @@ public class Controller : NetworkBehaviour
             #region creatureSelected
             if (creatureSelected != null)
             {
+                int numOfTicksPassed = (int)MathF.Round( (Vector3.Distance(positionOfCreatureSent, creatureSelected.actualPosition) / Time.fixedDeltaTime * creatureSelected.speed) );
                 if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
                 {
                     creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
+
+                    for (int i = 0; i < numOfTicksPassed; i++)
+                    {
+                        creatureSelected.Move();
+                    }
                 }
                 else
                 {
                     creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
 
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0; i < numOfTicksPassed; i++)
                     {
                         creatureSelected.Move();
                     }
@@ -1419,7 +1404,6 @@ public class Controller : NetworkBehaviour
     [ClientRpc]
     private void SendMessageClientRpc(string json)
     {
-        if (IsOwner) return;
         TranslateToFuntionalStruct(json);
     }
     #endregion

@@ -12,7 +12,7 @@ public class TickManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GameManager.singleton.tick += OnTick;
+        //GameManager.singleton.tick += OnTick;
     }
 
     private void OnTick()

@@ -30,16 +30,10 @@ public class GameManager : NetworkBehaviour
     public List<Controller> playersThatHaveBeenReceived = new List<Controller>();
 
     public Dictionary<int, Creature> allCreaturesOnField = new Dictionary<int, Creature>();
-    public delegate void Tick();
-    public event Tick tick;
 
-    public int gameManagerTick = 0;
     //public float tickTimeAverage;
     int playerCount; //TODO set this equal to players in scene and return if a player has not hit
 
-
-    public int tickTimer;
-    int tickTimerThreshold = 20;
     public int allCreatureGuidCounter;
 
     public int endingX;
@@ -107,21 +101,6 @@ public class GameManager : NetworkBehaviour
     }
 
 
-    public int numOfTicksPastBeforeReceievingAllPlayers;
-    private void FixedUpdate()
-    {
-        tickTimer++;
-        if (tickTimer >= tickTimerThreshold && playersThatHaveBeenReceived.Count == playerList.Count)
-        {
-            numOfTicksPastBeforeReceievingAllPlayers = tickTimer - tickTimerThreshold;
-            tickTimer = 0;
-            playersThatHaveBeenReceived.Clear();
-            tick.Invoke();
-            gameManagerTick++;
-            //tickTimeAverage = totalTickTime / gameManagerTick;
-            //allPlayersReceived = true;
-        }
-    }
     public enum State
     {
         Setup, //The state for placing your castle
@@ -157,7 +136,6 @@ public class GameManager : NetworkBehaviour
             foreach (Controller player in playerList)
             {
                 player.StartGame();
-                gameManagerTick = 0;
             }
         }
     }

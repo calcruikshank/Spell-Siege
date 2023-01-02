@@ -11,7 +11,7 @@ using UnityEngine.Tilemaps;
 public class Creature : MonoBehaviour
 {
     [SerializeField] Transform colorIndicator;
-    [SerializeField] float speed = 1f; //move speed
+    [SerializeField] public float speed = 1f; //move speed
     [SerializeField] public int range; //num of tiles that can attack
     [SerializeField] float UsageRate = 1f; // the rate at which the minion can use abilities/ attack 
 
@@ -107,7 +107,6 @@ public class Creature : MonoBehaviour
 
     protected virtual void Start()
     {
-        GameManager.singleton.tick += OnTick;
         grid = GameManager.singleton.grid;
         baseTileMap = GameManager.singleton.baseMap;
         currentCellPosition = grid.WorldToCell(this.transform.position);
@@ -127,11 +126,6 @@ public class Creature : MonoBehaviour
         CurrentAttack = Attack;
         UpdateCreatureHUD();
     }
-
-    private void OnTick()
-    {
-    }
-
     protected virtual void SetTravType()
     {
     }
@@ -575,7 +569,6 @@ public class Creature : MonoBehaviour
         creatureState = CreatureState.Moving;
 
 
-        Debug.Log(actualPosition);
     }
 
     public void SetMoveRpc()
@@ -755,7 +748,6 @@ public class Creature : MonoBehaviour
 
     public void SetStateToIdle()
     {
-        Debug.Log(GameManager.singleton.gameManagerTick + " tick");
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         lr.enabled = false;
 
