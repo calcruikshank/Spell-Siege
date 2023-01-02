@@ -554,8 +554,8 @@ public class Creature : MonoBehaviour
         }
 
 
-        currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
-        List<BaseTile> tempPathVectorList = pathfinder1.FindPath(currentCellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);
+        //currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
+        List<BaseTile> tempPathVectorList = pathfinder1.FindPath(tileCurrentlyOn.tilePosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);
         if (tempPathVectorList == null)
         {
             return;
@@ -597,6 +597,7 @@ public class Creature : MonoBehaviour
     {
         if (pathVectorList != null)
         {
+            CheckForCreaturesInPath();
             targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
 
             if (Vector3.Distance(actualPosition, targetedPosition) > .02f)
@@ -630,6 +631,11 @@ public class Creature : MonoBehaviour
         {
             tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
         }
+        if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) != null && tileCurrentlyOn.tilePosition != currentCellPosition)
+        {
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
+            Debug.Log(BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) + " the creature at path index + 1 is not null");
+        }
         if (previousTilePosition != tileCurrentlyOn)
         {
             CalculateAllTilesWithinRange();
@@ -638,7 +644,6 @@ public class Creature : MonoBehaviour
             tileCurrentlyOn.AddCreatureToTile(this);
         }
 
-        //CheckForCreaturesInPath();
 
 
     }
@@ -710,13 +715,9 @@ public class Creature : MonoBehaviour
     {
         if (currentPathIndex < pathVectorList.Count - 1)
         {
-            if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex + 1].tilePosition) != null && BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex + 1].tilePosition) != this)
+            if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex+ 1].tilePosition) != null)
             {
                 SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
-            }
-            if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex].tilePosition) != null && BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex].tilePosition) != this)
-            {
-                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(tileCurrentlyOn.tilePosition), actualPosition);
             }
         }
     }

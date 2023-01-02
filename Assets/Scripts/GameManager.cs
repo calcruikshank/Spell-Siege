@@ -55,6 +55,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] public Transform onDeathEffect;
     Transform instantiatedDamageText;
     Transform instantiatedHealthText;
+
+
     private void Awake()
     {
         if (singleton != null) Destroy(this);

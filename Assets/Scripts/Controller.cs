@@ -575,7 +575,6 @@ public class Controller : NetworkBehaviour
 
         string messageString = JsonUtility.ToJson(message);
 
-        Debug.Log(messageString);
         SendMessageServerRpc(messageString);
 
         localOrder.Clear();
