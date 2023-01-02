@@ -1428,9 +1428,12 @@ public class Controller : NetworkBehaviour
                 break;
             }
             numbersChosen.Add(randomNumber);
-            if (cardsInHand[randomNumber].cardType == CardInHand.CardType.Creature)
+            if (cardsInHand[randomNumber] != null)
             {
-                creatureSelectedInHand = cardsInHand[randomNumber];
+                if (cardsInHand[randomNumber].cardType == CardInHand.CardType.Creature)
+                {
+                    creatureSelectedInHand = cardsInHand[randomNumber];
+                }
             }
         }
         return creatureSelectedInHand;

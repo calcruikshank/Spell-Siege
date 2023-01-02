@@ -1055,6 +1055,11 @@ public class Creature : MonoBehaviour
     {
         GameManager.singleton.CreatureEntered(creatureID);
     }
+
+    private void OnDestroy()
+    {
+        OnMouseExit();
+    }
     public virtual void OnDeath()
     {
         SetStateToDead();
