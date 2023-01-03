@@ -199,7 +199,7 @@ public class Controller : NetworkBehaviour
 
     void GrabAllObjectsFromGameManager()
     {
-        canvasMain = FindObjectOfType<Canvas>();
+        canvasMain = GameManager.singleton.canvasMain.GetComponent<Canvas>();
         highlightTile = GameManager.singleton.highlightTile;
         highlightMap = GameManager.singleton.highlightMap;// set these = to gamemanage.singleton.highlightmap TODO
         baseMap = GameManager.singleton.baseMap;
@@ -335,13 +335,6 @@ public class Controller : NetworkBehaviour
         {
             if (instantiatedCaste != null)
             {
-                if (selectedCreaturesWithBox.Count > 0)
-                {
-                    foreach (Creature selectedC in selectedCreaturesWithBox)
-                    {
-                        selectedC.HidePathfinderLR();
-                    }
-                }
                 SetVisualsToNothingSelectedLocally();
                 localOrder.Add(new ActionStruct(ActionTaken.RightClick, true));
 
@@ -510,6 +503,13 @@ public class Controller : NetworkBehaviour
 
     public void SetVisualsToNothingSelectedLocally()
     {
+        if (selectedCreaturesWithBox.Count > 0)
+        {
+            foreach (Creature selectedC in selectedCreaturesWithBox)
+            {
+                selectedC.HidePathfinderLR();
+            }
+        }
         if (locallySelectedCreature != null)
         {
             locallySelectedCreature.HidePathfinderLR();

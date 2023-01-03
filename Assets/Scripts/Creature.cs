@@ -1116,6 +1116,10 @@ public class Creature : MonoBehaviour
         {
             pathVectorList = null;
         }
+        if (this.playerOwningCreature.selectedCreaturesWithBox.Contains(this))
+        {
+            this.playerOwningCreature.selectedCreaturesWithBox.Remove(this);
+        }
         this.playerOwningCreature.creaturesOwned.Remove(this.creatureID);
         OnMouseExit();
         creatureState = CreatureState.Dead;
