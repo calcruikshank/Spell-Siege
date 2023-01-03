@@ -56,13 +56,12 @@ public class GameManager : NetworkBehaviour
     Transform instantiatedDamageText;
     Transform instantiatedHealthText;
 
-
+    [SerializeField] public Canvas RectCanvas;
     private void Awake()
     {
         if (singleton != null) Destroy(this);
         singleton = this;
         state = State.Setup;
-        canvasMain = FindObjectOfType<Canvas>().transform;
     }
     private void Update()
     {

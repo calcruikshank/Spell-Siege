@@ -57,7 +57,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 80; //todo make this 800
+    int turnThreshold = 1200; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] List<CardInHand> demonDeck = new List<CardInHand>();
@@ -107,6 +107,8 @@ public class Controller : NetworkBehaviour
 
     [SerializeField] Color[] colorsToPickFrom;
 
+    private RectTransform selectionBox;
+
     [Serializable]
     public enum ActionTaken
     {
@@ -125,7 +127,7 @@ public class Controller : NetworkBehaviour
     void Start()
     {
         GrabAllObjectsFromGameManager();
-        
+
         cardsInDeck = new List<CardInHand>();
 
         if (NetworkManager.Singleton.IsHost && IsOwner)
@@ -161,6 +163,24 @@ public class Controller : NetworkBehaviour
         mousePositionScript = GetComponent<MousePositionScript>();
         state = State.PlacingCastle;
 
+        if (IsOwner)
+        {
+            SpawnSelectionBox();
+        }
+
+    }
+
+    private void SpawnSelectionBox()
+    {
+        selectionBox = new GameObject("selectionBoxGameObject", typeof(RectTransform), typeof(Image)).gameObject.GetComponent<RectTransform>();
+        selectionBox.transform.parent = GameManager.singleton.RectCanvas.transform;
+        selectionBox.transform.localEulerAngles = Vector3.zero;
+        selectionBox.transform.GetComponent<Image>().color = transparentCol;
+        selectionBox.transform.localScale = Vector3.one;
+        selectionBox.transform.localPosition = Vector3.zero;
+        selectionBox.gameObject.SetActive(false);
+        selectionBox.anchorMin = Vector2.zero;
+        selectionBox.anchorMax = Vector2.zero;
     }
 
     internal void StartGame()
@@ -315,12 +335,25 @@ public class Controller : NetworkBehaviour
         {
             if (instantiatedCaste != null)
             {
+                if (selectedCreaturesWithBox.Count > 0)
+                {
+                    foreach (Creature selectedC in selectedCreaturesWithBox)
+                    {
+                        selectedC.HidePathfinderLR();
+                    }
+                }
                 SetVisualsToNothingSelectedLocally();
                 localOrder.Add(new ActionStruct(ActionTaken.RightClick, true));
+
+                
             }
         }
         if (Input.GetMouseButtonUp(0))
         {
+            if (isDragginSelectionBox)
+            {
+                EndDragOfSelectionBox();
+            }
             if (locallySelectedCreature != null || locallySelectedCard != null)
             {
                 if (cellPositionSentToClients != null)
@@ -364,6 +397,7 @@ public class Controller : NetworkBehaviour
             {
                 if (!CheckForRaycast())
                 {
+
                     AddToTickQueueLocal(cellPositionSentToClients);
                 }
             }
@@ -378,12 +412,96 @@ public class Controller : NetworkBehaviour
                     }
                 }
             }
+
+
+            if (locallySelectedCreature == null && locallySelectedCard == null && selectedCreaturesWithBox.Count == 0 && !isDragginSelectionBox)
+            {
+                StartDragOfSelectionBox();
+            }
         }
         if (localOrder.Count > 0)
         {
             SendAllInputsInQueue();
         }
+
+        if (isDragginSelectionBox)
+        {
+            DragSelectionBox();
+        }
+
+        if (selectedCreaturesWithBox.Count > 0)
+        {
+            FindPathsForAllCreaturesSelected();
+        }
     }
+
+    private void FindPathsForAllCreaturesSelected()
+    {
+        for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
+        {
+            VisualPathfinderOnCreatureSelected(selectedCreaturesWithBox[i]);
+        }
+    }
+
+    float distanceOfDrag = 0f;
+    Vector2 startingPoint;
+    Vector2 currentPositionOfDrag;
+    public bool isDragginSelectionBox;
+    float width;
+    float height;
+
+    public List<Creature> selectedCreaturesWithBox = new List<Creature>();
+    private void EndDragOfSelectionBox()
+    {
+        selectedCreaturesWithBox = new List<Creature>();
+        isDragginSelectionBox = false;
+        selectionBox.gameObject.SetActive(false);
+
+        Vector2 bottomLeft = selectionBox.anchoredPosition - (selectionBox.sizeDelta / 2);
+        Vector2 topRight = selectionBox.anchoredPosition + (selectionBox.sizeDelta / 2);
+        foreach (KeyValuePair<int, Creature> kvp in creaturesOwned)
+        {
+            Vector3 screenPositionOfCreature = Camera.main.WorldToScreenPoint(kvp.Value.transform.position);
+            if (screenPositionOfCreature.x > bottomLeft.x && screenPositionOfCreature.x < topRight.x && screenPositionOfCreature.y > bottomLeft.y && screenPositionOfCreature.y < topRight.y)
+            {
+                Debug.Log(kvp.Value);
+                selectedCreaturesWithBox.Add(kvp.Value);
+            }
+        }
+    }
+
+    private void StartDragOfSelectionBox()
+    {
+        isDragginSelectionBox = true;
+        var screenPoint = Input.mousePosition;
+        startingPoint = screenPoint;
+        this.transform.position = Vector3.zero;
+        selectionBox.sizeDelta = new Vector2(0, 0);
+    }
+    private void DragSelectionBox()
+    {
+        var screenPoint = Input.mousePosition;
+        currentPositionOfDrag = screenPoint;
+        distanceOfDrag = Vector3.Distance(startingPoint, currentPositionOfDrag);
+        if (distanceOfDrag > .1f)
+        {
+            if (!selectionBox.gameObject.activeInHierarchy)
+            {
+                selectionBox.gameObject.SetActive(true);
+            }
+
+            width = currentPositionOfDrag.x - startingPoint.x;
+            height = currentPositionOfDrag.y - startingPoint.y;
+            selectionBox.sizeDelta = new Vector2(MathF.Abs(width), MathF.Abs(height));
+            selectionBox.anchoredPosition = new Vector3(startingPoint.x + width / 2, startingPoint.y + height / 2);
+
+        }
+    }
+
+
+
+
+
 
     private void LockInVisualPathfinder()
     {
@@ -431,7 +549,7 @@ public class Controller : NetworkBehaviour
 
     public bool ShowingPurchasableHarvestTiles = false;
 
-    
+
 
     private void ShowHarvestedTiles()
     {
@@ -521,16 +639,25 @@ public class Controller : NetworkBehaviour
         return false;
     }
 
-    #region regionOfTicks
     void AddToTickQueueLocal(Vector3Int positionSent)
     {
+        if (selectedCreaturesWithBox.Count > 0)
+        {
+            for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
+            {
+                HandleMutlipleCreaturesOnBoardSelected(positionSent, selectedCreaturesWithBox[i].actualPosition, selectedCreaturesWithBox[i]);
+            }
+            SetStateToNothingSelected();
+            creatureSelected = null;
+        }
         Vector3 positionOfCreature = new Vector3();
         if (locallySelectedCreature && IsOwner && state != State.SpellInHandSelected)
         {
             positionOfCreature = locallySelectedCreature.actualPosition;
 
             creatureSelected = locallySelectedCreature;
-            HandleCreatureOnBoardSelected(positionSent, positionOfCreature);
+
+            HandleCreatureOnBoardSelected(positionSent, positionOfCreature, locallySelectedCreature);
         }
 
 
@@ -647,7 +774,6 @@ public class Controller : NetworkBehaviour
         //AddToMaxMana(baseTileSent.manaType);
     }
 
-    #endregion
 
     void LocalLeftClick(Vector3Int positionSent, Vector3 positionOfCreatureSent)
     {
@@ -894,11 +1020,10 @@ public class Controller : NetworkBehaviour
         }
 
     }
-    void HandleCreatureOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent)
+    void HandleCreatureOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent, Creature creatureSelected)
     {
         MoveCreatureServerRpc(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
         targetedCellPosition = positionSent;
-        #region creatureSelected
         if (creatureSelected != null)
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
@@ -917,11 +1042,10 @@ public class Controller : NetworkBehaviour
                 SetToCreatureOnFieldSelected(creatureSelected);
                 return;
             }
-            creatureSelected = null;
             SetStateToNothingSelected();
         }
-        #endregion
     }
+
 
     [ServerRpc]
     private void MoveCreatureServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
@@ -940,10 +1064,9 @@ public class Controller : NetworkBehaviour
         if (!IsOwner)
         {
             targetedCellPosition = positionSent;
-            #region creatureSelected
             if (creatureSelected != null)
             {
-                int numOfTicksPassed = (int)MathF.Round( (Vector3.Distance(positionOfCreatureSent, creatureSelected.actualPosition) / Time.fixedDeltaTime * creatureSelected.speed) );
+                int numOfTicksPassed = (int)MathF.Round((Vector3.Distance(positionOfCreatureSent, creatureSelected.actualPosition) / Time.fixedDeltaTime * creatureSelected.speed));
                 if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
                 {
                     creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
@@ -971,8 +1094,75 @@ public class Controller : NetworkBehaviour
                 SetStateToNothingSelected();
             }
         }
-        #endregion
     }
+
+
+
+    void HandleMutlipleCreaturesOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent, Creature creatureSelectedSent)
+    {
+        MoveMultipleCreaturesServerRpc(positionSent, positionOfCreatureSent, creatureSelectedSent.creatureID);
+        targetedCellPosition = positionSent;
+        if (creatureSelectedSent != null)
+        {
+            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
+            {
+                creatureSelectedSent.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
+                SetVisualsToNothingSelectedLocally();
+            }
+            else
+            {
+                SetVisualsToNothingSelectedLocally();
+                creatureSelectedSent.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
+
+            }
+        }
+    }
+    [ServerRpc]
+    private void MoveMultipleCreaturesServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        MoveMultipleCreaturesClientRpc(positionSent, positionOfCreatureSent, creatureID);
+    }
+    [ClientRpc]
+    private void MoveMultipleCreaturesClientRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        MoveMultipleNonOwnedCreature(positionSent, positionOfCreatureSent, creatureID);
+    }
+
+    public void MoveMultipleNonOwnedCreature(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        if (!IsOwner)
+        {
+            creatureSelected = GameManager.singleton.allCreaturesOnField[creatureID];
+            targetedCellPosition = positionSent;
+            if (creatureSelected != null)
+            {
+                int numOfTicksPassed = (int)MathF.Round((Vector3.Distance(positionOfCreatureSent, creatureSelected.actualPosition) / Time.fixedDeltaTime * creatureSelected.speed));
+                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
+                {
+                    creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
+
+                    for (int i = 0; i < numOfTicksPassed; i++)
+                    {
+                        creatureSelected.Move();
+                    }
+                }
+                else
+                {
+                    creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
+
+                    for (int i = 0; i < numOfTicksPassed; i++)
+                    {
+                        creatureSelected.Move();
+                    }
+                }
+                creatureSelected = null;
+            }
+        }
+    }
+
+
+
+
 
 
     public Dictionary<int, Creature> creaturesOwned = new Dictionary<int, Creature>();
@@ -1303,7 +1493,7 @@ public class Controller : NetworkBehaviour
         }
         cardSelected = null;
         creatureSelected = null;
-
+        selectedCreaturesWithBox.Clear();
         state = State.NothingSelected;
     }
     void SetStateToWaiting()
@@ -1394,7 +1584,6 @@ public class Controller : NetworkBehaviour
 
 
 
-    #region RPCS
     [ServerRpc]
     private void SendMessageServerRpc(string json)
     {
@@ -1405,7 +1594,6 @@ public class Controller : NetworkBehaviour
     {
         TranslateToFuntionalStruct(json);
     }
-    #endregion
 
 
 
@@ -1451,7 +1639,7 @@ public class Controller : NetworkBehaviour
         AttackCreatureClientRpc(creatureAttacking, creatureBeingAttacked);
     }
     [ClientRpc]
-    internal void AttackCreatureClientRpc (int creatureAttacking, int creatureBeingAttacked)
+    internal void AttackCreatureClientRpc(int creatureAttacking, int creatureBeingAttacked)
     {
         GameManager.singleton.allCreaturesOnField[creatureAttacking].LocalAttackCreature(GameManager.singleton.allCreaturesOnField[creatureBeingAttacked]);
     }
@@ -1485,4 +1673,3 @@ public struct PlayerResources
     public int greenManaCap;
 
 }
-
