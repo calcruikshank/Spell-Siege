@@ -55,10 +55,10 @@ MonoBehaviour:
     m_Bits: 64
   turnTimer: 0
   dragonDeck:
-  - {fileID: 5255841600039758024, guid: a5e55e4c6dc8f16458776c4eba7c3e33, type: 3}
-  - {fileID: 5255841600039758024, guid: a5e55e4c6dc8f16458776c4eba7c3e33, type: 3}
-  - {fileID: 5255841600039758024, guid: a5e55e4c6dc8f16458776c4eba7c3e33, type: 3}
-  - {fileID: 5255841600039758024, guid: a5e55e4c6dc8f16458776c4eba7c3e33, type: 3}
+  - {fileID: 5255841600039758024, guid: 20b591e4a7f0a9b47a14524b175dfd4e, type: 3}
+  - {fileID: 5255841600039758024, guid: 20b591e4a7f0a9b47a14524b175dfd4e, type: 3}
+  - {fileID: 5255841600039758024, guid: 20b591e4a7f0a9b47a14524b175dfd4e, type: 3}
+  - {fileID: 5255841600039758024, guid: 20b591e4a7f0a9b47a14524b175dfd4e, type: 3}
   - {fileID: 5255841600039758024, guid: 3f3624b931dbb114f8d24f600d65e344, type: 3}
   - {fileID: 5255841600039758024, guid: 3f3624b931dbb114f8d24f600d65e344, type: 3}
   - {fileID: 5255841600039758024, guid: 3f3624b931dbb114f8d24f600d65e344, type: 3}
@@ -143,7 +143,6 @@ MonoBehaviour:
   allVertextPointsInTilesOwned: []
   tick: 0
   tickTimer: 0
-  hasTickedSinceSendingLastMessage: 1
   locallySelectedCreature: {fileID: 0}
   playerHud: {fileID: 8061840716336608874, guid: ff649b0ea61d66149a0f91d41f2ab955, type: 3}
   harvestedTiles: []
@@ -156,6 +155,8 @@ MonoBehaviour:
   - {r: 0.3372549, g: 0.58431375, b: 0.25882354, a: 0}
   - {r: 0.7254902, g: 0.38431373, b: 0.18431373, a: 0}
   - {r: 0.75686276, g: 0.0627451, b: 0.03529412, a: 0}
+  isDragginSelectionBox: 0
+  selectedCreaturesWithBox: []
   ShowingPurchasableHarvestTiles: 0
   visualSpawnEffect: {fileID: 8362349209469777723, guid: 1835dbeede209484cb976155d1b75638, type: 3}
 --- !u!114 &8164691875682251415

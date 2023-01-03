@@ -63,9 +63,13 @@ public class CardInHand : MonoBehaviour
         this.whiteManaCost = card.whiteManaCost;
         this.blackManaCost = card.blackManaCost;
         this.genericManaCost = card.genericManaCost;
-
-        keywords = this.GetComponentInChildren<Keywords>();
-        keywords.InjectDependencies(card);
+        if (this.GetComponentInChildren<Keywords>() != null)
+        {
+            keywords = this.GetComponentInChildren<Keywords>();
+            keywords.InjectDependencies(card);
+            keywords.gameObject.SetActive(false);
+        }
+        
 
     }
     public void UpdateMana()
