@@ -997,10 +997,10 @@ public class Creature : MonoBehaviour
     {
         Debug.Log("Setting original card to " + cardSelected);
         originalCard = cardSelected;
-        originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.canvasMain.transform);
-        originalCardTransform.transform.position = this.transform.position;
+        originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.RectCanvas.transform);
+        originalCardTransform.transform.position = Camera.main.WorldToScreenPoint( this.transform.position );
         originalCardTransform.transform.localEulerAngles = Vector3.zero;
-        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 2f;
+        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 1f;
 
         originalCardTransform.GetComponentInChildren<BoxCollider>().enabled = false;
         originalCardTransform.gameObject.SetActive(false);
@@ -1022,7 +1022,7 @@ public class Creature : MonoBehaviour
             originalCardTransform.gameObject.SetActive(false);
             return;
         }
-        originalCardTransform.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .5f, this.transform.position.z);
+        originalCardTransform.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
         originalCardTransform.gameObject.SetActive(true);
     }
 

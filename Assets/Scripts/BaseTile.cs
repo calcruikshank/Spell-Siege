@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 public class BaseTile : MonoBehaviour
 {
@@ -250,12 +251,12 @@ public class BaseTile : MonoBehaviour
     {
         costText.gameObject.SetActive(false);
         isBeingHarvested = true;
-        instantiatedManaSymbol.GetComponent<SpriteRenderer>().color = opaqueColor;
+        instantiatedManaSymbol.GetComponent<Image>().color = opaqueColor;
     }
     public void SetNotBeingHarvested()
     {
         isBeingHarvested = false;
-        instantiatedManaSymbol.GetComponent<SpriteRenderer>().color = transparentColor;
+        instantiatedManaSymbol.GetComponent<Image>().color = transparentColor;
     }
     private void InstantiateCorrectColorManaSymbol()
     {
@@ -279,11 +280,12 @@ public class BaseTile : MonoBehaviour
         {
             instantiatedManaSymbol = Instantiate(GameManager.singleton.greenManaSymbol, this.transform);
         }
-        transparentColor = instantiatedManaSymbol.GetComponent<SpriteRenderer>().color;
-        opaqueColor = instantiatedManaSymbol.GetComponent<SpriteRenderer>().color;
+        transparentColor = instantiatedManaSymbol.GetComponent<Image>().color;
+        opaqueColor = instantiatedManaSymbol.GetComponent<Image>().color;
         opaqueColor.a = playerOwningTile.col.a;
         transparentColor.a = playerOwningTile.transparentCol.a;
-        instantiatedManaSymbol.GetComponent<SpriteRenderer>().color = transparentColor;
+        instantiatedManaSymbol.GetComponent<Image>().color = transparentColor;
+        instantiatedManaSymbol.transform.parent = GameManager.singleton.RectCanvas.transform;
         HideHarvestIcon();
         MakeTextObjectForTileCost(instantiatedManaSymbol);
     }
@@ -296,6 +298,14 @@ public class BaseTile : MonoBehaviour
     internal void ShowHarvestIcon()
     {
         instantiatedManaSymbol.gameObject.SetActive(true);
+    }
+
+    private void Update()
+    {
+        if (instantiatedManaSymbol != null)
+        {
+            instantiatedManaSymbol.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
+        }
     }
 
 }
