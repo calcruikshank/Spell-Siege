@@ -598,7 +598,10 @@ public class Creature : MonoBehaviour
         if (pathVectorList != null)
         {
             CheckForCreaturesInPath();
-            targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
+            if (BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition) != null)
+            {
+                targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
+            }
 
             if (Vector3.Distance(actualPosition, targetedPosition) > .02f)
             {
