@@ -95,7 +95,7 @@ public class Creature : MonoBehaviour
     [HideInInspector] public BaseTile previousTilePosition;
 
     public Vector3 actualPosition;
-    Vector3 targetedPosition;
+    public Vector3 targetedPosition;
     Vector3[] positions;
 
 
@@ -537,17 +537,20 @@ public class Creature : MonoBehaviour
 
     public void LocalGiveCounter(int numOfCounters)
     {
-        Debug.Log("Giving pudge counter " + this + " " + numOfCounters );
-        for (int i = 0; i < numOfCounters; i++)
+        if (this != null && this.transform != null)
         {
-            MaxHealth++;
-            CurrentHealth++;
-            CurrentAttack++;
-            Attack++;
-        }
+            Debug.Log("Giving pudge counter " + this + " " + numOfCounters);
+            for (int i = 0; i < numOfCounters; i++)
+            {
+                MaxHealth++;
+                CurrentHealth++;
+                CurrentAttack++;
+                Attack++;
+            }
 
-        GameManager.singleton.SpawnLevelUpPrefab(this.transform.position);
-        UpdateCreatureHUD();
+            GameManager.singleton.SpawnLevelUpPrefab(this.transform.position);
+            UpdateCreatureHUD();
+        }
     }
 
     [HideInInspector] public List<BaseTile> pathVectorList = new List<BaseTile>();
@@ -698,7 +701,7 @@ public class Creature : MonoBehaviour
 
     LineRenderer tempLineRendererBetweenCreatures;
 
-    GameObject tempLineRendererBetweenCreaturesGameObject;
+    public GameObject tempLineRendererBetweenCreaturesGameObject;
     private void DrawLineToTargetedCreature(Vector3 positionSent)
     {
         if (tempLineRendererBetweenCreaturesGameObject == null)
@@ -776,10 +779,12 @@ public class Creature : MonoBehaviour
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         lr.enabled = false;
 
+        lrGameObject.SetActive(false);
+        lrGameObject2.SetActive(false);
         HidePathfinderLR();
         actualPosition = targetedPosition;
         this.transform.position = actualPosition;
-        currentCellPosition = grid.WorldToCell(new Vector3(this.transform.position.x, 0, this.transform.position.z));
+        currentCellPosition = grid.WorldToCell(new Vector3(this.actualPosition.x, 0, this.actualPosition.z));
         tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
         tileCurrentlyOn.AddCreatureToTile(this);
         creatureState = CreatureState.Idle;
@@ -1145,6 +1150,35 @@ public class Creature : MonoBehaviour
             this.playerOwningCreature.selectedCreaturesWithBox.Remove(this);
         }
         this.playerOwningCreature.creaturesOwned.Remove(this.creatureID);
+        OnMouseExit();
+        creatureState = CreatureState.Dead;
+    }
+    public void SetStateToExiled()
+    {
+        if (targetToFollow != null)
+        {
+            targetToFollow = null;
+        }
+        if (structureToFollow != null)
+        {
+            structureToFollow = null;
+        }
+        if (tempLineRendererBetweenCreaturesGameObject != null)
+        {
+            tempLineRendererBetweenCreaturesGameObject.SetActive(false);
+        }
+        if (pathVectorList != null)
+        {
+            pathVectorList = null;
+        }
+        if (this.playerOwningCreature.selectedCreaturesWithBox.Contains(this))
+        {
+            this.playerOwningCreature.selectedCreaturesWithBox.Remove(this);
+        }
+        lrGameObject.SetActive(false);
+        lrGameObject2.SetActive(false);
+
+        tileCurrentlyOn.RemoveCreatureFromTile(this);
         OnMouseExit();
         creatureState = CreatureState.Dead;
     }
