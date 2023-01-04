@@ -962,9 +962,9 @@ public class Controller : NetworkBehaviour
 
     public void MoveNonOwnedCreature(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
     {
-        creatureSelected = GameManager.singleton.allCreaturesOnField[creatureID];
         if (!IsOwner)
         {
+            creatureSelected = GameManager.singleton.allCreaturesOnField[creatureID];
             targetedCellPosition = positionSent;
             if (creatureSelected != null)
             {
