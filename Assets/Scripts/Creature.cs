@@ -779,8 +779,8 @@ public class Creature : MonoBehaviour
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         lr.enabled = false;
 
-        lrGameObject.SetActive(false);
-        lrGameObject2.SetActive(false);
+        lrGameObject.SetActive(true);
+        lrGameObject2.SetActive(true);
         HidePathfinderLR();
         actualPosition = targetedPosition;
         this.transform.position = actualPosition;

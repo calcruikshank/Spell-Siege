@@ -42,16 +42,10 @@ public class PrimitiveWeaponsmith : Creature
 
     public override void OnDeath()
     {
-        base.OnDeath();
-        if (creaturesThatHaveExtraRange != null)
+        foreach (Creature friendly in friendlyCreaturesWithinRange)
         {
-            foreach (Creature friendly in creaturesThatHaveExtraRange)
-            {
-                if (!friendlyCreaturesWithinRange.Contains(friendly))
-                {
-                    friendly.SubtractOneRange();
-                }
-            }
+            friendly.SubtractOneRange();
         }
+        base.OnDeath();
     }
 }
