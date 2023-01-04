@@ -634,11 +634,17 @@ public class Creature : MonoBehaviour
                     currentPathIndex++;
                 }
             }
-            if (tileCurrentlyOn == pathVectorList[0] && currentPathIndex == 0 && pathVectorList.Count > 1)
+            if (tileCurrentlyOn != null)
             {
-                if (pathVectorList.Count > 1)
+                if (pathVectorList.Count > 0)
                 {
-                    currentPathIndex++; //for keeping position
+                    if (tileCurrentlyOn == pathVectorList[0] && currentPathIndex == 0 && pathVectorList.Count > 1)
+                    {
+                        if (pathVectorList.Count > 1)
+                        {
+                            currentPathIndex++; //for keeping position
+                        }
+                    }
                 }
             }
         }
