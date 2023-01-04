@@ -32,6 +32,7 @@ public class Pudge : Creature
             {
                 GiveCounter((int)swallowedCreature.CurrentHealth);
                 playerOwningCreature.KillCreatureWithoutRequiringOwnershipServerRpc(swallowedCreature.creatureID);
+                swallowedCreature = null;
             }
             
         }

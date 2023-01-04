@@ -469,7 +469,6 @@ public class Creature : MonoBehaviour
     public void LocalDie()
     {
         Instantiate(GameManager.singleton.onDeathEffect, new Vector3(actualPosition.x, .4f, actualPosition.z), Quaternion.identity);
-        GameManager.singleton.CreatureDied(this.creatureID);
         if (this.playerOwningCreature.locallySelectedCreature == this)
         {
             playerOwningCreature.SetStateToNothingSelected();
@@ -478,6 +477,7 @@ public class Creature : MonoBehaviour
         lrGameObject2.SetActive(false);
         rangeLrGO.SetActive(false);
         OnDeath();
+        GameManager.singleton.CreatureDied(this.creatureID);
         Destroy(this.gameObject);
     }
 

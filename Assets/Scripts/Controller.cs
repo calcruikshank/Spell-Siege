@@ -339,7 +339,7 @@ public class Controller : NetworkBehaviour
                 SetVisualsToNothingSelectedLocally();
                 localOrder.Add(new ActionStruct(ActionTaken.RightClick, true));
 
-                
+
             }
         }
         if (Input.GetMouseButtonUp(0))
@@ -1617,12 +1617,9 @@ public class Controller : NetworkBehaviour
                 break;
             }
             numbersChosen.Add(randomNumber);
-            if (cardsInHand[randomNumber] != null)
+            if (cardsInHand[randomNumber].cardType == CardInHand.CardType.Creature)
             {
-                if (cardsInHand[randomNumber].cardType == CardInHand.CardType.Creature)
-                {
-                    creatureSelectedInHand = cardsInHand[randomNumber];
-                }
+                creatureSelectedInHand = cardsInHand[randomNumber];
             }
         }
         return creatureSelectedInHand;
