@@ -29,6 +29,8 @@ public class GameManager : NetworkBehaviour
     public List<Controller> playersThatHavePlacedCastle = new List<Controller>();
     public List<Controller> playersThatHaveBeenReceived = new List<Controller>();
 
+
+    [SerializeField] public Camera mainCam;
     public Dictionary<int, Creature> allCreaturesOnField = new Dictionary<int, Creature>();
 
     //public float tickTimeAverage;

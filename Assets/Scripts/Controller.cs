@@ -57,7 +57,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 1200; //todo make this 800
+    int turnThreshold = 80; //todo make this 800
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] List<CardInHand> demonDeck = new List<CardInHand>();
@@ -595,7 +595,7 @@ public class Controller : NetworkBehaviour
         }
         foreach (KeyValuePair<Vector3Int, BaseTile> kp in tilesOwned)
         {
-            if (kp.Value.CreatureOnTile() != null && kp.Value.CreatureOnTile().playerOwningCreature == this)
+            if (kp.Value.CreatureOnTile() != null && kp.Value.CreatureOnTile().playerOwningCreature == kp.Value.playerOwningTile)
             {
                 kp.Value.CreatureOnTile().Garrison();
             }

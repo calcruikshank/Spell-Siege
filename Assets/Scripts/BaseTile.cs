@@ -304,7 +304,7 @@ public class BaseTile : MonoBehaviour
     {
         if (instantiatedManaSymbol != null)
         {
-            instantiatedManaSymbol.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
+            instantiatedManaSymbol.transform.position = GameManager.singleton.mainCam.WorldToScreenPoint(this.transform.position);
         }
     }
 

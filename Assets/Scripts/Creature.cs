@@ -205,6 +205,14 @@ public class Creature : MonoBehaviour
             case CreatureState.Dead:
                 break;
         }
+
+        HandleSpecialUpdates();
+    }
+
+
+    //overridable
+    public virtual void HandleSpecialUpdates()
+    {
     }
 
     internal void IncreaseAttackByX(float v)
@@ -363,7 +371,7 @@ public class Creature : MonoBehaviour
 
     }
 
-    public void HandleAttack()
+    public virtual void HandleAttack()
     {
         CheckForCreaturesWithinRange();
         ChooseTarget();
@@ -396,7 +404,7 @@ public class Creature : MonoBehaviour
 
         }
     }
-    public void LocalAttackCreature(Creature creatureToAttack)
+    public virtual void LocalAttackCreature(Creature creatureToAttack)
     {
         if (visualAttackParticle != null)
         {
