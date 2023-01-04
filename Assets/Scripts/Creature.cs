@@ -758,6 +758,7 @@ public class Creature : MonoBehaviour
         this.transform.GetComponent<MeshRenderer>().material.color = controller.col;
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
         OnETB();
+        canAttack = true;
     }
 
     public void SetStateToIdle()
