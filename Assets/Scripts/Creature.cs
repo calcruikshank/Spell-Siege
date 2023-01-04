@@ -606,7 +606,7 @@ public class Creature : MonoBehaviour
         if (pathVectorList != null)
         {
             CheckForCreaturesInPath();
-            if (BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition) != null)
+            if (currentPathIndex < pathVectorList.Count - 1)
             {
                 targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
             }
