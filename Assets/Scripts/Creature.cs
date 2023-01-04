@@ -776,22 +776,31 @@ public class Creature : MonoBehaviour
 
     public void SetStateToIdle()
     {
+        if (playerOwningCreature.IsOwner)
+        {
+            playerOwningCreature.SetCreatureToIdleServerRpc(creatureID, currentCellPosition);
+        }
+    }
+
+    #region range
+
+
+    internal void LocalSetCreatureToIdle(Vector3Int actualPositionSent)
+    {
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         lr.enabled = false;
 
         lrGameObject.SetActive(true);
         lrGameObject2.SetActive(true);
         HidePathfinderLR();
-        actualPosition = targetedPosition;
+        this.actualPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(actualPositionSent);
         this.transform.position = actualPosition;
         currentCellPosition = grid.WorldToCell(new Vector3(this.actualPosition.x, 0, this.actualPosition.z));
         tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
         tileCurrentlyOn.AddCreatureToTile(this);
         creatureState = CreatureState.Idle;
+
     }
-
-    #region range
-
 
     internal void AddOneRange()
     {

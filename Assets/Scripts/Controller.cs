@@ -97,10 +97,6 @@ public class Controller : NetworkBehaviour
 
     public int spellCounter = 0;
 
-    public List<ActionStruct> finalOrder = new List<ActionStruct>();
-
-    public List<ActionStruct> localOrder = new List<ActionStruct>();
-
     public bool creaturePathLockedIn = false;
 
 
@@ -337,7 +333,7 @@ public class Controller : NetworkBehaviour
             if (instantiatedCaste != null)
             {
                 SetVisualsToNothingSelectedLocally();
-                localOrder.Add(new ActionStruct(ActionTaken.RightClick, true));
+                RightClickServerRpc();
 
 
             }
@@ -413,10 +409,6 @@ public class Controller : NetworkBehaviour
                 StartDragOfSelectionBox();
             }
         }
-        if (localOrder.Count > 0)
-        {
-            SendAllInputsInQueue();
-        }
 
         if (isDragginSelectionBox)
         {
@@ -428,6 +420,8 @@ public class Controller : NetworkBehaviour
             FindPathsForAllCreaturesSelected();
         }
     }
+
+    
 
     private void FindPathsForAllCreaturesSelected()
     {
@@ -608,16 +602,6 @@ public class Controller : NetworkBehaviour
         DrawCard();
     }
 
-    [ServerRpc]
-    internal void DieServerRpc(int creatureToDie)
-    {
-        DieClientRpc(creatureToDie);
-    }
-    [ClientRpc]
-    internal void DieClientRpc(int creatureToDie)
-    {
-        GameManager.singleton.allCreaturesOnField[creatureToDie].LocalDie();
-    }
 
     private void HandleMana()
     {
@@ -668,88 +652,26 @@ public class Controller : NetworkBehaviour
         {
             if (CheckToSeeIfCanSpawnCreature(positionSent))
             {
-                localOrder.Add(new ActionStruct(ActionTaken.LeftClickBaseMap, positionSent, positionOfCreature));
+                LeftClickBaseMapServerRpc(positionSent);
                 SpawnVisualCreatureOnTile(positionSent);
             }
             return;
         }
-        localOrder.Add(new ActionStruct(ActionTaken.LeftClickBaseMap, positionSent, positionOfCreature));
+        LeftClickBaseMapServerRpc(positionSent);
     }
 
 
     private void AddToPuchaseTileQueueLocal(Vector3Int cellPositionSentToClients)
     {
-        localOrder.Add(new ActionStruct(ActionTaken.TilePurchased, cellPositionSentToClients, Vector3.zero));
+        SelectTileToPurchaseServerRpc(cellPositionSentToClients);
     }
     void AddIndexOfCardInHandToTickQueueLocal(int index)
     {
-        localOrder.Add(new ActionStruct(ActionTaken.SelectedCardInHand, index));
+        SelectCardInHandServerRpc(index);
     }
     void AddIndexOfCreatureOnBoard(int index)
     {
-        localOrder.Add(new ActionStruct(ActionTaken.SelectedCreature, index));
-    }
-
-    void SendAllInputsInQueue()
-    {
-        Message message = new Message();
-        //message.timeBetweenLastTick = timeBetweenLastTick;
-        //set guids of struct
-
-        if (localOrder.Count > 0)
-        {
-            message.ActionsInOrder = localOrder;
-        }
-
-        string messageString = JsonUtility.ToJson(message);
-
-        SendMessageServerRpc(messageString);
-
-        localOrder.Clear();
-    }
-
-    void TranslateToFuntionalStruct(string jsonOfMessage)
-    {
-        Message receievedMessage = JsonUtility.FromJson<Message>(jsonOfMessage);
-
-
-        foreach (ActionStruct c in receievedMessage.ActionsInOrder)
-        {
-            finalOrder.Add(c);
-        }
-
-        OnTick();
-    }
-    void OnTick()
-    {
-        tick++;
-
-        for (int i = 0; i < finalOrder.Count; i++)
-        {
-            ActionStruct actionGrabbed = finalOrder[i];
-
-            if (actionGrabbed.actionType == ActionTaken.LeftClickBaseMap)
-            {
-                LocalLeftClick(actionGrabbed.actionInputVector, actionGrabbed.positionOfCreature);
-            }
-            if (actionGrabbed.actionType == ActionTaken.RightClick)
-            {
-                SetStateToNothingSelected();
-            }
-            if (actionGrabbed.actionType == ActionTaken.SelectedCardInHand)
-            {
-                LocalSelectCardWithIndex((int)actionGrabbed.actionInputInt);
-            }
-            if (actionGrabbed.actionType == ActionTaken.SelectedCreature)
-            {
-                SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[(int)actionGrabbed.actionInputInt]);
-            }
-            if (actionGrabbed.actionType == ActionTaken.TilePurchased)
-            {
-                PurchaseHarvestTile((Vector3Int)actionGrabbed.actionInputVector);
-            }
-        }
-        finalOrder.Clear();
+        SelectCreatureOnBoardServerRpc(index);
     }
 
     private void PurchaseHarvestTile(Vector3Int vector3Int)
@@ -776,7 +698,7 @@ public class Controller : NetworkBehaviour
     }
 
 
-    void LocalLeftClick(Vector3Int positionSent, Vector3 positionOfCreatureSent)
+    void LocalLeftClick(Vector3Int positionSent)
     {
         switch (state)
         {
@@ -859,6 +781,7 @@ public class Controller : NetworkBehaviour
 
         resourcesChanged.Invoke(resources);
     }
+
 
     CardInHand locallySelectedCardInHandToTurnOff;
     bool CheckForRaycast()
@@ -950,17 +873,6 @@ public class Controller : NetworkBehaviour
             SetStateToNothingSelected();
         }
     }
-
-    [ServerRpc]
-    private void TargetACreatureServerRpc(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
-    {
-        TargetACreatureClientRpc(selectedCreatureID, creatureToTargetID, actualPosition);
-    }
-    [ClientRpc]
-    private void TargetACreatureClientRpc(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
-    {
-        TargetACreatureLocal(selectedCreatureID, creatureToTargetID, actualPosition);
-    }
     private void TargetACreatureLocal(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
     {
         if (!IsOwner)
@@ -1047,17 +959,6 @@ public class Controller : NetworkBehaviour
         }
     }
 
-
-    [ServerRpc]
-    private void MoveCreatureServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        MoveCreatureClientRpc(positionSent, positionOfCreatureSent, creatureID);
-    }
-    [ClientRpc]
-    private void MoveCreatureClientRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        MoveNonOwnedCreature(positionSent, positionOfCreatureSent, creatureID);
-    }
 
     public void MoveNonOwnedCreature(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
     {
@@ -1585,18 +1486,6 @@ public class Controller : NetworkBehaviour
 
 
 
-    [ServerRpc]
-    private void SendMessageServerRpc(string json)
-    {
-        SendMessageClientRpc(json);
-    }
-    [ClientRpc]
-    private void SendMessageClientRpc(string json)
-    {
-        TranslateToFuntionalStruct(json);
-    }
-
-
 
     //overridables
     public virtual void OnSpellCast()
@@ -1672,6 +1561,101 @@ public class Controller : NetworkBehaviour
     {
         GameManager.singleton.allCreaturesOnField[creatureID].LocalDie();
     }
+    [ServerRpc]
+    internal void SetCreatureToIdleServerRpc(int creatureID, Vector3Int actualPosition)
+    {
+        SetCreatureToIdleClientRpc(creatureID, actualPosition);
+    }
+    [ClientRpc]
+    internal void SetCreatureToIdleClientRpc(int creatureID, Vector3Int actualPosition)
+    {
+        GameManager.singleton.allCreaturesOnField[creatureID].LocalSetCreatureToIdle(actualPosition);
+    }
+    [ServerRpc]
+    internal void DieServerRpc(int creatureToDie)
+    {
+        DieClientRpc(creatureToDie);
+    }
+    [ClientRpc]
+    internal void DieClientRpc(int creatureToDie)
+    {
+        GameManager.singleton.allCreaturesOnField[creatureToDie].LocalDie();
+    }
+
+    [ServerRpc]
+    private void TargetACreatureServerRpc(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
+    {
+        TargetACreatureClientRpc(selectedCreatureID, creatureToTargetID, actualPosition);
+    }
+    [ClientRpc]
+    private void TargetACreatureClientRpc(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
+    {
+        TargetACreatureLocal(selectedCreatureID, creatureToTargetID, actualPosition);
+    }
+
+    [ServerRpc]
+    private void MoveCreatureServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        MoveCreatureClientRpc(positionSent, positionOfCreatureSent, creatureID);
+    }
+    [ClientRpc]
+    private void MoveCreatureClientRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        MoveNonOwnedCreature(positionSent, positionOfCreatureSent, creatureID);
+    }
+    [ServerRpc]
+    private void RightClickServerRpc()
+    {
+        RightClickClientRpc();
+    }
+    [ClientRpc]
+    private void RightClickClientRpc()
+    {
+        SetStateToNothingSelected();
+    }
+
+
+    [ServerRpc]
+    private void SelectCardInHandServerRpc(int cardIndex)
+    {
+        SelectCardInHandClientRpc(cardIndex);
+    }
+    [ClientRpc]
+    private void SelectCardInHandClientRpc(int cardIndex)
+    {
+        LocalSelectCardWithIndex(cardIndex);
+    }
+    [ServerRpc]
+    private void LeftClickBaseMapServerRpc(Vector3Int positionSent)
+    {
+        LeftClickBaseMapClientRpc(positionSent);
+    }
+    [ClientRpc]
+    private void LeftClickBaseMapClientRpc(Vector3Int positionSent)
+    {
+        LocalLeftClick(positionSent);
+    }
+    [ServerRpc]
+    private void SelectTileToPurchaseServerRpc(Vector3Int positionSent)
+    {
+        SelectTileToPurchaseClientRpc(positionSent);
+    }
+    [ClientRpc]
+    private void SelectTileToPurchaseClientRpc(Vector3Int positionSent)
+    {
+        PurchaseHarvestTile(positionSent);
+    }
+    [ServerRpc]
+    private void SelectCreatureOnBoardServerRpc(int creatureIDSent)
+    {
+        SelectCreatureOnBoardClientRpc(creatureIDSent);
+    }
+    [ClientRpc]
+    private void SelectCreatureOnBoardClientRpc(int creatureIDSent)
+    {
+        SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[creatureIDSent]);
+    }
+    
 }
 
 
