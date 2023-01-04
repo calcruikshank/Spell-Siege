@@ -6,7 +6,6 @@ public class SpiritSummoner : Creature
 {
     public override void OnDeath()
     {
-        playerOwningCreature.SetStateToNothingSelected();
         CardInHand randomCreatureInHand = playerOwningCreature.GetRandomCreatureInHand();
         if (randomCreatureInHand != null)
         {

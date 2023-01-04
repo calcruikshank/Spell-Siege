@@ -1182,7 +1182,7 @@ public class Controller : NetworkBehaviour
             //show error
             return false;
         }
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).traverseType == BaseTile.traversableType.SwimmingAndFlying && cardSelected.GameObjectToInstantiate.GetComponent<Creature>().thisTraversableType == Creature.travType.Walking)
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).traverseType == BaseTile.traversableType.SwimmingAndFlying && locallySelectedCard.GameObjectToInstantiate.GetComponent<Creature>().thisTraversableType == Creature.travType.Walking)
         {
             return false;
         }
