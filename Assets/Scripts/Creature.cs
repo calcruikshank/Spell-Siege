@@ -206,14 +206,8 @@ public class Creature : MonoBehaviour
                 break;
         }
 
-        HandleSpecialUpdates();
     }
 
-
-    //overridable
-    public virtual void HandleSpecialUpdates()
-    {
-    }
 
     internal void IncreaseAttackByX(float v)
     {
@@ -531,6 +525,15 @@ public class Creature : MonoBehaviour
     }
     public void GiveCounter(int numOfCounters)
     {
+        if (playerOwningCreature.IsOwner)
+        {
+            playerOwningCreature.GiveCounterServerRpc(this.creatureID, numOfCounters);
+        }
+    }
+
+    public void LocalGiveCounter(int numOfCounters)
+    {
+        Debug.Log("Giving pudge counter " + this + " " + numOfCounters );
         for (int i = 0; i < numOfCounters; i++)
         {
             MaxHealth++;
@@ -542,7 +545,6 @@ public class Creature : MonoBehaviour
         GameManager.singleton.SpawnLevelUpPrefab(this.transform.position);
         UpdateCreatureHUD();
     }
-
 
     [HideInInspector] public List<BaseTile> pathVectorList = new List<BaseTile>();
     int currentPathIndex;
@@ -606,7 +608,7 @@ public class Creature : MonoBehaviour
         if (pathVectorList != null)
         {
             CheckForCreaturesInPath();
-            if (currentPathIndex < pathVectorList.Count - 1)
+            if (currentPathIndex < pathVectorList.Count)
             {
                 targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
             }

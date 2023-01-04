@@ -30,6 +30,7 @@ public class Controller : NetworkBehaviour
 
     public Dictionary<Vector3Int, BaseTile> tilesOwned = new Dictionary<Vector3Int, BaseTile>();
 
+
     MousePositionScript mousePositionScript;
 
     public Color col;
@@ -1652,6 +1653,27 @@ public class Controller : NetworkBehaviour
     internal void AttackStructureClientRpc(int creatureAttacking, Vector3Int positionOfStructure)
     {
         GameManager.singleton.allCreaturesOnField[creatureAttacking].LocalAttackStructure(BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionOfStructure).structureOnTile);
+    }
+
+    [ServerRpc]
+    public void GiveCounterServerRpc(int creatureID, int numOfCounters)
+    {
+        GiveCounterClientRpc(creatureID, numOfCounters);
+    }
+    [ClientRpc]
+    private void GiveCounterClientRpc(int creatureID, int numOfCounters)
+    {
+        GameManager.singleton.allCreaturesOnField[creatureID].LocalGiveCounter(numOfCounters);
+    }
+    [ServerRpc]
+    internal void KillCreatureWithoutRequiringOwnershipServerRpc(int creatureID)
+    {
+        KillCreatureWithoutRequiringOwnershipClientRpc(creatureID);
+    }
+    [ClientRpc]
+    internal void KillCreatureWithoutRequiringOwnershipClientRpc(int creatureID)
+    {
+        GameManager.singleton.allCreaturesOnField[creatureID].LocalDie();
     }
 }
 

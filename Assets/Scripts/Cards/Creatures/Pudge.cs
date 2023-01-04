@@ -12,6 +12,7 @@ public class Pudge : Creature
         {
             Swallow(creatureToEat);
             OnAttack();
+
         }
     }
 
@@ -20,31 +21,19 @@ public class Pudge : Creature
     {
         swallowedCreature = creatureToEat;
         creatureToEat.gameObject.SetActive(false);
-        creatureToEat.enabled = false;
-        swallowedCreature.creatureState = CreatureState.Dead;
-        
-    }
-
-    public override void HandleSpecialUpdates()
-    {
-        base.HandleSpecialUpdates();
-        if (swallowedCreature != null)
-        {
-            swallowedCreature.actualPosition = this.actualPosition;
-        }
     }
 
     public override void Garrison()
     {
         base.Garrison();
-        if (swallowedCreature != null)
+        if (playerOwningCreature.IsOwner)
         {
-            for (int i = 0; i < swallowedCreature.CurrentHealth; i++)
+            if (swallowedCreature != null)
             {
-                GiveCounter(1);
+                GiveCounter((int)swallowedCreature.CurrentHealth);
+                playerOwningCreature.KillCreatureWithoutRequiringOwnershipServerRpc(swallowedCreature.creatureID);
             }
-            swallowedCreature.Kill();
-            swallowedCreature = null;
+            
         }
     }
 
@@ -52,7 +41,6 @@ public class Pudge : Creature
     {
         if (swallowedCreature != null)
         {
-            swallowedCreature.enabled = true;
             swallowedCreature.gameObject.SetActive(true);
             swallowedCreature.actualPosition = this.actualPosition;
         }
