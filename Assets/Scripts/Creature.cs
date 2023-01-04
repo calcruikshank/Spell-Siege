@@ -402,17 +402,21 @@ public class Creature : MonoBehaviour
     {
         if (visualAttackParticle != null)
         {
-            Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
-            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, CurrentAttack);
-            if (deathtouch)
+            if (creatureToAttack != null)
             {
-                instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, CurrentAttack);
+
+                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, CurrentAttack);
+                if (deathtouch)
+                {
+                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, CurrentAttack);
+                }
+                if (range == 1)
+                {
+                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetRange(1);
+                }
+                OnAttack();
             }
-            if (range == 1)
-            {
-                instantiatedParticle.GetComponent<VisualAttackParticle>().SetRange(1);
-            }
-            OnAttack();
         }
     }
 
