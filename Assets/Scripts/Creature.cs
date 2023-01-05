@@ -375,6 +375,7 @@ public class Creature : MonoBehaviour
             {
                 VisualAttackAnimation(currentTargetedCreature);
                 canAttack = false;
+                canAttackIcon.gameObject.SetActive(false);
                 OnAttack();
             }
         }
@@ -384,6 +385,7 @@ public class Creature : MonoBehaviour
             {
                 VisualAttackAnimationOnStructure(currentTargetedStructure);
                 canAttack = false;
+                canAttackIcon.gameObject.SetActive(false);
                 OnAttack();
             }
         }
@@ -524,6 +526,7 @@ public class Creature : MonoBehaviour
     internal void OnTurn()
     {
         canAttack = true;
+        canAttackIcon.gameObject.SetActive(true);
         HandleFriendlyCreaturesList();
         //GiveCounter(1);
     }
@@ -761,6 +764,7 @@ public class Creature : MonoBehaviour
         this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3(targetedPosition.x, actualPosition.y, targetedPosition.z), speed * Time.deltaTime);
     }
 
+    public Transform canAttackIcon;
     internal void SetToPlayerOwningCreature(Controller controller)
     {
         creatureState = CreatureState.Summoned;
@@ -772,6 +776,11 @@ public class Creature : MonoBehaviour
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
         OnETB();
         canAttack = true;
+        canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon);
+        canAttackIcon.parent = transform;
+        canAttackIcon.localScale = new Vector3(.4f, .4f, .4f);
+        canAttackIcon.localPosition = new Vector3(0, 1.6f, 0);
+        canAttackIcon.localEulerAngles = new Vector3(90, 90, 130);
     }
 
     public void SetStateToIdle()
