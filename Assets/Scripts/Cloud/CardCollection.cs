@@ -4,10 +4,12 @@ using UnityEngine;
 using Unity.Services.CloudSave;
 using Unity.Services.Authentication;
 using System;
+using System.Linq;
 
 public class CardCollection : MonoBehaviour
 {
     CardsCollectedForPlayer cardsCollected;
+    CardsCollectedForPlayer loadedCollection;
     private void Start()
     {
         LoadSomeData();
@@ -33,20 +35,75 @@ public class CardCollection : MonoBehaviour
             SaveInitialCardsCollected();
             Debug.Log("Loading card collection for the first time");
         }
-        CardsCollectedForPlayer myObject = JsonUtility.FromJson<CardsCollectedForPlayer>(savedData["CardsCollected"]);
-        Debug.Log(myObject.AngryTurtle);
+        loadedCollection = JsonUtility.FromJson<CardsCollectedForPlayer>(savedData["CardsCollected"]);
 
-        LoadCardCollection(myObject);
+        LoadCardCollection(loadedCollection);
 
     }
+
+
+    [SerializeField] Transform cardHolder;
 
     [SerializeField] Transform angryTurtleButton;
 
+    public int lastInstantiatedInt = 0;
     private void LoadCardCollection(CardsCollectedForPlayer myObject)
     {
-        if (myObject.AngryTurtle > 0)
+        for (int i = lastInstantiatedInt; i < myObject.cardsCollected.Count; i++)
         {
+            AssignButtonToTransform(GetCardAssociatedWithType((CardAssigned.Cards)myObject.cardsCollected[i]));
         }
+        lastInstantiatedInt = myObject.cardsCollected.Count;
     }
 
+    private void AssignButtonToTransform(CardInHand transformSent)
+    {
+        Transform instantiatedObject = Instantiate(transformSent.transform, cardHolder);
+        CardInHand cardToAssign = instantiatedObject.gameObject.GetComponent<CardInHand>();
+        CardButton newCardButton = instantiatedObject.gameObject.AddComponent<CardButton>();
+        newCardButton.AssignCard(cardToAssign.cardAssignedToObject);
+        Destroy(cardToAssign);
+    }
+
+
+
+
+    [SerializeField] List<CardInHand> allCardsInGame = new List<CardInHand>();
+    public CardInHand GetCardAssociatedWithType(CardAssigned.Cards cardGrabbed)
+    {
+        CardInHand selectedObject;
+
+        selectedObject = allCardsInGame.FirstOrDefault(s => s.cardAssignedToObject == cardGrabbed);
+
+        if (selectedObject == null)
+        {
+            //Debug.LogError("Could not find prefab associated with -> " + buildingType + " defaulting to 0"); 
+            //TODO when we have enough building prefabs created we can uncomment this to figure out what we're missing
+            selectedObject = allCardsInGame[0];
+        }
+        return selectedObject;
+    }
+
+
+
+
+    public async void TempOpenPack()
+    {
+        if (loadedCollection == null)
+        {
+            LoadSomeData();
+        }
+        List<int> cardsOpened = new List<int>();
+        for (int i = 0; i < 5; i++)
+        {
+            cardsOpened.Add(UnityEngine.Random.Range(0, (int)CardAssigned.Cards.NumOfCardTypes));
+        }
+        foreach (int i in cardsOpened)
+        {
+            loadedCollection.cardsCollected.Add(i);
+        }
+        var data = new Dictionary<string, object> { { "CardsCollected", loadedCollection } };
+        await CloudSaveService.Instance.Data.ForceSaveAsync(data);
+        LoadCardCollection(loadedCollection);
+    }
 }

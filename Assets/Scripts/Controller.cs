@@ -48,7 +48,6 @@ public class Controller : NetworkBehaviour
 
     Transform castle;
     Transform instantiatedCaste;
-    public Creature creatureSelected;
     Vector3Int currentLocalHoverCellPosition;
     Vector3Int cellPositionSentToClients;
     Vector3Int targetedCellPosition;
@@ -630,17 +629,15 @@ public class Controller : NetworkBehaviour
         {
             for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
             {
-                HandleMutlipleCreaturesOnBoardSelected(positionSent, selectedCreaturesWithBox[i].actualPosition, selectedCreaturesWithBox[i]);
+                HandleCreatureOnBoardSelected(positionSent, selectedCreaturesWithBox[i].actualPosition, selectedCreaturesWithBox[i]);
             }
             SetStateToNothingSelected();
-            creatureSelected = null;
         }
         Vector3 positionOfCreature = new Vector3();
         if (locallySelectedCreature && IsOwner && state != State.SpellInHandSelected)
         {
             positionOfCreature = locallySelectedCreature.actualPosition;
 
-            creatureSelected = locallySelectedCreature;
 
             HandleCreatureOnBoardSelected(positionSent, positionOfCreature, locallySelectedCreature);
         }
@@ -928,130 +925,54 @@ public class Controller : NetworkBehaviour
     void HandleCreatureOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent, Creature creatureSelected)
     {
         MoveCreatureServerRpc(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
-        targetedCellPosition = positionSent;
-        if (creatureSelected != null)
-        {
-            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
-            {
-                creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
-                SetVisualsToNothingSelectedLocally();
-            }
-            else
-            {
-                SetVisualsToNothingSelectedLocally();
-                creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
-
-            }
-            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition) == creatureSelected.tileCurrentlyOn) //this makes sure you can double click to stop the creature and also have it selected
-            {
-                SetToCreatureOnFieldSelected(creatureSelected);
-                return;
-            }
-            SetStateToNothingSelected();
-        }
+        MoveCreatureLocally(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
     }
 
 
-    public void MoveNonOwnedCreature(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+
+
+
+    [ServerRpc]
+    private void MoveCreatureServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
+    {
+        MoveCreatureClientRpc(positionSent, positionOfCreatureSent, creatureID);
+    }
+    [ClientRpc]
+    private void MoveCreatureClientRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
     {
         if (!IsOwner)
         {
-            creatureSelected = GameManager.singleton.allCreaturesOnField[creatureID];
-            targetedCellPosition = positionSent;
-            if (creatureSelected != null)
-            {
-                int numOfTicksPassed = (int)MathF.Round((Vector3.Distance(positionOfCreatureSent, creatureSelected.actualPosition) / Time.fixedDeltaTime * creatureSelected.speed));
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
-                {
-                    creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
-
-                    for (int i = 0; i < numOfTicksPassed; i++)
-                    {
-                        creatureSelected.Move();
-                    }
-                }
-                else
-                {
-                    creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
-
-                    for (int i = 0; i < numOfTicksPassed; i++)
-                    {
-                        creatureSelected.Move();
-                    }
-                }
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition) == creatureSelected.tileCurrentlyOn) //this makes sure you can double click to stop the creature and also have it selected
-                {
-                    SetToCreatureOnFieldSelected(creatureSelected);
-                    return;
-                }
-                creatureSelected = null;
-                SetStateToNothingSelected();
-            }
+            MoveCreatureLocally(positionSent, positionOfCreatureSent, creatureID);
         }
     }
 
-
-
-    void HandleMutlipleCreaturesOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent, Creature creatureSelectedSent)
+    public void MoveCreatureLocally(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
     {
-        MoveMultipleCreaturesServerRpc(positionSent, positionOfCreatureSent, creatureSelectedSent.creatureID);
+        Creature creatureSelectedSent = GameManager.singleton.allCreaturesOnField[creatureID];
         targetedCellPosition = positionSent;
         if (creatureSelectedSent != null)
         {
+            int numOfTicksPassed = (int)MathF.Round((Vector3.Distance(positionOfCreatureSent, creatureSelectedSent.actualPosition) / Time.fixedDeltaTime * creatureSelectedSent.speed));
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
             {
                 creatureSelectedSent.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
-                SetVisualsToNothingSelectedLocally();
+
+                for (int i = 0; i < numOfTicksPassed; i++)
+                {
+                    creatureSelectedSent.Move();
+                }
             }
             else
             {
-                SetVisualsToNothingSelectedLocally();
                 creatureSelectedSent.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
 
+                for (int i = 0; i < numOfTicksPassed; i++)
+                {
+                    creatureSelectedSent.Move();
+                }
             }
         }
-    }
-    [ServerRpc]
-    private void MoveMultipleCreaturesServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        MoveMultipleCreaturesClientRpc(positionSent, positionOfCreatureSent, creatureID);
-    }
-    [ClientRpc]
-    private void MoveMultipleCreaturesClientRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        MoveMultipleNonOwnedCreature(positionSent, positionOfCreatureSent, creatureID);
-    }
-
-    public void MoveMultipleNonOwnedCreature(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        if (!IsOwner)
-        {
-            creatureSelected = GameManager.singleton.allCreaturesOnField[creatureID];
-            targetedCellPosition = positionSent;
-            if (creatureSelected != null)
-            {
-                int numOfTicksPassed = (int)MathF.Round((Vector3.Distance(positionOfCreatureSent, creatureSelected.actualPosition) / Time.fixedDeltaTime * creatureSelected.speed));
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
-                {
-                    creatureSelected.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
-
-                    for (int i = 0; i < numOfTicksPassed; i++)
-                    {
-                        creatureSelected.Move();
-                    }
-                }
-                else
-                {
-                    creatureSelected.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
-
-                    for (int i = 0; i < numOfTicksPassed; i++)
-                    {
-                        creatureSelected.Move();
-                    }
-                }
-                creatureSelected = null;
-            }
-        }
+        locallySelectedCreature = null;
     }
 
 
@@ -1366,7 +1287,6 @@ public class Controller : NetworkBehaviour
             }
             return;
         }
-        creatureSelected = creatureSelectedSent;
     }
 
     private void CastSpellOnTargetedCreature(Creature creatureSelectedSent)
@@ -1387,14 +1307,12 @@ public class Controller : NetworkBehaviour
             //SetVisualsToNothingSelectedLocally();
         }
         cardSelected = null;
-        creatureSelected = null;
         selectedCreaturesWithBox.Clear();
         state = State.NothingSelected;
     }
     void SetStateToWaiting()
     {
         cardSelected = null;
-        creatureSelected = null;
         state = State.Waiting;
     }
 
@@ -1584,17 +1502,6 @@ public class Controller : NetworkBehaviour
     private void TargetACreatureClientRpc(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
     {
         TargetACreatureLocal(selectedCreatureID, creatureToTargetID, actualPosition);
-    }
-
-    [ServerRpc]
-    private void MoveCreatureServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        MoveCreatureClientRpc(positionSent, positionOfCreatureSent, creatureID);
-    }
-    [ClientRpc]
-    private void MoveCreatureClientRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        MoveNonOwnedCreature(positionSent, positionOfCreatureSent, creatureID);
     }
     [ServerRpc]
     private void RightClickServerRpc()
