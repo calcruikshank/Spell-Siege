@@ -652,8 +652,8 @@ public class Controller : NetworkBehaviour
         {
             if (CheckToSeeIfCanSpawnCreature(positionSent))
             {
-                LeftClickBaseMapServerRpc(positionSent);
                 SpawnVisualCreatureOnTile(positionSent);
+                LeftClickBaseMapServerRpc(positionSent);
             }
             return;
         }
@@ -1135,6 +1135,7 @@ public class Controller : NetworkBehaviour
         RemoveCardFromHand(cardSelectedSent);
         if (instantiatedSpawnPArticle != null)
         {
+            Debug.Log("destroying spawn particle");
             Destroy(instantiatedSpawnPArticle);
         }
     }
@@ -1492,7 +1493,7 @@ public class Controller : NetworkBehaviour
         CardInHand creatureSelectedInHand = new CardInHand();
         while (creatureSelectedInHand == null)
         {
-            int randomNumber = UnityEngine.Random.Range(0, cardsInHand.Count);
+            int randomNumber = UnityEngine.Random.Range(0, cardsInHand.Count - 1);
             if (numbersChosen.Contains(randomNumber))
             {
                 break;
