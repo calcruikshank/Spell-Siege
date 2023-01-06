@@ -51,14 +51,14 @@ public class CardCollection : MonoBehaviour
     {
         for (int i = lastInstantiatedInt; i < myObject.cardsCollected.Count; i++)
         {
-            AssignButtonToTransform(GetCardAssociatedWithType((CardAssigned.Cards)myObject.cardsCollected[i]));
+            AssignButtonToTransform(GetCardAssociatedWithType((CardAssigned.Cards)myObject.cardsCollected[i]), i);
         }
         lastInstantiatedInt = myObject.cardsCollected.Count;
     }
 
-    private void AssignButtonToTransform(CardInHand transformSent)
+    private void AssignButtonToTransform(CardInHand transformSent, int i)
     {
-        Transform instantiatedObject = Instantiate(transformSent.transform, cardHolder);
+        Transform instantiatedObject = Instantiate(transformSent.transform, cardHolder.transform.GetChild(i).transform);
         CardInHand cardToAssign = instantiatedObject.gameObject.GetComponent<CardInHand>();
         CardButton newCardButton = instantiatedObject.gameObject.AddComponent<CardButton>();
         newCardButton.AssignCard(cardToAssign.cardAssignedToObject);
