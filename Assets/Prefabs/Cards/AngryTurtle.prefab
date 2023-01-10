@@ -1215,7 +1215,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d64a1f6a99f40e4d9d3069f88da2f3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  card: {fileID: 11400000, guid: a498e7ab3685ae64996c9069b06b137b, type: 2}
   GameObjectToInstantiate: {fileID: 6239865746917987993, guid: 8baa95e1d4c01124999188af9ea741ba, type: 3}
   indexOfCard: 26
   greenManaCost: 1
@@ -1234,6 +1233,7 @@ MonoBehaviour:
   genericManaText: {fileID: 0}
   playerOwningCard: {fileID: 0}
   isPurchasable: 0
+  cardAssignedToObject: 0
   cardType: 0
 --- !u!65 &1037695483380822100
 BoxCollider:
@@ -3058,6 +3058,10 @@ PrefabInstance:
     - target: {fileID: 4706540284086102503, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_Name
       value: Keywords
+      objectReference: {fileID: 0}
+    - target: {fileID: 4706540284086102503, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6084853275323712954, guid: 744e86d2ce7a2634b91be9280002a843, type: 3}
       propertyPath: m_IsActive

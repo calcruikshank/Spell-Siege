@@ -10,12 +10,4 @@ public class Keywords : MonoBehaviour
     [SerializeField] public Transform amphibiousIndicator;
     [SerializeField] public Transform tauntIndicator;
 
-    public void InjectDependencies(Card cardSent)
-    {
-        lifelinkIndicator.gameObject.SetActive(cardSent.lifelink);
-        deathtouchIndicator.gameObject.SetActive(cardSent.deathtouch);
-        flyingIndicator.gameObject.SetActive(cardSent.flying);
-        amphibiousIndicator.gameObject.SetActive(cardSent.amphibious);
-        tauntIndicator.gameObject.SetActive(cardSent.taunt);
-    }
 }

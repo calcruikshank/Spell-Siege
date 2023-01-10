@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class CardInHand : MonoBehaviour
 {
-    [SerializeField] Card card;
     [SerializeField]public Transform GameObjectToInstantiate;
     public int indexOfCard;
 
@@ -58,16 +57,9 @@ public class CardInHand : MonoBehaviour
 
     void SetCard()
     {
-        this.blueManaCost = card.blueManaCost;
-        this.greenManaCost = card.greenManaCost;
-        this.redManaCost = card.redManaCost;
-        this.whiteManaCost = card.whiteManaCost;
-        this.blackManaCost = card.blackManaCost;
-        this.genericManaCost = card.genericManaCost;
         if (this.GetComponentInChildren<Keywords>() != null)
         {
             keywords = this.GetComponentInChildren<Keywords>();
-            keywords.InjectDependencies(card);
             keywords.gameObject.SetActive(false);
         }
         
