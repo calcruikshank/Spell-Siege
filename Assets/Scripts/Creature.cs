@@ -1085,6 +1085,8 @@ public class Creature : MonoBehaviour
             return;
         }
         originalCardTransform.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
+
+        originalCardTransform.transform.localScale = Vector3.one * 100 / originalCardTransform.transform.position.z;
         originalCardTransform.gameObject.SetActive(true);
     }
 

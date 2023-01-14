@@ -305,6 +305,7 @@ public class BaseTile : MonoBehaviour
         if (instantiatedManaSymbol != null)
         {
             instantiatedManaSymbol.transform.position = GameManager.singleton.mainCam.WorldToScreenPoint(this.transform.position);
+            instantiatedManaSymbol.transform.localScale = Vector3.one * 10 / instantiatedManaSymbol.transform.position.z;
         }
     }
 
