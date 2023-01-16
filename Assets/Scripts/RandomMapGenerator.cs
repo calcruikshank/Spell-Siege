@@ -30,6 +30,8 @@ using Unity.Collections;
     public Tilemap backgroundMap;
 
     [SerializeField] TileBase[] tilesToChooseFrom;
+    [SerializeField] TileBase[] forestTilesToChooseFrom;
+    [SerializeField] TileBase[] islandTilesToChooseFrom;
 
 
     [SerializeField] TileBase[] plainsEnvironmentTilesToChooseFrom;
@@ -90,32 +92,36 @@ using Unity.Collections;
             {
                 if (terrainMap[x, y] != 0)
                 {
-                    baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), tilesToChooseFrom[terrainMap[x, y] - 1]);
-
+                    int tileValue = terrainMap[x, y];
+                    if (tileValue == 1)
+                    {
+                        //baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestTilesToChooseFrom[Random.Range(0, forestTilesToChooseFrom.Length)]);
+                        //environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), plainsEnvironmentTilesToChooseFrom[Random.Range(0, plainsEnvironmentTilesToChooseFrom.Length)]);
+                    }
+                    if (tileValue == 2)
+                    {
+                        //baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestTilesToChooseFrom[Random.Range(0, forestTilesToChooseFrom.Length)]);
+                        //environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), swampEnvironmentTilesToChooseFrom[Random.Range(0, swampEnvironmentTilesToChooseFrom.Length)]);
+                    }
+                    if (tileValue == 3)
+                    {
+                        //baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestTilesToChooseFrom[Random.Range(0, forestTilesToChooseFrom.Length)]);
+                        //environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), mountainEnvironmentTilesToChooseFrom[Random.Range(0, mountainEnvironmentTilesToChooseFrom.Length)]);
+                    }
+                    if (tileValue == 4)
+                    {
+                        baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestTilesToChooseFrom[Random.Range(0, forestTilesToChooseFrom.Length)]);
+                        // environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestEnvironmentTilesToChooseFrom[Random.Range(0, forestEnvironmentTilesToChooseFrom.Length)]);
+                    }
                     if (Random.Range(0, 100) > 75)
                     {
-                        int tileValue = terrainMap[x, y];
-                        if (tileValue == 1)
-                        {
-                            environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), plainsEnvironmentTilesToChooseFrom[Random.Range(0, plainsEnvironmentTilesToChooseFrom.Length)]);
-                        }
-                        if (tileValue == 2)
-                        {
-                            environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), swampEnvironmentTilesToChooseFrom[Random.Range(0, swampEnvironmentTilesToChooseFrom.Length)]);
-                        }
-                        if (tileValue == 3)
-                        {
-                            environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), mountainEnvironmentTilesToChooseFrom[Random.Range(0, mountainEnvironmentTilesToChooseFrom.Length)]);
-                        }
-                        if (tileValue == 4)
-                        {
-                            environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestEnvironmentTilesToChooseFrom[Random.Range(0, forestEnvironmentTilesToChooseFrom.Length)]);
-                        }
+                        
                     }
 
                 }
 
-                botMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), botTile);
+                botMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), islandTilesToChooseFrom[Random.Range(0, islandTilesToChooseFrom.Length)]);
+                //botMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), botTile);
 
                 backgroundMap.SetTile(new Vector3Int((-x + width / 2) + width, (-y + height / 2) + height, 0), backgroundTile);
                 backgroundMap.SetTile(new Vector3Int((-x + width / 2) - width, (-y + height / 2) - height, 0), backgroundTile);
