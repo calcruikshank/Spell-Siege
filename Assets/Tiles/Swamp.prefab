@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -7011141208685322689}
   - component: {fileID: 7890982584060249880}
   m_Layer: 3
-  m_Name: Island 2
+  m_Name: Swamp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,7 +50,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7364862864276254007}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 014bd5ae198dd044eb93001a11e03440, type: 2}
+  - {fileID: 2100000, guid: c70afc50b5e29ff4dabc738722add302, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -121,8 +121,8 @@ MonoBehaviour:
   fCost: 0
   cameFromBaseTile: {fileID: 0}
   harvestCost: 0
-  manaType: 2
-  traverseType: 2
+  manaType: 3
+  traverseType: 3
   worldPositionsOfVectorsOnGrid: []
   topRight: {x: 0, y: 0, z: 0}
   bottomRight: {x: 0, y: 0, z: 0}

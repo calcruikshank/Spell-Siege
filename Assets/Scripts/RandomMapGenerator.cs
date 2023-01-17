@@ -32,6 +32,9 @@ using Unity.Collections;
     [SerializeField] TileBase[] tilesToChooseFrom;
     [SerializeField] TileBase[] forestTilesToChooseFrom;
     [SerializeField] TileBase[] islandTilesToChooseFrom;
+    [SerializeField] TileBase[] mountainTilesToChooseFrom;
+    [SerializeField] TileBase[] plainsTilesToChooseFrom;
+    [SerializeField] TileBase[] swampTilesToChooseFrom;
 
 
     [SerializeField] TileBase[] plainsEnvironmentTilesToChooseFrom;
@@ -95,17 +98,17 @@ using Unity.Collections;
                     int tileValue = terrainMap[x, y];
                     if (tileValue == 1)
                     {
-                        //baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestTilesToChooseFrom[Random.Range(0, forestTilesToChooseFrom.Length)]);
+                        baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), plainsTilesToChooseFrom[Random.Range(0, plainsTilesToChooseFrom.Length)]);
                         //environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), plainsEnvironmentTilesToChooseFrom[Random.Range(0, plainsEnvironmentTilesToChooseFrom.Length)]);
                     }
                     if (tileValue == 2)
                     {
-                        //baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestTilesToChooseFrom[Random.Range(0, forestTilesToChooseFrom.Length)]);
+                        baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), swampTilesToChooseFrom[Random.Range(0, swampTilesToChooseFrom.Length)]);
                         //environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), swampEnvironmentTilesToChooseFrom[Random.Range(0, swampEnvironmentTilesToChooseFrom.Length)]);
                     }
                     if (tileValue == 3)
                     {
-                        //baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestTilesToChooseFrom[Random.Range(0, forestTilesToChooseFrom.Length)]);
+                        baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), mountainTilesToChooseFrom[Random.Range(0, mountainTilesToChooseFrom.Length)]);
                         //environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), mountainEnvironmentTilesToChooseFrom[Random.Range(0, mountainEnvironmentTilesToChooseFrom.Length)]);
                     }
                     if (tileValue == 4)
