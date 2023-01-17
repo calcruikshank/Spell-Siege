@@ -116,9 +116,24 @@ using Unity.Collections;
                         baseMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestTilesToChooseFrom[Random.Range(0, forestTilesToChooseFrom.Length)]);
                         // environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestEnvironmentTilesToChooseFrom[Random.Range(0, forestEnvironmentTilesToChooseFrom.Length)]);
                     }
-                    if (Random.Range(0, 100) > 75)
+                    if (Random.Range(0, 100) > 85)
                     {
-                        
+                        if (tileValue == 1)
+                        {
+                            environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), plainsEnvironmentTilesToChooseFrom[Random.Range(0, plainsEnvironmentTilesToChooseFrom.Length)]);
+                        }
+                        if (tileValue == 2)
+                        {
+                            environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), swampEnvironmentTilesToChooseFrom[Random.Range(0, swampEnvironmentTilesToChooseFrom.Length)]);
+                        }
+                        if (tileValue == 3)
+                        {
+                            environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), mountainEnvironmentTilesToChooseFrom[Random.Range(0, mountainEnvironmentTilesToChooseFrom.Length)]);
+                        }
+                        if (tileValue == 4)
+                        {
+                            environmentMap.SetTile(new Vector3Int(-x + width / 2, -y + height / 2, 0), forestEnvironmentTilesToChooseFrom[Random.Range(0, forestEnvironmentTilesToChooseFrom.Length)]);
+                        }
                     }
 
                 }

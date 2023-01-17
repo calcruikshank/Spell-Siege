@@ -168,7 +168,7 @@ public class BaseTile : MonoBehaviour
     void CalculateAllPoints()
     {
         float y = 0;
-        Vector3 worldPositionOfCell = new Vector3(this.transform.position.x, .21f, this.transform.position.z);
+        Vector3 worldPositionOfCell = new Vector3(this.transform.position.x, .11f, this.transform.position.z);
         topRight = new Vector3(grid.GetBoundsLocal(tilePosition).extents.x, y, grid.GetBoundsLocal(tilePosition).extents.z / 2) + worldPositionOfCell;
         worldPositionsOfVectorsOnGrid.Add(topRight);
 
