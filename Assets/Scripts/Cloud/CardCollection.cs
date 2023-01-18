@@ -8,8 +8,22 @@ using System.Linq;
 
 public class CardCollection : MonoBehaviour
 {
+    public static CardCollection singleton;
     CardsCollectedForPlayer cardsCollected;
     CardsCollectedForPlayer loadedCollection;
+
+    [SerializeField] List<Deck> decks = new List<Deck>();
+
+    Deck currentSelectedDeck;
+
+    private void Awake()
+    {
+        if (singleton != null)
+        {
+            Destroy(this);
+        }
+        singleton = this;
+    }
     private void Start()
     {
         LoadSomeData();
@@ -105,5 +119,19 @@ public class CardCollection : MonoBehaviour
         var data = new Dictionary<string, object> { { "CardsCollected", loadedCollection } };
         await CloudSaveService.Instance.Data.ForceSaveAsync(data);
         LoadCardCollection(loadedCollection);
+    }
+
+    public void ChooseDeck(int deckChosen)
+    {
+        currentSelectedDeck = decks[deckChosen];
+    }
+
+
+    internal void CardHasBeenClicked(CardAssigned.Cards cardAssigned)
+    {
+        if (currentSelectedDeck != null)
+        {
+            currentSelectedDeck.deck.Add(cardAssigned);
+        }
     }
 }
