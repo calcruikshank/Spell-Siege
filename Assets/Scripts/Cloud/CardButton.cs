@@ -10,11 +10,6 @@ public class CardButton : MonoBehaviour, IPointerDownHandler
     public void AssignCard(CardAssigned.Cards cardSent)
     {
         cardAssigned = cardSent;
-        foreach (Image i in GetComponentsInChildren<Image>())
-        {
-            i.enabled = false;
-            i.raycastTarget = false;
-        }
     }
 
     public void OnMouseDown()
