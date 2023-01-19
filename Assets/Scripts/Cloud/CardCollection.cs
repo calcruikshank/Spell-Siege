@@ -32,6 +32,8 @@ public class CardCollection : MonoBehaviour
 
     [SerializeField] Transform cardHolder;
 
+    [SerializeField] TextMeshProUGUI[] deckNames;
+
 
     public int lastInstantiatedInt = 0;
 
@@ -39,6 +41,10 @@ public class CardCollection : MonoBehaviour
     public List<CardButton> instantiatedCardButtons = new List<CardButton>();
     private void LoadCardCollection(CardsCollectedForPlayer myObject)
     {
+        for (int i = 0; i < CardCollectionData.singleton.decks.Count; i++)
+        {
+            deckNames[i].text = CardCollectionData.singleton.decks[i].deckName;
+        }
         for (int i = lastInstantiatedInt; i < myObject.cardsCollected.Count; i++)
         {
             AssignButtonToTransform(GetCardAssociatedWithType((CardAssigned.Cards)myObject.cardsCollected[i]), i);
