@@ -5,11 +5,14 @@ using Unity.Services.CloudSave;
 using Unity.Services.Authentication;
 using System;
 using System.Linq;
+using TMPro;
 
 public class CardCollection : MonoBehaviour
 {
     public static CardCollection singleton;
     Deck currentSelectedDeck;
+
+    [SerializeField] TextMeshProUGUI loadedDeckName;
 
     private void Awake()
     {
@@ -116,11 +119,16 @@ public class CardCollection : MonoBehaviour
     }
 
     [SerializeField] Transform loadedDeckPanel;
+
+    [SerializeField] TMP_InputField nameInputField;
     private void LoadPanelWithCurrentlySelectedDeck(Deck currentSelectedDeck)
     {
         loadedDeckPanel.gameObject.SetActive(true);
         deckSelectionPanel.gameObject.SetActive(false);
 
+        loadedDeckName.text = currentSelectedDeck.deckName;
+        nameInputField.text = currentSelectedDeck.deckName;
+        Debug.Log(currentSelectedDeck.deckName);
         LoadDeck(currentSelectedDeck);
     }
 
@@ -141,10 +149,12 @@ public class CardCollection : MonoBehaviour
     [SerializeField] Transform deckSelectionPanel;
     public void GoToDeckSelectionPanel()
     {
+        currentSelectedDeck.deckName = loadedDeckName.text.ToString();
         currentSelectedDeck = null;
         loadedDeckPanel.gameObject.SetActive(false);
         deckSelectionPanel.gameObject.SetActive(true);
 
+        
         CardCollectionData.singleton.SaveDecklists();
     }
 

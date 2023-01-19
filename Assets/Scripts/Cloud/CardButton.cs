@@ -28,7 +28,6 @@ public class CardButton : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     public void OnPointerDown(PointerEventData eventData)
     {
         CardCollection.singleton.AddCardToDeck(cardAssigned);
-        Debug.Log("card assigned " + cardAssigned);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

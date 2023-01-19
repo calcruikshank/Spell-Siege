@@ -48,6 +48,7 @@ public class CardCollectionData : MonoBehaviour
     public async void SaveInitialDecklist0()
     {
         Deck deck0 = new Deck();
+        deck0.deckName = "Deck 1";
         var data = new Dictionary<string, object> { { "Deck0", deck0 } };
         await CloudSaveService.Instance.Data.ForceSaveAsync(data);
         LoadDeck0FromCloudSave();
@@ -71,6 +72,7 @@ public class CardCollectionData : MonoBehaviour
     public async void SaveInitialDecklist1()
     {
         Deck deck1 = new Deck();
+        deck1.deckName = "Deck 2";
         var data = new Dictionary<string, object> { { "Deck1", deck1 } };
         await CloudSaveService.Instance.Data.ForceSaveAsync(data);
         LoadDeck1FromCloudSave();
@@ -98,6 +100,7 @@ public class CardCollectionData : MonoBehaviour
     public async void SaveInitialDecklist2()
     {
         Deck deck2 = new Deck();
+        deck2.deckName = "Deck 3";
         var data = new Dictionary<string, object> { { "Deck2", deck2 } };
         await CloudSaveService.Instance.Data.ForceSaveAsync(data);
         LoadDeck2FromCloudSave();
@@ -124,6 +127,7 @@ public class CardCollectionData : MonoBehaviour
     public async void SaveInitialDecklist3()
     {
         Deck deck3 = new Deck();
+        deck3.deckName = "Deck 4";
         var data = new Dictionary<string, object> { { "Deck3", deck3 } };
         await CloudSaveService.Instance.Data.ForceSaveAsync(data);
         LoadDeck3FromCloudSave();
@@ -151,6 +155,7 @@ public class CardCollectionData : MonoBehaviour
     public async void SaveInitialDecklist4()
     {
         Deck deck4 = new Deck();
+        deck4.deckName = "Deck 5";
         var data = new Dictionary<string, object> { { "Deck4", deck4 } };
         await CloudSaveService.Instance.Data.ForceSaveAsync(data);
         LoadDeck4FromCloudSave();
@@ -165,6 +170,7 @@ public class CardCollectionData : MonoBehaviour
             return;
         }
         decks.Add(JsonUtility.FromJson<Deck>(savedData["Deck4"]));
+        
     }
     private async void SaveDeckList4()
     {
@@ -177,6 +183,7 @@ public class CardCollectionData : MonoBehaviour
     public async void SaveInitialDecklist5()
     {
         Deck deck5 = new Deck();
+        deck5.deckName = "Deck 6";
         var data = new Dictionary<string, object> { { "Deck5", deck5 } };
         await CloudSaveService.Instance.Data.ForceSaveAsync(data);
         LoadDeck5FromCloudSave();
