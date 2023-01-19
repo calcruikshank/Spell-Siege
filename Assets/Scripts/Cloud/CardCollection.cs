@@ -132,8 +132,23 @@ public class CardCollection : MonoBehaviour
     {
         loadedDeckPanel.gameObject.SetActive(true);
         deckSelectionPanel.gameObject.SetActive(false);
+
+        LoadDeck(currentSelectedDeck);
     }
 
+    List<GameObject> instantiatedCardsInDeck = new List<GameObject>();
+    private void LoadDeck(Deck currentSelectedDeckSent)
+    {
+        foreach (GameObject go in instantiatedCardsInDeck)
+        {
+            Destroy(go);
+        }
+
+        foreach (CardAssigned.Cards c in currentSelectedDeckSent.deck)
+        {
+            InstantiateCardPrefabInCurrentSelectedDeck(c);
+        }
+    }
 
     [SerializeField] Transform deckSelectionPanel;
     public void GoToDeckSelectionPanel()
@@ -143,11 +158,29 @@ public class CardCollection : MonoBehaviour
         deckSelectionPanel.gameObject.SetActive(true);
     }
 
-    internal void CardHasBeenClicked(CardAssigned.Cards cardAssigned)
+
+    [SerializeField] GameObject cardInDeckIcon;
+    [SerializeField] Transform loadedDeckVertScrollRect;
+    internal void AddCardToDeck(CardAssigned.Cards cardAssigned)
     {
         if (currentSelectedDeck != null)
         {
             currentSelectedDeck.deck.Add(cardAssigned);
+            InstantiateCardPrefabInCurrentSelectedDeck(cardAssigned);
         }
+    }
+
+
+    internal void RemoveCardFromDeck(CardIconInDeck cardIconInDeck)
+    {
+        currentSelectedDeck.deck.Remove(cardIconInDeck.c);
+        instantiatedCardsInDeck.Remove(cardIconInDeck.gameObject);
+        Destroy(cardIconInDeck.gameObject);
+    }
+    private void InstantiateCardPrefabInCurrentSelectedDeck(CardAssigned.Cards cardAssigned)
+    {
+        GameObject instCard = Instantiate(cardInDeckIcon, loadedDeckVertScrollRect.transform);
+        instCard.GetComponent<CardIconInDeck>().InjectDependencies(cardAssigned);
+        instantiatedCardsInDeck.Add(instCard);
     }
 }

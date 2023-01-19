@@ -18,7 +18,7 @@ public class CardButton : MonoBehaviour, IPointerDownHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        CardCollection.singleton.CardHasBeenClicked(cardAssigned);
+        CardCollection.singleton.AddCardToDeck(cardAssigned);
         Debug.Log("card assigned " + cardAssigned);
     }
 }
