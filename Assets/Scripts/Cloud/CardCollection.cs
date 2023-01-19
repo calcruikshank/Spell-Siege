@@ -124,8 +124,24 @@ public class CardCollection : MonoBehaviour
     public void ChooseDeck(int deckChosen)
     {
         currentSelectedDeck = decks[deckChosen];
+        LoadPanelWithCurrentlySelectedDeck(currentSelectedDeck);
     }
 
+    [SerializeField] Transform loadedDeckPanel;
+    private void LoadPanelWithCurrentlySelectedDeck(Deck currentSelectedDeck)
+    {
+        loadedDeckPanel.gameObject.SetActive(true);
+        deckSelectionPanel.gameObject.SetActive(false);
+    }
+
+
+    [SerializeField] Transform deckSelectionPanel;
+    public void GoToDeckSelectionPanel()
+    {
+        currentSelectedDeck = null;
+        loadedDeckPanel.gameObject.SetActive(false);
+        deckSelectionPanel.gameObject.SetActive(true);
+    }
 
     internal void CardHasBeenClicked(CardAssigned.Cards cardAssigned)
     {
