@@ -143,7 +143,7 @@ public class CardCollection : MonoBehaviour
         {
             Destroy(go);
         }
-
+        instantiatedCardsInDeck.Clear();
         foreach (CardAssigned.Cards c in currentSelectedDeckSent.deck)
         {
             InstantiateCardPrefabInCurrentSelectedDeck(c);
@@ -183,17 +183,19 @@ public class CardCollection : MonoBehaviour
     }
     private void InstantiateCardPrefabInCurrentSelectedDeck(CardAssigned.Cards cardAssigned)
     {
-        if (currentSelectedDeck.deck.Contains(cardAssigned))
+        bool gameObjectHasBeenInstantiated = false;
+        if (instantiatedCardsInDeck.Count > 0)
         {
             foreach (GameObject instCard in instantiatedCardsInDeck)
             {
                 if (instCard.GetComponent<CardIconInDeck>().c == cardAssigned)
                 {
+                    gameObjectHasBeenInstantiated = true;
                     instCard.GetComponent<CardIconInDeck>().AddNumber();
                 }
             }
         }
-        else
+        if (!gameObjectHasBeenInstantiated)
         {
             GameObject instCard = Instantiate(cardInDeckIcon, loadedDeckVertScrollRect.transform);
             instCard.GetComponent<CardIconInDeck>().InjectDependencies(cardAssigned);
