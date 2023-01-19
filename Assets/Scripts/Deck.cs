@@ -1,8 +1,9 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class Deck : MonoBehaviour
+
+[Serializable]
+public class Deck 
 {
-    [SerializeField] public List<CardAssigned.Cards> deck = new List<CardAssigned.Cards>();
+    public List<int> deck = new List<int>();
 }
