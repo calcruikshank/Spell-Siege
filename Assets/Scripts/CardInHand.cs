@@ -37,6 +37,9 @@ public class CardInHand : MonoBehaviour
     public bool isPurchasable;
 
     public CardAssigned.Cards cardAssignedToObject;
+
+
+    public TextMeshProUGUI cardTitle;
     public enum CardType
     {
         Creature,

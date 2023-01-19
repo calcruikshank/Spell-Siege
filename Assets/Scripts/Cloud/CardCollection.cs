@@ -165,8 +165,8 @@ public class CardCollection : MonoBehaviour
     {
         if (currentSelectedDeck != null)
         {
-            currentSelectedDeck.deck.Add(cardAssigned);
             InstantiateCardPrefabInCurrentSelectedDeck(cardAssigned);
+            currentSelectedDeck.deck.Add(cardAssigned);
         }
     }
 
@@ -174,13 +174,30 @@ public class CardCollection : MonoBehaviour
     internal void RemoveCardFromDeck(CardIconInDeck cardIconInDeck)
     {
         currentSelectedDeck.deck.Remove(cardIconInDeck.c);
+    }
+
+    public void DestroyCardIcon(CardIconInDeck cardIconInDeck)
+    {
         instantiatedCardsInDeck.Remove(cardIconInDeck.gameObject);
         Destroy(cardIconInDeck.gameObject);
     }
     private void InstantiateCardPrefabInCurrentSelectedDeck(CardAssigned.Cards cardAssigned)
     {
-        GameObject instCard = Instantiate(cardInDeckIcon, loadedDeckVertScrollRect.transform);
-        instCard.GetComponent<CardIconInDeck>().InjectDependencies(cardAssigned);
-        instantiatedCardsInDeck.Add(instCard);
+        if (currentSelectedDeck.deck.Contains(cardAssigned))
+        {
+            foreach (GameObject instCard in instantiatedCardsInDeck)
+            {
+                if (instCard.GetComponent<CardIconInDeck>().c == cardAssigned)
+                {
+                    instCard.GetComponent<CardIconInDeck>().AddNumber();
+                }
+            }
+        }
+        else
+        {
+            GameObject instCard = Instantiate(cardInDeckIcon, loadedDeckVertScrollRect.transform);
+            instCard.GetComponent<CardIconInDeck>().InjectDependencies(cardAssigned);
+            instantiatedCardsInDeck.Add(instCard);
+        }
     }
 }
