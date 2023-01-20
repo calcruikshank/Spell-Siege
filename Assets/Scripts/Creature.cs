@@ -282,7 +282,7 @@ public class Creature : MonoBehaviour
         {
             currentTargetedCreature = targetToFollow;
         }
-        if (targetToFollow == null || !IsCreatureWithinRange(targetToFollow))
+        /*if (targetToFollow == null || !IsCreatureWithinRange(targetToFollow))
         {
             foreach (Creature creatureInRange in creaturesWithinRange)
             {
@@ -305,7 +305,7 @@ public class Creature : MonoBehaviour
 
 
             }
-        }
+        }*/
 
 
 
@@ -316,7 +316,7 @@ public class Creature : MonoBehaviour
                 currentTargetedStructure = null;
             }
         }
-        foreach (Structure structureInRange in structresWithinRange)
+        /*foreach (Structure structureInRange in structresWithinRange)
         {
             if (structureInRange.playerOwningStructure != this.playerOwningCreature)
             {
@@ -328,7 +328,7 @@ public class Creature : MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
         if (structureToFollow != null)
         {
             if (structureToFollow.playerOwningStructure != this.playerOwningCreature)
@@ -407,7 +407,7 @@ public class Creature : MonoBehaviour
             if (creatureToAttack != null)
             {
 
-                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
+                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .1f, this.transform.position.z), Quaternion.identity);
                 instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, CurrentAttack);
                 if (deathtouch)
                 {
@@ -1229,6 +1229,7 @@ public class Creature : MonoBehaviour
         {
             if (creatureToFollow.playerOwningCreature != this.playerOwningCreature)
             {
+                Debug.Log("Targeting creature");
                 targetToFollow = creatureToFollow;
                 if (targetToFollow != null)
                 {
@@ -1257,6 +1258,7 @@ public class Creature : MonoBehaviour
         }
         if (structureToFollowSent.playerOwningStructure != this.playerOwningCreature)
         {
+            Debug.Log("Targeting structure");
             structureToFollow = structureToFollowSent;
             if (IsStructureInRange(structureToFollow))
             {

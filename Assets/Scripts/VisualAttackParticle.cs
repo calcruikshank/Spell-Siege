@@ -14,58 +14,110 @@ public class VisualAttackParticle : MonoBehaviour
     public void SetTarget(Creature creatureToTarget, float attack)
     {
         targetedCreature = creatureToTarget;
-        Vector3 direction = creatureToTarget.transform.position - this.transform.position;
+        Vector3 direction = new Vector3( creatureToTarget.transform.position.x, this.transform.position.y, creatureToTarget.transform.position.z) - this.transform.position;
         this.transform.forward = direction;
         amountofdamage = attack;
     }
 
+
+    float timer = 0;
+    float timerThreshold = .1f;
     private void FixedUpdate()
     {
-        if (shutDown)
+        if (range != 1)
         {
-            return;
-        }
-        if (targetedCreature != null)
-        {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, targetedCreature.actualPosition, speed * Time.deltaTime);
-
-            if (Vector3.Distance(this.transform.position, targetedCreature.actualPosition) < .02f && shutDown == false)
+            if (shutDown)
             {
-                targetedCreature.TakeDamage(amountofdamage);
-                if (deathtouch)
+                return;
+            }
+            if (targetedCreature != null)
+            {
+                this.transform.position = Vector3.MoveTowards(this.transform.position, targetedCreature.actualPosition, speed * Time.deltaTime);
+
+                if (Vector3.Distance(this.transform.position, targetedCreature.actualPosition) < .02f && shutDown == false)
                 {
-                    targetedCreature.Kill();
+                    targetedCreature.TakeDamage(amountofdamage);
+                    if (deathtouch)
+                    {
+                        targetedCreature.Kill();
+                    }
+
+
+
+                    TurnOff();
+                    shutDown = true;
                 }
-
-
-
-                TurnOff();
-                shutDown = true;
             }
-        }
-        if (targetedStructure != null)
-        {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3(targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z), 10f * Time.deltaTime);
-            if (Vector3.Distance(this.transform.position, new Vector3(targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z)) < .02f && shutDown == false)
+            if (targetedStructure != null)
             {
-                targetedStructure.TakeDamage(amountofdamage);
+                this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3(targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z), 10f * Time.deltaTime);
+                if (Vector3.Distance(this.transform.position, new Vector3(targetedStructure.transform.position.x, .2f, targetedStructure.transform.position.z)) < .02f && shutDown == false)
+                {
+                    targetedStructure.TakeDamage(amountofdamage);
+
+                    TurnOff();
+                    shutDown = true;
+                }
+            }
+            if (targetedStructure == null && targetedCreature == null)
+            {
 
                 TurnOff();
                 shutDown = true;
             }
         }
-        if (targetedStructure == null && targetedCreature == null)
+        else
         {
+            if (shutDown)
+            {
+                return;
+            }
+            if (targetedCreature != null)
+            {
+                //this.transform.position = Vector3.MoveTowards(this.transform.position, targetedCreature.actualPosition, speed * Time.deltaTime);
+                timer += Time.fixedDeltaTime;
+                if (timer > timerThreshold)
+                {
 
-            TurnOff();
-            shutDown = true;
+                    targetedCreature.TakeDamage(amountofdamage);
+                    if (deathtouch)
+                    {
+                        targetedCreature.Kill();
+                    }
+
+
+
+                    TurnOff();
+                    shutDown = true;
+                }
+            }
+            if (targetedStructure != null)
+            {
+                timer += Time.fixedDeltaTime;
+                if (timer > timerThreshold)
+                {
+
+                    targetedStructure.TakeDamage(amountofdamage);
+
+
+
+                    TurnOff();
+                    shutDown = true;
+                }
+            }
+            if (targetedStructure == null && targetedCreature == null)
+            {
+
+                TurnOff();
+                shutDown = true;
+            }
         }
     }
 
     internal void SetTargetStructure(Structure structureToAttack, float attack)
     {
         targetedStructure = structureToAttack;
-        Vector3 direction = structureToAttack.transform.position - this.transform.position;
+        Vector3 direction = new Vector3(structureToAttack.transform.position.x, this.transform.position.y, structureToAttack.transform.position.z) - this.transform.position;
         this.transform.forward = direction;
         amountofdamage = attack;
     }
@@ -103,28 +155,6 @@ public class VisualAttackParticle : MonoBehaviour
     int range = 0;
     internal void SetRange(int v)
     {
-        return;
-        if (v == 1)
-        {
-            range = v;
-            if (targetedCreature != null)
-            {
-                targetedCreature.TakeDamage(amountofdamage);
-                if (deathtouch)
-                {
-                    targetedCreature.Kill();
-                }
-
-
-
-                shutDown = true;
-            }
-            if (targetedStructure != null)
-            {
-                targetedStructure.TakeDamage(amountofdamage);
-
-                shutDown = true;
-            }
-        }
+        range = v;
     }
 }

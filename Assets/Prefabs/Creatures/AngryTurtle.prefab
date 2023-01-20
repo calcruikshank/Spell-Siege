@@ -522,8 +522,17 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6239865746917987997}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
+  serializedVersion: 2
   m_Radius: 0.5000001
   m_Height: 2
   m_Direction: 1
@@ -562,8 +571,11 @@ MonoBehaviour:
   tileCurrentlyOn: {fileID: 0}
   previousTilePosition: {fileID: 0}
   actualPosition: {x: 0, y: 0, z: 0}
-  visualAttackParticle: {fileID: 6003523913816622651, guid: 3f80c0f2c84ba644d8cc959b3f4f0f50, type: 3}
+  targetedPosition: {x: 0, y: 0, z: 0}
+  visualAttackParticle: {fileID: 6131268248031804042, guid: 58eb57a8db9362b49a2c9d078230ae67, type: 3}
   pathVectorList: []
+  tempLineRendererBetweenCreaturesGameObject: {fileID: 0}
+  canAttackIcon: {fileID: 0}
   lifelink: 0
   deathtouch: 0
   taunt: 0

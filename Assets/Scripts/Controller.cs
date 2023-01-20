@@ -129,6 +129,12 @@ public class Controller : NetworkBehaviour
     {
         GrabAllObjectsFromGameManager();
 
+        if (IsOwner)
+        {
+            DeckSelectorInScene.singleton.AssignLocalPlayer(this);
+            SpawnSelectionBox();
+        }
+
         col.a = 1;
         transparentCol = col;
         transparentCol.a = .5f;
@@ -161,11 +167,6 @@ public class Controller : NetworkBehaviour
         transparentCol = col;
         transparentCol.a = .5f;
 
-        if (IsOwner)
-        {
-            DeckSelectorInScene.singleton.AssignLocalPlayer(this);
-            SpawnSelectionBox();
-        }
 
     }
 
@@ -988,6 +989,8 @@ public class Controller : NetworkBehaviour
             }
             else
             {
+                creatureSelectedSent.targetToFollow = null;
+                creatureSelectedSent.structureToFollow = null;
                 creatureSelectedSent.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
 
                 for (int i = 0; i < numOfTicksPassed; i++)
