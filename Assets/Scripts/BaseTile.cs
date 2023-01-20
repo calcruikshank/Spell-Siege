@@ -285,7 +285,7 @@ public class BaseTile : MonoBehaviour
         opaqueColor.a = playerOwningTile.col.a;
         transparentColor.a = playerOwningTile.transparentCol.a;
         instantiatedManaSymbol.GetComponent<Image>().color = transparentColor;
-        instantiatedManaSymbol.transform.parent = GameManager.singleton.RectCanvas.transform;
+        instantiatedManaSymbol.transform.parent = GameManager.singleton.scalableUICanvas.transform;
         HideHarvestIcon();
         MakeTextObjectForTileCost(instantiatedManaSymbol);
     }

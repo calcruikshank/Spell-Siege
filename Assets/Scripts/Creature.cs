@@ -1059,7 +1059,7 @@ public class Creature : MonoBehaviour
     {
         Debug.Log("Setting original card to " + cardSelected);
         originalCard = cardSelected;
-        originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.RectCanvas.transform);
+        originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.scalableUICanvas.transform);
         originalCardTransform.transform.position = Camera.main.WorldToScreenPoint( this.transform.position );
         originalCardTransform.transform.localEulerAngles = Vector3.zero;
         originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 1f;

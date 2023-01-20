@@ -59,6 +59,7 @@ public class GameManager : NetworkBehaviour
     Transform instantiatedHealthText;
 
     [SerializeField] public Canvas RectCanvas;
+    [SerializeField] public Canvas scalableUICanvas;
     private void Awake()
     {
         if (singleton != null) Destroy(this);

@@ -41,7 +41,7 @@ public class CardCollection : MonoBehaviour
     public List<CardButton> instantiatedCardButtons = new List<CardButton>();
     private void LoadCardCollection(CardsCollectedForPlayer myObject)
     {
-        for (int i = 0; i < CardCollectionData.singleton.decks.Count; i++)
+        for (int i = 0; i < CardCollectionData.singleton.decks.Length; i++)
         {
             deckNames[i].text = CardCollectionData.singleton.decks[i].deckName;
         }
@@ -147,6 +147,11 @@ public class CardCollection : MonoBehaviour
 
         
         CardCollectionData.singleton.SaveDecklists();
+
+        for (int i = 0; i < CardCollectionData.singleton.decks.Length; i++)
+        {
+            deckNames[i].text = CardCollectionData.singleton.decks[i].deckName;
+        }
     }
 
 

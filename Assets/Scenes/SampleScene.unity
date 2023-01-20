@@ -556,6 +556,10 @@ PrefabInstance:
       propertyPath: enviornmentMap
       value: 
       objectReference: {fileID: 2016102483}
+    - target: {fileID: 46496581176591912, guid: 011e342b2eae9bd4fbd2ca9763eb047a, type: 3}
+      propertyPath: scalableUICanvas
+      value: 
+      objectReference: {fileID: 263302622}
     - target: {fileID: 46496581176591913, guid: 011e342b2eae9bd4fbd2ca9763eb047a, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -792,6 +796,11 @@ PrefabInstance:
 --- !u!224 &263302621 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3887336545852742121, guid: 3730442ad81efce4d958721eaaac9263, type: 3}
+  m_PrefabInstance: {fileID: 263302620}
+  m_PrefabAsset: {fileID: 0}
+--- !u!223 &263302622 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 3887336545852742120, guid: 3730442ad81efce4d958721eaaac9263, type: 3}
   m_PrefabInstance: {fileID: 263302620}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &386951380
@@ -2294,6 +2303,10 @@ MonoBehaviour:
   - {fileID: 392062456}
   - {fileID: 1055527038}
   - {fileID: 34018069}
+  SelectedDeck:
+    deckName: 
+    deck: 
+  localPlayerInScene: {fileID: 0}
 --- !u!224 &985914937 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6079338418938132856, guid: 85d57fa013450e54d96f44b799ab0c65, type: 3}

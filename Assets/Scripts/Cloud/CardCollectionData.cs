@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,11 @@ public class CardCollectionData : MonoBehaviour
 {
     public static CardCollectionData singleton;
     // Start is called before the first frame update
-    
-    public List<Deck> decks = new List<Deck>();
 
+    public Deck[] decks = new Deck[6];
     private void Awake()
     {
+        decks = new Deck[6];
         if (singleton != null)
         {
             Destroy(this);
@@ -63,7 +64,7 @@ public class CardCollectionData : MonoBehaviour
             SaveInitialDecklist0();
             return;
         }
-        decks.Add(JsonUtility.FromJson<Deck>(savedData["Deck0"]));
+        decks[0] = (JsonUtility.FromJson<Deck>(savedData["Deck0"]));
     }
     private async void SaveDeckList0()
     {
@@ -87,7 +88,7 @@ public class CardCollectionData : MonoBehaviour
             SaveInitialDecklist1();
             return;
         }
-        decks.Add(JsonUtility.FromJson<Deck>(savedData["Deck1"]));
+        decks[1] = (JsonUtility.FromJson<Deck>(savedData["Deck1"]));
     }
     private async void SaveDeckList1()
     {
@@ -115,7 +116,7 @@ public class CardCollectionData : MonoBehaviour
             SaveInitialDecklist2();
             return;
         }
-        decks.Add(JsonUtility.FromJson<Deck>(savedData["Deck2"]));
+        decks[2] = (JsonUtility.FromJson<Deck>(savedData["Deck2"]));
     }
     private async void SaveDeckList2()
     {
@@ -142,7 +143,7 @@ public class CardCollectionData : MonoBehaviour
             SaveInitialDecklist3();
             return;
         }
-        decks.Add(JsonUtility.FromJson<Deck>(savedData["Deck3"]));
+        decks[3] = (JsonUtility.FromJson<Deck>(savedData["Deck3"]));
     }
     private async void SaveDeckList3()
     {
@@ -170,7 +171,7 @@ public class CardCollectionData : MonoBehaviour
             SaveInitialDecklist4();
             return;
         }
-        decks.Add(JsonUtility.FromJson<Deck>(savedData["Deck4"]));
+        decks[4] = (JsonUtility.FromJson<Deck>(savedData["Deck4"]));
         
     }
     private async void SaveDeckList4()
@@ -198,7 +199,7 @@ public class CardCollectionData : MonoBehaviour
             SaveInitialDecklist5();
             return;
         }
-        decks.Add(JsonUtility.FromJson<Deck>(savedData["Deck5"]));
+        decks[5] = (JsonUtility.FromJson<Deck>(savedData["Deck5"]));
     }
     private async void SaveDeckList5()
     {
