@@ -47,7 +47,7 @@ public class CardCollection : MonoBehaviour
         }
         for (int i = lastInstantiatedInt; i < myObject.cardsCollected.Count; i++)
         {
-            AssignButtonToTransform(GetCardAssociatedWithType((CardAssigned.Cards)myObject.cardsCollected[i]), i);
+            AssignButtonToTransform(CardCollectionData.singleton.GetCardAssociatedWithType((CardAssigned.Cards)myObject.cardsCollected[i]), i);
         }
         lastInstantiatedInt = myObject.cardsCollected.Count;
     }
@@ -79,22 +79,7 @@ public class CardCollection : MonoBehaviour
 
 
 
-    [SerializeField] List<CardInHand> allCardsInGame = new List<CardInHand>();
-    public CardInHand GetCardAssociatedWithType(CardAssigned.Cards cardGrabbed)
-    {
-        CardInHand selectedObject;
-
-        selectedObject = allCardsInGame.FirstOrDefault(s => s.cardAssignedToObject == cardGrabbed);
-
-        if (selectedObject == null)
-        {
-            //Debug.LogError("Could not find prefab associated with -> " + buildingType + " defaulting to 0"); 
-            //TODO when we have enough building prefabs created we can uncomment this to figure out what we're missing
-            selectedObject = allCardsInGame[0];
-        }
-        return selectedObject;
-    }
-
+    
 
 
 

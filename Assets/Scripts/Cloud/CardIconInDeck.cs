@@ -34,7 +34,7 @@ public class CardIconInDeck : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void InjectDependencies(CardAssigned.Cards c)
     {
         this.c = c;
-        CardInHand selectedCard = CardCollection.singleton.GetCardAssociatedWithType(c);
+        CardInHand selectedCard = CardCollectionData.singleton.GetCardAssociatedWithType(c);
 
         visualCardOnHover = Instantiate(selectedCard, mainCanvas.transform).transform;
 

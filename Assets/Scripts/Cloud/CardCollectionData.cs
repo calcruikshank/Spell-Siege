@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Services.CloudSave;
 using UnityEngine;
 
@@ -236,7 +237,21 @@ public class CardCollectionData : MonoBehaviour
             return;
         }
         loadedCollection = JsonUtility.FromJson<CardsCollectedForPlayer>(savedData["CardsCollected"]);
-
-
     }
+    [SerializeField] List<CardInHand> allCardsInGame = new List<CardInHand>();
+    public CardInHand GetCardAssociatedWithType(CardAssigned.Cards cardGrabbed)
+    {
+        CardInHand selectedObject;
+
+        selectedObject = allCardsInGame.FirstOrDefault(s => s.cardAssignedToObject == cardGrabbed);
+
+        if (selectedObject == null)
+        {
+            //Debug.LogError("Could not find prefab associated with -> " + buildingType + " defaulting to 0"); 
+            //TODO when we have enough building prefabs created we can uncomment this to figure out what we're missing
+            selectedObject = allCardsInGame[0];
+        }
+        return selectedObject;
+    }
+
 }

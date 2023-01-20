@@ -18,6 +18,7 @@ public class Controller : NetworkBehaviour
         SpellInHandSelected,
         StructureInHandSeleced,
         PlacingCastle,
+        SelectingDeck,
         Waiting
     }
 
@@ -105,6 +106,9 @@ public class Controller : NetworkBehaviour
 
     private RectTransform selectionBox;
 
+
+    [SerializeField] Transform deckSelectionPrefab;
+
     [Serializable]
     public enum ActionTaken
     {
@@ -157,13 +161,20 @@ public class Controller : NetworkBehaviour
         resources = new PlayerResources();
         resourcesChanged += UpdateHudForResourcesChanged;
         mousePositionScript = GetComponent<MousePositionScript>();
-        state = State.PlacingCastle;
+
+        state = State.SelectingDeck;
+
+        SpawnDeckSelectionPrefabs();
 
         if (IsOwner)
         {
             SpawnSelectionBox();
         }
 
+    }
+
+    private void SpawnDeckSelectionPrefabs()
+    {
     }
 
     private void SpawnSelectionBox()
