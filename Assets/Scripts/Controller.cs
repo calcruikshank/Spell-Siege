@@ -140,7 +140,26 @@ public class Controller : NetworkBehaviour
         mousePositionScript = GetComponent<MousePositionScript>();
 
         state = State.SelectingDeck;
-        
+        if (NetworkManager.Singleton.IsHost && IsOwner)
+        {
+            col = colorsToPickFrom[0];
+        }
+        if (!IsHost && IsOwner)
+        {
+            col = colorsToPickFrom[1];
+        }
+
+        if (!IsOwner && IsHost)
+        {
+            col = colorsToPickFrom[1];
+        }
+        if (!IsOwner && !IsHost)
+        {
+            col = colorsToPickFrom[0];
+        }
+        col.a = 1;
+        transparentCol = col;
+        transparentCol.a = .5f;
 
         if (IsOwner)
         {
@@ -728,7 +747,7 @@ public class Controller : NetworkBehaviour
             SetOwningTile(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).neighborTiles[i].tilePosition);
         }
         instantiatedCaste = Instantiate(castle, positionToSpawn, Quaternion.identity);
-        instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
+        //instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
         AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
         SetStateToWaiting();
