@@ -46,6 +46,7 @@ public class CardInHand : MonoBehaviour
         Spell,
         Structure
     }
+
     public CardType cardType;
     // Start is called before the first frame update
 

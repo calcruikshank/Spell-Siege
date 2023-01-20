@@ -48,6 +48,7 @@ public class BaseTile : MonoBehaviour
         TraversableByAll
     }
     [SerializeField] public traversableType traverseType;
+
     private void Start()
     {
         SetupLR();
@@ -247,9 +248,12 @@ public class BaseTile : MonoBehaviour
     Color transparentColor;
     Color opaqueColor;
     Transform instantiatedManaSymbol;
+
+    public int currentAmountOfManaProducing = 1;
     public void SetBeingHarvested()
     {
-        costText.gameObject.SetActive(false);
+        instantiatedManaSymbol.GetChild(0).gameObject.SetActive(true);
+        //costText.gameObject.SetActive(true);
         isBeingHarvested = true;
         instantiatedManaSymbol.GetComponent<Image>().color = opaqueColor;
     }
@@ -287,7 +291,7 @@ public class BaseTile : MonoBehaviour
         instantiatedManaSymbol.GetComponent<Image>().color = transparentColor;
         instantiatedManaSymbol.transform.parent = GameManager.singleton.scalableUICanvas.transform;
         HideHarvestIcon();
-        MakeTextObjectForTileCost(instantiatedManaSymbol);
+        //MakeTextObjectForTileCost(instantiatedManaSymbol);
     }
 
     internal void HideHarvestIcon()
@@ -306,6 +310,18 @@ public class BaseTile : MonoBehaviour
         {
             instantiatedManaSymbol.transform.position = GameManager.singleton.mainCam.WorldToScreenPoint(this.transform.position);
             instantiatedManaSymbol.transform.localScale = Vector3.one * 10 / instantiatedManaSymbol.transform.position.z;
+        }
+    }
+
+    public void IncreaseAmountOfManaProducing()
+    {
+        currentAmountOfManaProducing++;
+
+        instantiatedManaSymbol.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = "+" + currentAmountOfManaProducing;
+
+        if (playerOwningTile != null)
+        {
+            playerOwningTile.AddTileToHarvestedTilesList(this);
         }
     }
 

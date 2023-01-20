@@ -15,6 +15,8 @@ public class Spell : MonoBehaviour
     Transform instantiatedParticle;
     [SerializeField] protected int damage = 3;
     float lifetime;
+
+    public bool SpellRequiresToBeInsidePlayerKeep = false;
     public void InjectDependencies(Vector3Int targetTile, Controller playerCasting)
     {
         currentCellPosition = targetTile;
@@ -230,7 +232,7 @@ public class Spell : MonoBehaviour
     {
     }
 
-    private void Update()
+    public virtual void Update()
     {
         if (instantiatedParticle != null)
         {

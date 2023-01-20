@@ -762,7 +762,7 @@ public class Controller : NetworkBehaviour
         structure.playerOwningStructure = this;
     }
 
-    private void AddTileToHarvestedTilesList(BaseTile baseTileSent)
+    public void AddTileToHarvestedTilesList(BaseTile baseTileSent)
     {
         if (baseTileSent.manaType == BaseTile.ManaType.Green)
         {
@@ -789,8 +789,12 @@ public class Controller : NetworkBehaviour
             resources.redManaCap++;
             resources.redMana++;
         }
-        harvestedTiles.Add(baseTileSent);
-        baseTileSent.SetBeingHarvested();
+
+        if (!harvestedTiles.Contains(baseTileSent))
+        {
+            harvestedTiles.Add(baseTileSent);
+            baseTileSent.SetBeingHarvested();
+        }
 
 
         resourcesChanged.Invoke(resources);
@@ -1119,7 +1123,7 @@ public class Controller : NetworkBehaviour
                 SetStateToNothingSelected();
                 return;
             }
-            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0)
+            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0 && !cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().SpellRequiresToBeInsidePlayerKeep)
             {
                 Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
 
@@ -1131,6 +1135,22 @@ public class Controller : NetworkBehaviour
                 SetVisualsToNothingSelectedLocally();
                 SetStateToNothingSelected();
                 return;
+            }
+            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0 && cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().SpellRequiresToBeInsidePlayerKeep)
+            {
+                if (tilesOwned.ContainsKey(cellSent))
+                {
+                    Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+
+                    RemoveCardFromHand(cardSelected);
+                    SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+                    GameObject instantiatedSpell = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+                    instantiatedSpell.GetComponent<Spell>().InjectDependencies(cellSent, this);
+                    OnSpellCast();
+                    SetVisualsToNothingSelectedLocally();
+                    SetStateToNothingSelected();
+                    return;
+                }
             }
         }
     }
@@ -1357,25 +1377,28 @@ public class Controller : NetworkBehaviour
     {
         for (int i = 0; i < harvestedTiles.Count; i++)
         {
-            if (harvestedTiles[i].manaType == BaseTile.ManaType.Blue)
+            for (int j = 0; j < harvestedTiles[i].currentAmountOfManaProducing; j++)
             {
-                resources.blueMana++;
-            }
-            if (harvestedTiles[i].manaType == BaseTile.ManaType.Black)
-            {
-                resources.blackMana++;
-            }
-            if (harvestedTiles[i].manaType == BaseTile.ManaType.Red)
-            {
-                resources.redMana++;
-            }
-            if (harvestedTiles[i].manaType == BaseTile.ManaType.White)
-            {
-                resources.whiteMana++;
-            }
-            if (harvestedTiles[i].manaType == BaseTile.ManaType.Green)
-            {
-                resources.greenMana++;
+                if (harvestedTiles[i].manaType == BaseTile.ManaType.Blue)
+                {
+                    resources.blueMana++;
+                }
+                if (harvestedTiles[i].manaType == BaseTile.ManaType.Black)
+                {
+                    resources.blackMana++;
+                }
+                if (harvestedTiles[i].manaType == BaseTile.ManaType.Red)
+                {
+                    resources.redMana++;
+                }
+                if (harvestedTiles[i].manaType == BaseTile.ManaType.White)
+                {
+                    resources.whiteMana++;
+                }
+                if (harvestedTiles[i].manaType == BaseTile.ManaType.Green)
+                {
+                    resources.greenMana++;
+                }
             }
         }
 
@@ -1383,7 +1406,6 @@ public class Controller : NetworkBehaviour
     }
     public void AddSpecificManaToPool(BaseTile.ManaType manaTypeSent)
     {
-
         if (manaTypeSent == BaseTile.ManaType.Black)
         {
             resources.blackMana++;

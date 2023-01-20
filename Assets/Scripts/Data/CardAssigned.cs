@@ -28,6 +28,7 @@ public struct CardAssigned
         DragonWhisperer,
         Archer,
         ArcanePortal,
+        LeylineOfTheHarvest,
         NumOfCardTypes
     }
 }
