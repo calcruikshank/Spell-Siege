@@ -18,6 +18,21 @@ public class DeckSelectorInScene : MonoBehaviour
     bool hasAddedGreen = false;
     bool hasAddedWhite = false;
 
+    public Deck SelectedDeck;
+
+    public Controller localPlayerInScene;
+
+    public static DeckSelectorInScene singleton;
+
+
+    private void Awake()
+    {
+        if (singleton != null)
+        {
+            Destroy(this);
+        }
+        singleton = this;
+    }
     public void Start()
     {
         for (int i = 0; i < decks.Length; i++)
@@ -73,6 +88,15 @@ public class DeckSelectorInScene : MonoBehaviour
     }
     public void ChooseDeck(int deckChosen)
     {
+        SelectedDeck = CardCollectionData.singleton.decks[deckChosen];
         this.gameObject.SetActive(false);
+
+        string json = JsonUtility.ToJson(SelectedDeck);
+        localPlayerInScene.ChooseDeckServerRpc(json);
+    }
+
+    public void AssignLocalPlayer(Controller playerSent)
+    {
+        localPlayerInScene = playerSent;
     }
 }

@@ -119,6 +119,7 @@ public class Controller : NetworkBehaviour
         TilePurchased
     }
 
+
     public override void OnNetworkSpawn()
     {
 
@@ -128,34 +129,10 @@ public class Controller : NetworkBehaviour
     {
         GrabAllObjectsFromGameManager();
 
-        cardsInDeck = new List<CardInHand>();
-
-        if (NetworkManager.Singleton.IsHost && IsOwner)
-        {
-            cardsInDeck = dragonDeck;
-            col = colorsToPickFrom[0];
-        }
-        if (!IsHost && IsOwner)
-        {
-            cardsInDeck = demonDeck;
-            col = colorsToPickFrom[1];
-        }
-
-        if (!IsOwner && IsHost)
-        {
-            cardsInDeck = demonDeck;
-            col = colorsToPickFrom[1];
-        }
-        if (!IsOwner && !IsHost)
-        {
-            cardsInDeck = dragonDeck;
-            col = colorsToPickFrom[0];
-        }
         col.a = 1;
         transparentCol = col;
         transparentCol.a = .5f;
         SpawnHUDAndHideOnAllNonOwners();
-        cardsInDeck = GameManager.singleton.Shuffle(cardsInDeck);
         instantiatedPlayerUI.gameObject.SetActive(false);
         turn += OnTurn;
         resources = new PlayerResources();
@@ -163,19 +140,36 @@ public class Controller : NetworkBehaviour
         mousePositionScript = GetComponent<MousePositionScript>();
 
         state = State.SelectingDeck;
-
-        SpawnDeckSelectionPrefabs();
+        
 
         if (IsOwner)
         {
+            DeckSelectorInScene.singleton.AssignLocalPlayer(this);
             SpawnSelectionBox();
         }
 
     }
 
-    private void SpawnDeckSelectionPrefabs()
+    private void LocalChooseDeckForPlayer(string selectedDeck)
     {
+        Deck deckChosenAsInts = JsonUtility.FromJson<Deck>(selectedDeck);
+        List<CardInHand> translatedCards = new List<CardInHand>();
+        for (int i = 0; i < deckChosenAsInts.deck.Count; i++)
+        {
+            translatedCards.Add( CardCollectionData.singleton.GetCardAssociatedWithType((CardAssigned.Cards)deckChosenAsInts.deck[i]));
+        }
+        cardsInDeck = new List<CardInHand>();
+        cardsInDeck = translatedCards;
+        cardsInDeck = GameManager.singleton.Shuffle(cardsInDeck);
+
+        SetStateToPlacingCastle();
     }
+
+    private void SetStateToPlacingCastle()
+    {
+        state = State.PlacingCastle;
+    }
+
 
     private void SpawnSelectionBox()
     {
@@ -1441,6 +1435,17 @@ public class Controller : NetworkBehaviour
 
 
 
+    [ServerRpc]
+    public void ChooseDeckServerRpc(string selectedDeck)
+    {
+        ChooseDeckClientRpc(selectedDeck);
+    }
+    [ClientRpc]
+    public void ChooseDeckClientRpc(string selectedDeck)
+    {
+        LocalChooseDeckForPlayer(selectedDeck);
+    }
+
 
     [ServerRpc]
     internal void AttackCreatureServerRpc(int creatureAttacking, int creatureBeingAttacked)
@@ -1566,7 +1571,7 @@ public class Controller : NetworkBehaviour
     {
         SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[creatureIDSent]);
     }
-    
+
 }
 
 
