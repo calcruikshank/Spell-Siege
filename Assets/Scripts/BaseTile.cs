@@ -31,23 +31,8 @@ public class BaseTile : MonoBehaviour
     public int harvestCost;
 
     int harvestCostMultiplier = 3;
-    public enum ManaType
-    {
-        Red,
-        Green,
-        Blue,
-        Black,
-        White
-    }
-    public ManaType manaType;
-    public enum traversableType
-    {
-        Untraversable,
-        OnlyFlying,
-        SwimmingAndFlying,
-        TraversableByAll
-    }
-    [SerializeField] public traversableType traverseType;
+    public SpellSiegeData.ManaType manaType;
+    [SerializeField] public SpellSiegeData.traversableType traverseType;
 
     private void Start()
     {
@@ -264,23 +249,23 @@ public class BaseTile : MonoBehaviour
     }
     private void InstantiateCorrectColorManaSymbol()
     {
-        if (manaType == ManaType.Blue)
+        if (manaType == SpellSiegeData.ManaType.Blue)
         {
             instantiatedManaSymbol = Instantiate(GameManager.singleton.blueManaSymbol, this.transform);
         }
-        if (manaType == ManaType.Black)
+        if (manaType == SpellSiegeData.ManaType.Black)
         {
             instantiatedManaSymbol = Instantiate(GameManager.singleton.blackManaSymbol, this.transform);
         }
-        if (manaType == ManaType.White)
+        if (manaType == SpellSiegeData.ManaType.White)
         {
             instantiatedManaSymbol = Instantiate(GameManager.singleton.whiteManaSymbol, this.transform);
         }
-        if (manaType == ManaType.Red)
+        if (manaType == SpellSiegeData.ManaType.Red)
         {
             instantiatedManaSymbol = Instantiate(GameManager.singleton.redManaSymbol, this.transform);
         }
-        if (manaType == ManaType.Green)
+        if (manaType == SpellSiegeData.ManaType.Green)
         {
             instantiatedManaSymbol = Instantiate(GameManager.singleton.greenManaSymbol, this.transform);
         }

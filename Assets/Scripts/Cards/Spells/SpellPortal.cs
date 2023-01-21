@@ -11,7 +11,7 @@ public class SpellPortal : Spell
         while (indexOfCardSelected == -1)
         {
             if (iterator >= playerCastingSpell.cardsInDeck.Count) break;
-            if (playerCastingSpell.cardsInDeck[iterator].cardType == CardInHand.CardType.Spell)
+            if (playerCastingSpell.cardsInDeck[iterator].cardType == SpellSiegeData.CardType.Spell)
             {
                 indexOfCardSelected = iterator;
                 playerCastingSpell.DrawCardWithIndex(indexOfCardSelected);

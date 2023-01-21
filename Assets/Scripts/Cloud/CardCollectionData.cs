@@ -240,7 +240,7 @@ public class CardCollectionData : MonoBehaviour
         loadedCollection = JsonUtility.FromJson<CardsCollectedForPlayer>(savedData["CardsCollected"]);
     }
     [SerializeField] List<CardInHand> allCardsInGame = new List<CardInHand>();
-    public CardInHand GetCardAssociatedWithType(CardAssigned.Cards cardGrabbed)
+    public CardInHand GetCardAssociatedWithType(SpellSiegeData.Cards cardGrabbed)
     {
         CardInHand selectedObject;
 

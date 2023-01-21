@@ -16,7 +16,7 @@ public class Spell : MonoBehaviour
     [SerializeField] protected int damage = 3;
     float lifetime;
 
-    public bool SpellRequiresToBeInsidePlayerKeep = false;
+    public bool SpellRequiresToBeCastOnAHarvestedTile = false;
     public void InjectDependencies(Vector3Int targetTile, Controller playerCasting)
     {
         currentCellPosition = targetTile;

@@ -37,6 +37,6 @@ public class FlyingCreature : Creature
 
     protected override void SetTravType()
     {
-        thisTraversableType = travType.Flying;
+        thisTraversableType = SpellSiegeData.travType.Flying;
     }
 }

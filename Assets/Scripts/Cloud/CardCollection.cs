@@ -37,7 +37,7 @@ public class CardCollection : MonoBehaviour
 
     public int lastInstantiatedInt = 0;
 
-    public List<CardAssigned.Cards> cardsInstantiatedInCollection = new List<CardAssigned.Cards>();
+    public List<SpellSiegeData.Cards> cardsInstantiatedInCollection = new List<SpellSiegeData.Cards>();
     public List<CardButton> instantiatedCardButtons = new List<CardButton>();
     private void LoadCardCollection(CardsCollectedForPlayer myObject)
     {
@@ -47,7 +47,7 @@ public class CardCollection : MonoBehaviour
         }
         for (int i = lastInstantiatedInt; i < myObject.cardsCollected.Count; i++)
         {
-            AssignButtonToTransform(CardCollectionData.singleton.GetCardAssociatedWithType((CardAssigned.Cards)myObject.cardsCollected[i]), i);
+            AssignButtonToTransform(CardCollectionData.singleton.GetCardAssociatedWithType((SpellSiegeData.Cards)myObject.cardsCollected[i]), i);
         }
         lastInstantiatedInt = myObject.cardsCollected.Count;
     }
@@ -92,7 +92,7 @@ public class CardCollection : MonoBehaviour
         List<int> cardsOpened = new List<int>();
         for (int i = 0; i < 5; i++)
         {
-            cardsOpened.Add(UnityEngine.Random.Range(0, (int)CardAssigned.Cards.NumOfCardTypes));
+            cardsOpened.Add(UnityEngine.Random.Range(0, (int)SpellSiegeData.Cards.NumOfCardTypes));
         }
         foreach (int i in cardsOpened)
         {
@@ -131,7 +131,7 @@ public class CardCollection : MonoBehaviour
             Destroy(go);
         }
         instantiatedCardsInDeck.Clear();
-        foreach (CardAssigned.Cards c in currentSelectedDeckSent.deck)
+        foreach (SpellSiegeData.Cards c in currentSelectedDeckSent.deck)
         {
             InstantiateCardPrefabInCurrentSelectedDeck(c);
         }
@@ -157,7 +157,7 @@ public class CardCollection : MonoBehaviour
 
     [SerializeField] GameObject cardInDeckIcon;
     [SerializeField] Transform loadedDeckVertScrollRect;
-    internal void AddCardToDeck(CardAssigned.Cards cardAssigned)
+    internal void AddCardToDeck(SpellSiegeData.Cards cardAssigned)
     {
         if (currentSelectedDeck != null)
         {
@@ -177,7 +177,7 @@ public class CardCollection : MonoBehaviour
         instantiatedCardsInDeck.Remove(cardIconInDeck.gameObject);
         Destroy(cardIconInDeck.gameObject);
     }
-    private void InstantiateCardPrefabInCurrentSelectedDeck(CardAssigned.Cards cardAssigned)
+    private void InstantiateCardPrefabInCurrentSelectedDeck(SpellSiegeData.Cards cardAssigned)
     {
         bool gameObjectHasBeenInstantiated = false;
         if (instantiatedCardsInDeck.Count > 0)

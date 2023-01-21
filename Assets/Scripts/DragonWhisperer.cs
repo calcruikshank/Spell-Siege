@@ -11,7 +11,7 @@ public class DragonWhisperer : Creature
         {
             if (cardindeck.GameObjectToInstantiate.GetComponent<Creature>() != null)
             {
-                if (cardindeck.GameObjectToInstantiate.GetComponent<Creature>().creatureType == CreatureType.Dragon)
+                if (cardindeck.GameObjectToInstantiate.GetComponent<Creature>().creatureType == SpellSiegeData.CreatureType.Dragon)
                 {
                     if (cardindeck.redManaCost > 0)
                     {

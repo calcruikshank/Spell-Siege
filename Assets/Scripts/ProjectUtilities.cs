@@ -35,5 +35,51 @@ public class ProjectUtilities : MonoBehaviour
         }
         Debug.Log("Done!");
     }
+    [SerializeField] static GameObject baseGameObjectToApplyTextureTo;
+    [MenuItem("Project Tools/Create Card From Template")]
+    private static void CreateCardFromTemplate()
+    {
+        foreach (Transform transformSelected in Selection.transforms)
+        {
+            baseGameObjectToApplyTextureTo = transformSelected.gameObject;
+        }
+        foreach (Object o in Selection.objects)
+        {
+            if (o.GetType() == typeof(CardSO))
+            {
+                Debug.Log("Selected Transform = " + o.GetType());
+                CardSO cardToCreate = o as CardSO;
+
+
+
+                GameObject InstantiatedCard = Instantiate(baseGameObjectToApplyTextureTo);
+                InstantiatedCard.transform.parent = FindObjectOfType<Canvas>().transform;
+                InstantiatedCard.name = cardToCreate.cardName;
+                CardInHand cardTemplate = InstantiatedCard.GetComponentInChildren<CardInHand>();
+
+                cardTemplate.cardType = cardToCreate.cardType;
+                cardTemplate.cardArt.sprite = cardToCreate.cardArt;
+                cardTemplate.blackManaCost = cardToCreate.blackManaCost;
+                cardTemplate.blueManaCost = cardToCreate.blueManaCost;
+                cardTemplate.whiteManaCost = cardToCreate.whiteManaCost;
+                cardTemplate.redManaCost = cardToCreate.redManaCost;
+                cardTemplate.greenManaCost = cardToCreate.greenManaCost;
+                cardTemplate.genericManaCost = cardToCreate.genericManaCost;
+                cardTemplate.currentAttack = cardToCreate.attack;
+                cardTemplate.currentHealth = cardToCreate.health;
+                cardTemplate.cardTitle.text = cardToCreate.cardName;
+                cardTemplate.cardAssignedToObject = cardToCreate.cardAssigned;
+
+                cardTemplate.creatureType = cardToCreate.creatureType;
+                cardTemplate.rarity = cardToCreate.rarity;
+                cardTemplate.GameObjectToInstantiate = cardToCreate.gameObjectToInstantiate.transform;
+                cardTemplate.traversableType = cardToCreate.traversableType;
+                cardTemplate.cardAbilityText.text = cardToCreate.cardText;
+                cardTemplate.UpdateMana();
+                cardTemplate.UpdateAttack();
+
+            }
+        }
+    }
 }
 #endif

@@ -11,8 +11,8 @@ public class Pathfinding
 
     private List<BaseTile> openList;
     private List<BaseTile> closedList;
-    Creature.travType travTypeSent;
-    public List<BaseTile> FindPath(Vector3Int startingPosition, Vector3Int endingPosition, Creature.travType travTypeOfCreature)
+    SpellSiegeData.travType travTypeSent;
+    public List<BaseTile> FindPath(Vector3Int startingPosition, Vector3Int endingPosition, SpellSiegeData.travType travTypeOfCreature)
     {
         travTypeSent = travTypeOfCreature;
         openList = new List<BaseTile>();
@@ -66,28 +66,28 @@ public class Pathfinding
                 }
                 switch (travTypeSent)
                 {
-                    case Creature.travType.Flying:
-                        if (neighbor.traverseType == BaseTile.traversableType.Untraversable)
+                    case SpellSiegeData.travType.Flying:
+                        if (neighbor.traverseType == SpellSiegeData.traversableType.Untraversable)
                         {
                             continue;
                         }
                         break;
-                    case Creature.travType.SwimmingAndWalking:
-                        if (neighbor.traverseType == BaseTile.traversableType.Untraversable)
+                    case SpellSiegeData.travType.SwimmingAndWalking:
+                        if (neighbor.traverseType == SpellSiegeData.traversableType.Untraversable)
                         {
                             continue;
                         }
                         break;
-                    case Creature.travType.Walking:
-                        if (neighbor.traverseType == BaseTile.traversableType.Untraversable)
+                    case SpellSiegeData.travType.Walking:
+                        if (neighbor.traverseType == SpellSiegeData.traversableType.Untraversable)
                         {
                             continue;
                         }
-                        if (neighbor.traverseType == BaseTile.traversableType.OnlyFlying)
+                        if (neighbor.traverseType == SpellSiegeData.traversableType.OnlyFlying)
                         {
                             continue;
                         }
-                        if (neighbor.traverseType == BaseTile.traversableType.SwimmingAndFlying)
+                        if (neighbor.traverseType == SpellSiegeData.traversableType.SwimmingAndFlying)
                         {
                             continue;
                         }

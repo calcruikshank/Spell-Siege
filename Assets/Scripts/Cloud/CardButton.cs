@@ -7,12 +7,12 @@ using UnityEngine.UI;
 
 public class CardButton : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    public CardAssigned.Cards cardAssigned;
+    public SpellSiegeData.Cards cardAssigned;
     Vector3 originalScale;
 
     TextMeshProUGUI amount;
     public int amountOwned;
-    public void AssignCard(CardAssigned.Cards cardSent)
+    public void AssignCard(SpellSiegeData.Cards cardSent)
     {
         originalScale = this.transform.localScale;
         cardAssigned = cardSent;

@@ -52,35 +52,14 @@ public class Creature : MonoBehaviour
         Dead
         //not sure if i need a tapped state yet trying to keep it as simple as possible
     }
-    public enum CreatureType
-    {
-        None,
-        Dragon, //On The turn created
-        Elf,
-        Goblin,
-        Reptile,
-        Human,
-        Angel,
-        Wizard,
-        Demon
-
-        //not sure if i need a tapped state yet trying to keep it as simple as possible
-    }
-    public CreatureType creatureType;
+    public SpellSiegeData.CreatureType creatureType;
 
     bool canAttack = false;
     [HideInInspector] public Controller playerOwningCreature;
     Pathfinding pathfinder1;
     Pathfinding pathfinder2;
 
-    public enum travType
-    {
-        Walking,
-        Swimming,
-        SwimmingAndWalking,
-        Flying
-    }
-    public travType thisTraversableType;
+    public SpellSiegeData.travType thisTraversableType;
 
 
     LineRenderer lr;
@@ -1074,7 +1053,7 @@ public class Creature : MonoBehaviour
         rangeLr.enabled = true;
         if (playerOwningCreature.locallySelectedCard != null)
         {
-            if (playerOwningCreature.locallySelectedCard.cardType != CardInHand.CardType.Spell)
+            if (playerOwningCreature.locallySelectedCard.cardType != SpellSiegeData.CardType.Spell)
             {
                 playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
             }

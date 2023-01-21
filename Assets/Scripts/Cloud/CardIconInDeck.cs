@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class CardIconInDeck : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
     Transform visualCardOnHover;
-    public CardAssigned.Cards c;
+    public SpellSiegeData.Cards c;
     Canvas mainCanvas;
 
     [SerializeField] Image cardImage;
@@ -31,7 +31,7 @@ public class CardIconInDeck : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         numberInDeck--;
         numOfTypesInDeck.text = ("X" + numberInDeck);
     }
-    public void InjectDependencies(CardAssigned.Cards c)
+    public void InjectDependencies(SpellSiegeData.Cards c)
     {
         this.c = c;
         CardInHand selectedCard = CardCollectionData.singleton.GetCardAssociatedWithType(c);

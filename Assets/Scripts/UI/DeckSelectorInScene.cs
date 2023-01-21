@@ -41,7 +41,7 @@ public class DeckSelectorInScene : MonoBehaviour
             decks[i].GetComponentInChildren<TextMeshProUGUI>().text = CardCollectionData.singleton.decks[i].deckName;
             for (int j = 0; j < CardCollectionData.singleton.decks[i].deck.Count; j++)
             {
-                CardInHand cardInDeck = CardCollectionData.singleton.GetCardAssociatedWithType((CardAssigned.Cards)CardCollectionData.singleton.decks[i].deck[j]);
+                CardInHand cardInDeck = CardCollectionData.singleton.GetCardAssociatedWithType((SpellSiegeData.Cards)CardCollectionData.singleton.decks[i].deck[j]);
 
                 if (cardInDeck.blackManaCost > 0)
                 {

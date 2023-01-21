@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardInHand : MonoBehaviour
 {
@@ -18,6 +19,16 @@ public class CardInHand : MonoBehaviour
 
     public int remainingMana;
 
+    public int currentAttack;
+    public int currentHealth;
+
+    [SerializeField] public Image cardArt;
+    [SerializeField] public Image[] raritySymbols;
+
+    [SerializeField] public TextMeshProUGUI attackText;
+    [SerializeField] public TextMeshProUGUI healthText;
+    [SerializeField] public TextMeshProUGUI cardAbilityText;
+
     public Keywords keywords;
 
     [SerializeField] TextMeshProUGUI greenManaText;
@@ -30,45 +41,52 @@ public class CardInHand : MonoBehaviour
 
     Transform purchasableGlow;
 
-    BaseTile.ManaType manaType;
+    SpellSiegeData.ManaType manaType;
 
     public Controller playerOwningCard;
 
     public bool isPurchasable;
 
-    public CardAssigned.Cards cardAssignedToObject;
+    public SpellSiegeData.Cards cardAssignedToObject;
 
 
     public TextMeshProUGUI cardTitle;
-    public enum CardType
-    {
-        Creature,
-        Spell,
-        Structure
-    }
 
-    public CardType cardType;
+    public SpellSiegeData.CardType cardType;
+
+    public SpellSiegeData.CreatureType creatureType;
+    public SpellSiegeData.cardRarity rarity;
+    public SpellSiegeData.travType traversableType;
     // Start is called before the first frame update
 
     private void Awake()
     {
-        SetCard();
         UpdateMana();
+
+        UpdateAttack();
     }
+
+    public void UpdateAttack()
+    {
+        if (this.cardType == SpellSiegeData.CardType.Spell || this.cardType == SpellSiegeData.CardType.Structure)
+        {
+            attackText.transform.parent.gameObject.SetActive(false);
+            healthText.transform.parent.gameObject.SetActive(false);
+        }
+        if (this.cardType == SpellSiegeData.CardType.Creature)
+        {
+            attackText.transform.parent.gameObject.SetActive(true);
+            healthText.transform.parent.gameObject.SetActive(true);
+
+            this.attackText.text = currentAttack.ToString();
+            this.healthText.text = currentHealth.ToString();
+        }
+    }
+
     void Start()
     {
     }
 
-    void SetCard()
-    {
-        if (this.GetComponentInChildren<Keywords>() != null)
-        {
-            keywords = this.GetComponentInChildren<Keywords>();
-            keywords.gameObject.SetActive(false);
-        }
-        
-
-    }
     public void UpdateMana()
     {
         if (genericManaCost == 0)

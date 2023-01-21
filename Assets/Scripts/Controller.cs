@@ -58,7 +58,7 @@ public class Controller : NetworkBehaviour
     Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 80; //todo make this 800
+    int turnThreshold = 80; //todo make this 1200
     int maxHandSize = 7;
     [SerializeField] List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] List<CardInHand> demonDeck = new List<CardInHand>();
@@ -176,7 +176,7 @@ public class Controller : NetworkBehaviour
         List<CardInHand> translatedCards = new List<CardInHand>();
         for (int i = 0; i < deckChosenAsInts.deck.Count; i++)
         {
-            translatedCards.Add( CardCollectionData.singleton.GetCardAssociatedWithType((CardAssigned.Cards)deckChosenAsInts.deck[i]));
+            translatedCards.Add( CardCollectionData.singleton.GetCardAssociatedWithType((SpellSiegeData.Cards)deckChosenAsInts.deck[i]));
         }
         cardsInDeck = new List<CardInHand>();
         cardsInDeck = translatedCards;
@@ -670,7 +670,7 @@ public class Controller : NetworkBehaviour
 
 
         //visual section for spawning creatures
-        if (locallySelectedCard != null && locallySelectedCard.cardType == CardInHand.CardType.Creature)
+        if (locallySelectedCard != null && locallySelectedCard.cardType == SpellSiegeData.CardType.Creature)
         {
             if (CheckToSeeIfCanSpawnCreature(positionSent))
             {
@@ -736,7 +736,7 @@ public class Controller : NetworkBehaviour
     void LocalPlaceCastle(Vector3Int positionSent)
     {
         placedCellPosition = positionSent;
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).traverseType == BaseTile.traversableType.Untraversable)
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).traverseType == SpellSiegeData.traversableType.Untraversable)
         {
             return;
         }
@@ -764,27 +764,27 @@ public class Controller : NetworkBehaviour
 
     public void AddTileToHarvestedTilesList(BaseTile baseTileSent)
     {
-        if (baseTileSent.manaType == BaseTile.ManaType.Green)
+        if (baseTileSent.manaType == SpellSiegeData.ManaType.Green)
         {
             resources.greenManaCap++;
             resources.greenMana++;
         }
-        if (baseTileSent.manaType == BaseTile.ManaType.Black)
+        if (baseTileSent.manaType == SpellSiegeData.ManaType.Black)
         {
             resources.blackManaCap++;
             resources.blackMana++;
         }
-        if (baseTileSent.manaType == BaseTile.ManaType.White)
+        if (baseTileSent.manaType == SpellSiegeData.ManaType.White)
         {
             resources.whiteManaCap++;
             resources.whiteMana++;
         }
-        if (baseTileSent.manaType == BaseTile.ManaType.Blue)
+        if (baseTileSent.manaType == SpellSiegeData.ManaType.Blue)
         {
             resources.blueManaCap++;
             resources.blueMana++;
         }
-        if (baseTileSent.manaType == BaseTile.ManaType.Red)
+        if (baseTileSent.manaType == SpellSiegeData.ManaType.Red)
         {
             resources.redManaCap++;
             resources.redMana++;
@@ -801,6 +801,8 @@ public class Controller : NetworkBehaviour
     }
 
 
+
+
     CardInHand locallySelectedCardInHandToTurnOff;
     bool CheckForRaycast()
     {
@@ -811,7 +813,7 @@ public class Controller : NetworkBehaviour
             {
                 if (raycastHitKeep.transform.GetComponent<PlayerKeep>().playerOwningStructure == this)
                 {
-                    if (locallySelectedCard == null || locallySelectedCard.cardType != CardInHand.CardType.Spell)
+                    if (locallySelectedCard == null || locallySelectedCard.cardType != SpellSiegeData.CardType.Spell)
                     {
                         if (!ShowingPurchasableHarvestTiles)
                         {
@@ -903,7 +905,7 @@ public class Controller : NetworkBehaviour
     private void VisualPathfinderOnCreatureSelected(Creature creature)
     {
         if (creaturePathLockedIn) return;
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType == BaseTile.traversableType.Untraversable || creature.thisTraversableType == Creature.travType.Walking && BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType != BaseTile.traversableType.TraversableByAll)
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType == SpellSiegeData.traversableType.Untraversable || creature.thisTraversableType == SpellSiegeData.travType.Walking && BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType != SpellSiegeData.traversableType.TraversableByAll)
         {
             creature.HidePathfinderLR();
             return;
@@ -935,15 +937,15 @@ public class Controller : NetworkBehaviour
             {
                 cardToSelect = cardsInHand[i];
                 cardSelected = cardToSelect;
-                if (cardSelected.cardType == CardInHand.CardType.Creature)
+                if (cardSelected.cardType == SpellSiegeData.CardType.Creature)
                 {
                     state = State.CreatureInHandSelected;
                 }
-                if (cardSelected.cardType == CardInHand.CardType.Spell)
+                if (cardSelected.cardType == SpellSiegeData.CardType.Spell)
                 {
                     state = State.SpellInHandSelected;
                 }
-                if (cardSelected.cardType == CardInHand.CardType.Structure)
+                if (cardSelected.cardType == SpellSiegeData.CardType.Structure)
                 {
                     state = State.StructureInHandSeleced;
                 }
@@ -1027,7 +1029,7 @@ public class Controller : NetworkBehaviour
             //show error
             return false;
         }
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).traverseType == BaseTile.traversableType.SwimmingAndFlying && locallySelectedCard.GameObjectToInstantiate.GetComponent<Creature>().thisTraversableType == Creature.travType.Walking)
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).traverseType == SpellSiegeData.traversableType.SwimmingAndFlying && locallySelectedCard.GameObjectToInstantiate.GetComponent<Creature>().thisTraversableType == SpellSiegeData.travType.Walking)
         {
             return false;
         }
@@ -1123,7 +1125,7 @@ public class Controller : NetworkBehaviour
                 SetStateToNothingSelected();
                 return;
             }
-            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0 && !cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().SpellRequiresToBeInsidePlayerKeep)
+            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0 && !cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().SpellRequiresToBeCastOnAHarvestedTile)
             {
                 Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
 
@@ -1136,9 +1138,9 @@ public class Controller : NetworkBehaviour
                 SetStateToNothingSelected();
                 return;
             }
-            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0 && cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().SpellRequiresToBeInsidePlayerKeep)
+            if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().range == 0 && cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<Spell>().SpellRequiresToBeCastOnAHarvestedTile)
             {
-                if (tilesOwned.ContainsKey(cellSent))
+                if (harvestedTiles.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
                 {
                     Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
 
@@ -1315,7 +1317,7 @@ public class Controller : NetworkBehaviour
         cardsInHand.Remove(cardToRemove);
         if (cardToRemove != null)
         {
-            if (cardToRemove.cardType != CardInHand.CardType.Creature)
+            if (cardToRemove.cardType != SpellSiegeData.CardType.Creature)
             {
                 cardToRemove.transform.parent = null;
             }
@@ -1379,23 +1381,23 @@ public class Controller : NetworkBehaviour
         {
             for (int j = 0; j < harvestedTiles[i].currentAmountOfManaProducing; j++)
             {
-                if (harvestedTiles[i].manaType == BaseTile.ManaType.Blue)
+                if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Blue)
                 {
                     resources.blueMana++;
                 }
-                if (harvestedTiles[i].manaType == BaseTile.ManaType.Black)
+                if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Black)
                 {
                     resources.blackMana++;
                 }
-                if (harvestedTiles[i].manaType == BaseTile.ManaType.Red)
+                if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Red)
                 {
                     resources.redMana++;
                 }
-                if (harvestedTiles[i].manaType == BaseTile.ManaType.White)
+                if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.White)
                 {
                     resources.whiteMana++;
                 }
-                if (harvestedTiles[i].manaType == BaseTile.ManaType.Green)
+                if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Green)
                 {
                     resources.greenMana++;
                 }
@@ -1404,25 +1406,25 @@ public class Controller : NetworkBehaviour
 
         resourcesChanged.Invoke(resources);
     }
-    public void AddSpecificManaToPool(BaseTile.ManaType manaTypeSent)
+    public void AddSpecificManaToPool(SpellSiegeData.ManaType manaTypeSent)
     {
-        if (manaTypeSent == BaseTile.ManaType.Black)
+        if (manaTypeSent == SpellSiegeData.ManaType.Black)
         {
             resources.blackMana++;
         }
-        if (manaTypeSent == BaseTile.ManaType.Blue)
+        if (manaTypeSent == SpellSiegeData.ManaType.Blue)
         {
             resources.blueMana++;
         }
-        if (manaTypeSent == BaseTile.ManaType.Red)
+        if (manaTypeSent == SpellSiegeData.ManaType.Red)
         {
             resources.redMana++;
         }
-        if (manaTypeSent == BaseTile.ManaType.Green)
+        if (manaTypeSent == SpellSiegeData.ManaType.Green)
         {
             resources.greenMana++;
         }
-        if (manaTypeSent == BaseTile.ManaType.White)
+        if (manaTypeSent == SpellSiegeData.ManaType.White)
         {
             resources.whiteMana++;
         }
@@ -1466,7 +1468,7 @@ public class Controller : NetworkBehaviour
                 break;
             }
             numbersChosen.Add(randomNumber);
-            if (cardsInHand[randomNumber].cardType == CardInHand.CardType.Creature)
+            if (cardsInHand[randomNumber].cardType == SpellSiegeData.CardType.Creature)
             {
                 creatureSelectedInHand = cardsInHand[randomNumber];
             }
