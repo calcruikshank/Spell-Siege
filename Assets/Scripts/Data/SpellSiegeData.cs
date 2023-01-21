@@ -22,7 +22,6 @@ public struct SpellSiegeData
         Dissolve,
         LightningStrike,
         MeteorStrike,
-        SpellPortal,
         Factory,
         OvercommitedCleric,
         DragonWhisperer,
