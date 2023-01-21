@@ -47,7 +47,6 @@ public class ProjectUtilities : MonoBehaviour
         {
             if (o.GetType() == typeof(CardSO))
             {
-                Debug.Log("Selected Transform = " + o.GetType());
                 CardSO cardToCreate = o as CardSO;
 
 
@@ -57,6 +56,7 @@ public class ProjectUtilities : MonoBehaviour
                 InstantiatedCard.name = cardToCreate.cardName;
                 CardInHand cardTemplate = InstantiatedCard.GetComponentInChildren<CardInHand>();
 
+                //todo make it do the anchor position is center!!!!
                 cardTemplate.cardType = cardToCreate.cardType;
                 cardTemplate.cardArt.sprite = cardToCreate.cardArt;
                 cardTemplate.blackManaCost = cardToCreate.blackManaCost;
@@ -72,7 +72,15 @@ public class ProjectUtilities : MonoBehaviour
 
                 cardTemplate.creatureType = cardToCreate.creatureType;
                 cardTemplate.rarity = cardToCreate.rarity;
-                cardTemplate.GameObjectToInstantiate = cardToCreate.gameObjectToInstantiate.transform;
+                if (cardToCreate.gameObjectToInstantiate != null)
+                {
+                    cardTemplate.GameObjectToInstantiate = cardToCreate.gameObjectToInstantiate.transform;
+                }
+                if (cardToCreate.gameObjectToInstantiate == null)
+                {
+                    cardTemplate.GameObjectToInstantiate = null;
+                    Debug.Log("Gameobject on " + cardToCreate.cardName + " is null" );
+                }
                 cardTemplate.traversableType = cardToCreate.traversableType;
                 cardTemplate.cardAbilityText.text = cardToCreate.cardText;
                 cardTemplate.UpdateMana();
