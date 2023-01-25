@@ -41,6 +41,7 @@ public class CardCollection : MonoBehaviour
     public List<CardButton> instantiatedCardButtons = new List<CardButton>();
     private void LoadCardCollection(CardsCollectedForPlayer myObject)
     {
+        Debug.Log(CardCollectionData.singleton.decks[0].deckName);
         for (int i = 0; i < CardCollectionData.singleton.decks.Length; i++)
         {
             deckNames[i].text = CardCollectionData.singleton.decks[i].deckName;

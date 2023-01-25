@@ -18,6 +18,10 @@ public class SceneHandler : MonoBehaviour
     {
         SceneManager.LoadSceneAsync("Packs");
     }
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadSceneAsync("MainMenu");
+    }
     public void ExitGame()
     {
         Application.Quit();

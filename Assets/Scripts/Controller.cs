@@ -129,11 +129,6 @@ public class Controller : NetworkBehaviour
     {
         GrabAllObjectsFromGameManager();
 
-        if (IsOwner)
-        {
-            DeckSelectorInScene.singleton.AssignLocalPlayer(this);
-            SpawnSelectionBox();
-        }
 
         col.a = 1;
         transparentCol = col;
@@ -167,6 +162,11 @@ public class Controller : NetworkBehaviour
         transparentCol = col;
         transparentCol.a = .5f;
 
+        if (IsOwner)
+        {
+            DeckSelectorInScene.singleton.AssignLocalPlayer(this);
+            SpawnSelectionBox();
+        }
 
     }
 

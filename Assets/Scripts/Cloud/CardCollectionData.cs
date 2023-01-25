@@ -10,21 +10,21 @@ public class CardCollectionData : MonoBehaviour
     public static CardCollectionData singleton;
     // Start is called before the first frame update
 
-    public Deck[] decks = new Deck[6];
+    public Deck[] decks;
     private void Awake()
     {
-        decks = new Deck[6];
         if (singleton != null)
         {
             Destroy(this);
         }
         DontDestroyOnLoad(this);
         singleton = this;
+        decks = new Deck[6];
+        LoadAllDecks();
+        LoadSomeData();
     }
     void Start()
     {
-        LoadAllDecks();
-        LoadSomeData();
     }
 
     public void LoadAllDecks()
@@ -172,7 +172,7 @@ public class CardCollectionData : MonoBehaviour
             return;
         }
         decks[4] = (JsonUtility.FromJson<Deck>(savedData["Deck4"]));
-        
+
     }
     private async void SaveDeckList4()
     {
