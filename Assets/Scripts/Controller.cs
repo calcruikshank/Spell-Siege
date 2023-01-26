@@ -323,7 +323,13 @@ public class Controller : NetworkBehaviour
         {
             highlightMap.SetTile(previousCellPosition, null);
             highlightMap.SetTile(currentLocalHoverCellPosition, highlightTile);
+
+
+            BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).OnMouseEnterTile();
+
+            BaseMapTileState.singleton.GetBaseTileAtCellPosition(previousCellPosition).OnMouseExitTile();
             previousCellPosition = currentLocalHoverCellPosition;
+
             if (locallySelectedCreature != null && !creaturePathLockedIn)
             {
                 VisualPathfinderOnCreatureSelected(locallySelectedCreature);
@@ -587,7 +593,7 @@ public class Controller : NetworkBehaviour
             {
                 bt.Value.ShowHarvestIcon();
             }
-            if (!harvestedTiles.Contains(bt.Value))
+            if (!harvestedTiles.Contains(bt.Value) && canPurchaseHarvestTile)
             {
                 bt.Value.HighlightTile();
                 highlightedTiles.Add(bt.Value);
@@ -1229,35 +1235,38 @@ public class Controller : NetworkBehaviour
                 {
                     if (kvp.Value.neighborTiles.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
                     {
-                        Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
-                        if (environmentMap.GetInstantiatedObject(cellSent))
+                        if (!tilesOwned.ContainsValue(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
                         {
-                            GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
-                            if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
+                            Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+                            if (environmentMap.GetInstantiatedObject(cellSent))
                             {
-                                instantiatedObject.AddComponent<ChangeTransparency>();
+                                GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
+                                if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
+                                {
+                                    instantiatedObject.AddComponent<ChangeTransparency>();
+                                }
+                                ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
+                                instantiatedObjectsChangeTransparency.ChangeTransparent(100);
+
+                                Destroy(instantiatedObject);
                             }
-                            ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
-                            instantiatedObjectsChangeTransparency.ChangeTransparent(100);
 
-                            Destroy(instantiatedObject);
+                            SetOwningTile(cellSent);
+
+                            SpendManaToCast(cardSelected.GetComponent<CardInHand>()); //she works out too much 
+                            GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+                            instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
+
+                            foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
+                            {
+                                SetOwningTile(bt.tilePosition);
+                            }
+                            AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
+                            RemoveCardFromHand(cardSelected);
+                            SetVisualsToNothingSelectedLocally();
+                            SetStateToNothingSelected();
+                            return;
                         }
-
-                        SetOwningTile(cellSent);
-
-                        SpendManaToCast(cardSelected.GetComponent<CardInHand>()); //she works out too much 
-                        GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-                        instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
-
-                        foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
-                        {
-                            SetOwningTile(bt.tilePosition);
-                        }
-                        AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
-                        RemoveCardFromHand(cardSelected);
-                        SetVisualsToNothingSelectedLocally();
-                        SetStateToNothingSelected();
-                        return;
                     }
                 }
             }

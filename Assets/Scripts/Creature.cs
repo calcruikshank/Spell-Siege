@@ -723,7 +723,7 @@ public class Creature : MonoBehaviour
     {
         if (currentPathIndex < pathVectorList.Count - 1)
         {
-            if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex+ 1].tilePosition) != null)
+            if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex + 1].tilePosition) != null)
             {
                 SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
             }
@@ -1039,7 +1039,7 @@ public class Creature : MonoBehaviour
         Debug.Log("Setting original card to " + cardSelected);
         originalCard = cardSelected;
         originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.scalableUICanvas.transform);
-        originalCardTransform.transform.position = Camera.main.WorldToScreenPoint( this.transform.position );
+        originalCardTransform.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
         originalCardTransform.transform.localEulerAngles = Vector3.zero;
         originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 1f;
 
@@ -1050,6 +1050,17 @@ public class Creature : MonoBehaviour
 
     private void OnMouseOver()
     {
+        if (playerOwningCreature.ShowingPurchasableHarvestTiles)
+        {
+            if (playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn))
+            {
+                if (!playerOwningCreature.harvestedTiles.Contains(tileCurrentlyOn))
+                {
+                    OnMouseExit();
+                    return;
+                }
+            }
+        }
         rangeLr.enabled = true;
         if (playerOwningCreature.locallySelectedCard != null)
         {
@@ -1067,6 +1078,7 @@ public class Creature : MonoBehaviour
 
         originalCardTransform.transform.localScale = Vector3.one * 100 / originalCardTransform.transform.position.z;
         originalCardTransform.gameObject.SetActive(true);
+
     }
 
     private void OnMouseExit()

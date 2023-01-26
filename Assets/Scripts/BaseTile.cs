@@ -273,7 +273,7 @@ public class BaseTile : MonoBehaviour
         opaqueColor = instantiatedManaSymbol.GetComponent<Image>().color;
         opaqueColor.a = playerOwningTile.col.a;
         transparentColor.a = playerOwningTile.transparentCol.a;
-        instantiatedManaSymbol.GetComponent<Image>().color = transparentColor;
+        instantiatedManaSymbol.GetComponent<Image>().color = opaqueColor;
         instantiatedManaSymbol.transform.parent = GameManager.singleton.scalableUICanvas.transform;
         HideHarvestIcon();
         //MakeTextObjectForTileCost(instantiatedManaSymbol);
@@ -294,7 +294,8 @@ public class BaseTile : MonoBehaviour
         if (instantiatedManaSymbol != null)
         {
             instantiatedManaSymbol.transform.position = GameManager.singleton.mainCam.WorldToScreenPoint(this.transform.position);
-            instantiatedManaSymbol.transform.localScale = Vector3.one * 10 / instantiatedManaSymbol.transform.position.z;
+            
+            instantiatedManaSymbol.transform.localScale = Vector3.one * 10 * highlightMultiplierForManaSymbol / instantiatedManaSymbol.transform.position.z;
         }
     }
 
@@ -328,6 +329,29 @@ public class BaseTile : MonoBehaviour
         if (instantiatedHighlightTile != null)
         {
             instantiatedHighlightTile.gameObject.SetActive(false);
+        }
+    }
+
+
+    float highlightMultiplierForManaSymbol = 1;
+    public void OnMouseEnterTile()
+    {
+        if (playerOwningTile != null)
+        {
+                if (playerOwningTile.tilesOwned.ContainsValue(this))
+                {
+                    if (!playerOwningTile.harvestedTiles.Contains(this))
+                    {
+                        highlightMultiplierForManaSymbol = 2f;
+                    }
+                }
+        }
+    }
+    public void OnMouseExitTile()
+    {
+        if (highlightMultiplierForManaSymbol != 1)
+        {
+            highlightMultiplierForManaSymbol = 1f;
         }
     }
 }
