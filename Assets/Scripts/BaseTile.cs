@@ -310,4 +310,24 @@ public class BaseTile : MonoBehaviour
         }
     }
 
+    GameObject instantiatedHighlightTile;
+    internal void HighlightTile()
+    {
+        if (instantiatedHighlightTile == null)
+        {
+
+            instantiatedHighlightTile = Instantiate(GameManager.singleton.highlightForBaseTiles, this.transform);
+        }
+        else
+        {
+            instantiatedHighlightTile.gameObject.SetActive(true);
+        }
+    }
+    internal void UnHighlightTile()
+    {
+        if (instantiatedHighlightTile != null)
+        {
+            instantiatedHighlightTile.gameObject.SetActive(false);
+        }
+    }
 }

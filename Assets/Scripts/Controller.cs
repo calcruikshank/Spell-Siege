@@ -294,12 +294,15 @@ public class Controller : NetworkBehaviour
 
         if (IsOwner)
         {
-            ShowHarvestedTiles();
-            foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
+            if (locallySelectedCard == null)
             {
-                if (ShowingPurchasableHarvestTiles)
+                ShowHarvestedTiles();
+                foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
                 {
-                    ShowHarvestedTiles();
+                    if (ShowingPurchasableHarvestTiles)
+                    {
+                        ShowHarvestedTiles();
+                    }
                 }
             }
         }
@@ -543,6 +546,12 @@ public class Controller : NetworkBehaviour
             }
             Destroy(locallySelectedCard.gameObject);
         }
+
+        foreach (BaseTile bt in highlightedTiles)
+        {
+            bt.UnHighlightTile();
+        }
+        highlightedTiles.Clear();
     }
 
     private void FixedUpdate()
@@ -578,6 +587,11 @@ public class Controller : NetworkBehaviour
             {
                 bt.Value.ShowHarvestIcon();
             }
+            if (!harvestedTiles.Contains(bt.Value))
+            {
+                bt.Value.HighlightTile();
+                highlightedTiles.Add(bt.Value);
+            }
         }
         ShowingPurchasableHarvestTiles = true;
     }
@@ -587,7 +601,9 @@ public class Controller : NetworkBehaviour
         foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
         {
             bt.Value.HideHarvestIcon();
+            bt.Value.UnHighlightTile();
         }
+        highlightedTiles.Clear();
         ShowingPurchasableHarvestTiles = false;
     }
 
@@ -839,11 +855,12 @@ public class Controller : NetworkBehaviour
                     SetVisualsToNothingSelectedLocally();
                     locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
                     locallySelectedCardInHandToTurnOff.TurnOffVisualCard();
-                    locallySelectedCard = Instantiate(raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject, canvasMain.transform).GetComponent<CardInHand>();
+                    locallySelectedCard = Instantiate(locallySelectedCardInHandToTurnOff.gameObject, canvasMain.transform).GetComponent<CardInHand>();
                     locallySelectedCard.transform.position = locallySelectedCardInHandToTurnOff.transform.position;
                     locallySelectedCard.transform.localEulerAngles = Vector3.zero;
-                    raycastHitCardInHand.transform.GetComponent<CardInHand>().gameObject.SetActive(false);
-                    AddIndexOfCardInHandToTickQueueLocal(raycastHitCardInHand.transform.GetComponent<CardInHand>().indexOfCard);
+                    locallySelectedCardInHandToTurnOff.gameObject.SetActive(false);
+                    AddIndexOfCardInHandToTickQueueLocal(locallySelectedCardInHandToTurnOff.indexOfCard);
+                    ShowViablePlacableTiles(locallySelectedCardInHandToTurnOff);
                     return true;
                 }
             }
@@ -881,6 +898,48 @@ public class Controller : NetworkBehaviour
             }
         }
         return false;
+    }
+
+    List<BaseTile> highlightedTiles = new List<BaseTile>();
+    private void ShowViablePlacableTiles(CardInHand locallySelectedCardInHandToTurnOff)
+    {
+        HideHarvestedTiles();
+        if (locallySelectedCardInHandToTurnOff.cardType == SpellSiegeData.CardType.Creature)
+        {
+            foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
+            {
+                kvp.Value.HighlightTile();
+                highlightedTiles.Add(kvp.Value);
+            }
+        }
+        if (locallySelectedCardInHandToTurnOff.cardType == SpellSiegeData.CardType.Structure)
+        {
+            foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
+            {
+                foreach (BaseTile neighbor in kvp.Value.neighborTiles)
+                {
+                    if (!tilesOwned.ContainsValue(neighbor))
+                    {
+                        neighbor.HighlightTile();
+                        highlightedTiles.Add(neighbor);
+                    }
+                }
+            }
+        }
+        if (locallySelectedCardInHandToTurnOff.cardType == SpellSiegeData.CardType.Spell)
+        {
+            if (locallySelectedCardInHandToTurnOff.GameObjectToInstantiate.GetComponent<Spell>() != null)
+            {
+                if (locallySelectedCardInHandToTurnOff.GameObjectToInstantiate.GetComponent<Spell>().SpellRequiresToBeCastOnAHarvestedTile)
+                {
+                    foreach (BaseTile bt in harvestedTiles)
+                    {
+                        bt.HighlightTile();
+                        highlightedTiles.Add(bt);
+                    }
+                }
+            }
+        }
     }
 
     private void TargetACreature(Creature creatureToTarget)

@@ -22,6 +22,7 @@ public class GameManager : NetworkBehaviour
     public Material OpaqueSharedMat;
     public Transform castleTransform;
     public TileBase highlightTile;
+    public GameObject highlightForBaseTiles;
 
     public Transform cardParent;
     public Transform canvasMain;
