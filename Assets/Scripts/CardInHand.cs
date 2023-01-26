@@ -64,6 +64,7 @@ public class CardInHand : MonoBehaviour
         UpdateMana();
 
         UpdateAttack();
+        UpdateRarity();
     }
 
     public void UpdateAttack()
@@ -87,6 +88,36 @@ public class CardInHand : MonoBehaviour
     {
     }
 
+
+    [SerializeField] Sprite commonRarityImage;
+    [SerializeField] Sprite uncommon;
+    [SerializeField] Sprite rare;
+    [SerializeField] Sprite mythic;
+    [SerializeField] Sprite legendary;
+    public void UpdateRarity()
+    {
+        foreach (Image i in raritySymbols)
+        {
+            switch (rarity)
+            {
+                case SpellSiegeData.cardRarity.common:
+                    i.sprite = commonRarityImage;
+                    break;
+                case SpellSiegeData.cardRarity.uncommon:
+                    i.sprite = uncommon;
+                    break;
+                case SpellSiegeData.cardRarity.rare:
+                    i.sprite = rare;
+                    break;
+                case SpellSiegeData.cardRarity.mythic:
+                    i.sprite = mythic;
+                    break;
+                case SpellSiegeData.cardRarity.Legendary:
+                    i.sprite = legendary;
+                    break;
+            }
+        }
+    }
     public void UpdateMana()
     {
         if (genericManaCost == 0)

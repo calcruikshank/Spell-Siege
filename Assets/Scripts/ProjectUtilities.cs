@@ -85,6 +85,7 @@ public class ProjectUtilities : MonoBehaviour
                 cardTemplate.cardAbilityText.text = cardToCreate.cardText;
                 cardTemplate.UpdateMana();
                 cardTemplate.UpdateAttack();
+                cardTemplate.UpdateRarity();
 
             }
         }
