@@ -11,7 +11,7 @@ public class CustomHorizontalLayoutGroup : MonoBehaviour
 
     int middleNumber = 0;
 
-    float rotationMultiplier = 5;
+    float rotationMultiplier = 2;
     float yOffsetMultiplier = 10;
     private void Update()
     {
@@ -42,8 +42,15 @@ public class CustomHorizontalLayoutGroup : MonoBehaviour
             {
                 startingOffset = ((widthOfChild + spacing) * distanceFromMiddleNumber) + (widthOfChild / 2);
             }
-            transform.GetChild(i).localPosition = new Vector3( startingOffset, yOffsetMultiplier * -Mathf.Abs( distanceFromMiddleNumber ), transform.GetChild(i).localPosition.z);
-            transform.GetChild(i).localEulerAngles = new Vector3(transform.GetChild(i).localEulerAngles.x, transform.GetChild(i).localEulerAngles.y, -rotationMultiplier * distanceFromMiddleNumber);
+            Transform transformToMove = transform.GetChild(i);
+
+            if (Vector3.Distance(transformToMove.localPosition, new Vector3(startingOffset, yOffsetMultiplier * -Mathf.Abs(distanceFromMiddleNumber), transformToMove.localPosition.z)) > .1f)
+            {
+                transformToMove.localPosition = Vector3.MoveTowards(transformToMove.localPosition, new Vector3(startingOffset, yOffsetMultiplier * -Mathf.Abs(distanceFromMiddleNumber), transformToMove.localPosition.z), 1000 * Time.deltaTime);
+            }
+            transformToMove.localRotation = Quaternion.RotateTowards(transformToMove.localRotation, new Quaternion(0, 0,0 +( -rotationMultiplier * distanceFromMiddleNumber * Mathf.PI / 180),  1), 1000 * Time.deltaTime);
+           
         }
     }
+
 }

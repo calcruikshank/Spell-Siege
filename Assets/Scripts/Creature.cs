@@ -10,7 +10,7 @@ using UnityEngine.Tilemaps;
 
 public class Creature : MonoBehaviour
 {
-    [SerializeField] Transform colorIndicator;
+    Transform colorIndicator;
     [SerializeField] public float speed = 1f; //move speed
     [SerializeField] public int range; //num of tiles that can attack
     [SerializeField] float UsageRate = 1f; // the rate at which the minion can use abilities/ attack 
@@ -52,7 +52,7 @@ public class Creature : MonoBehaviour
         Dead
         //not sure if i need a tapped state yet trying to keep it as simple as possible
     }
-    public SpellSiegeData.CreatureType creatureType;
+    SpellSiegeData.CreatureType creatureType;
 
     bool canAttack = false;
     [HideInInspector] public Controller playerOwningCreature;
@@ -82,6 +82,7 @@ public class Creature : MonoBehaviour
     protected Grid grid;
     private void Awake()
     {
+        this.colorIndicator = transform;
     }
 
     protected virtual void Start()
@@ -101,8 +102,6 @@ public class Creature : MonoBehaviour
         SetTravType();
         pathfinder1 = new Pathfinding();
         pathfinder2 = new Pathfinding();
-        CurrentHealth = MaxHealth;
-        CurrentAttack = Attack;
         UpdateCreatureHUD();
     }
     protected virtual void SetTravType()
@@ -521,15 +520,13 @@ public class Creature : MonoBehaviour
     {
         if (this != null && this.transform != null)
         {
-            Debug.Log("Giving pudge counter " + this + " " + numOfCounters);
-            for (int i = 0; i < numOfCounters; i++)
-            {
-                MaxHealth++;
-                CurrentHealth++;
-                CurrentAttack++;
-                Attack++;
-            }
+            MaxHealth += numOfCounters;
+            CurrentHealth += numOfCounters;
+            CurrentAttack += numOfCounters;
+            Attack += numOfCounters;
 
+
+            //for numberofcounters trigger on counter gained
             GameManager.singleton.SpawnLevelUpPrefab(this.transform.position);
             UpdateCreatureHUD();
         }
@@ -1036,6 +1033,11 @@ public class Creature : MonoBehaviour
     Transform originalCardTransform;
     internal void SetOriginalCard(CardInHand cardSelected)
     {
+        this.Attack = cardSelected.currentAttack;
+        this.MaxHealth = cardSelected.currentAttack;
+        this.CurrentAttack = cardSelected.currentAttack;
+        this.CurrentHealth = cardSelected.currentHealth;
+        this.creatureType = cardSelected.creatureType;
         Debug.Log("Setting original card to " + cardSelected);
         originalCard = cardSelected;
         originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.scalableUICanvas.transform);
@@ -1045,6 +1047,7 @@ public class Creature : MonoBehaviour
 
         originalCardTransform.GetComponentInChildren<BoxCollider>().enabled = false;
         originalCardTransform.gameObject.SetActive(false);
+        UpdateCreatureHUD();
 
     }
 

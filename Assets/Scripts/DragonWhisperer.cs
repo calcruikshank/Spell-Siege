@@ -9,14 +9,11 @@ public class DragonWhisperer : Creature
         base.OnETB();
         foreach (CardInHand cardindeck in playerOwningCreature.cardsInHand)
         {
-            if (cardindeck.GameObjectToInstantiate.GetComponent<Creature>() != null)
+            if (cardindeck.creatureType == SpellSiegeData.CreatureType.Dragon)
             {
-                if (cardindeck.GameObjectToInstantiate.GetComponent<Creature>().creatureType == SpellSiegeData.CreatureType.Dragon)
+                if (cardindeck.redManaCost > 0)
                 {
-                    if (cardindeck.redManaCost > 0)
-                    {
-                        cardindeck.redManaCost--;
-                    }
+                    cardindeck.redManaCost--;
                     cardindeck.UpdateMana();
                 }
             }

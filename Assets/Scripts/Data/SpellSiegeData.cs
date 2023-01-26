@@ -28,6 +28,7 @@ public struct SpellSiegeData
         Archer,
         ArcanePortal,
         LeylineOfTheHarvest,
+        CaptainOfTheGuard,
         NumOfCardTypes
     }
 
