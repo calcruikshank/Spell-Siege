@@ -9,6 +9,7 @@ using UnityEngine.Tilemaps;
 public class GameManager : NetworkBehaviour
 {
     [SerializeField] GameObject playerPrefab;
+    [SerializeField] GameObject aiPrefab;
     public static GameManager singleton;
     public State state;
     public Grid grid;
@@ -82,6 +83,7 @@ public class GameManager : NetworkBehaviour
         {
             if (NetworkManager.Singleton.ConnectedClientsIds.Count == 1)
             {
+                GameObject instantiatedAI = Instantiate(aiPrefab);
                 SpawnPlayersServerRpc();
             }
         }

@@ -32,36 +32,36 @@ public class Controller : NetworkBehaviour
     public Dictionary<Vector3Int, BaseTile> tilesOwned = new Dictionary<Vector3Int, BaseTile>();
 
 
-    MousePositionScript mousePositionScript;
+    protected MousePositionScript mousePositionScript;
 
     public Color col;
     public Color transparentCol;
 
 
-    Vector3 mousePosition;
-    TileBase highlightTile;
-    Tilemap highlightMap;// set these = to gamemanage.singleton.highlightmap TODO
-    Tilemap baseMap;
-    Tilemap environmentMap;
-    Tilemap waterMap;
+    protected Vector3 mousePosition;
+    protected TileBase highlightTile;
+    protected Tilemap highlightMap;// set these = to gamemanage.singleton.highlightmap TODO
+    protected Tilemap baseMap;
+    protected Tilemap environmentMap;
+    protected Tilemap waterMap;
     protected Grid grid;
-    Vector3Int previousCellPosition;
+    protected Vector3Int previousCellPosition;
 
-    Transform castle;
-    Transform instantiatedCaste;
-    Vector3Int currentLocalHoverCellPosition;
-    Vector3Int cellPositionSentToClients;
-    Vector3Int targetedCellPosition;
+    protected Transform castle;
+    protected Transform instantiatedCaste;
+    protected Vector3Int currentLocalHoverCellPosition;
+    protected Vector3Int cellPositionSentToClients;
+    protected Vector3Int targetedCellPosition;
 
-    [SerializeField] LayerMask creatureMask;
+    [SerializeField] protected LayerMask creatureMask;
 
-    Vector3Int placedCellPosition;
+    protected Vector3Int placedCellPosition;
 
     public int turnTimer;
-    int turnThreshold = 80; //todo make this 1200
-    int maxHandSize = 7;
-    [SerializeField] List<CardInHand> dragonDeck = new List<CardInHand>();
-    [SerializeField] List<CardInHand> demonDeck = new List<CardInHand>();
+    protected int turnThreshold = 1200; //todo make this 1200
+    protected int maxHandSize = 7;
+    [SerializeField] protected List<CardInHand> dragonDeck = new List<CardInHand>();
+    [SerializeField] protected List<CardInHand> demonDeck = new List<CardInHand>();
     public List<CardInHand> cardsInDeck = new List<CardInHand>();
     public List<CardInHand> cardsInHand = new List<CardInHand>();
 
@@ -69,10 +69,10 @@ public class Controller : NetworkBehaviour
     public CardInHand locallySelectedCard;
     public List<Vector3> allVertextPointsInTilesOwned = new List<Vector3>();
 
-    Transform instantiatedPlayerUI;
-    Transform cardParent;
+    protected Transform instantiatedPlayerUI;
+    protected Transform cardParent;
 
-    Canvas canvasMain;
+    protected Canvas canvasMain;
 
     public int tick = 0; //this is for determining basically everything
     public float tickTimer = 0f;
@@ -80,17 +80,17 @@ public class Controller : NetworkBehaviour
 
     public Creature locallySelectedCreature;
 
-    PlayerResources resources;
+    protected PlayerResources resources;
 
-    delegate void ResourcesChanged(PlayerResources resources);
-    ResourcesChanged resourcesChanged;
+    protected delegate void ResourcesChanged(PlayerResources resources);
+    protected ResourcesChanged resourcesChanged;
 
-    [SerializeField] Transform playerHud;
-    HudElements hudElements;
-    delegate void Turn();
-    event Turn turn;
+    [SerializeField] protected Transform playerHud;
+    protected HudElements hudElements;
+    protected delegate void Turn();
+    protected event Turn turn;
 
-    int numOfPurchasableHarvestTiles = 1;
+    protected int numOfPurchasableHarvestTiles = 1;
 
     public List<BaseTile> harvestedTiles = new List<BaseTile>();
 
@@ -100,14 +100,14 @@ public class Controller : NetworkBehaviour
     public bool creaturePathLockedIn = false;
 
 
-    bool canPurchaseHarvestTile = false;
+    protected bool canPurchaseHarvestTile = false;
 
-    [SerializeField] Color[] colorsToPickFrom;
+    [SerializeField] protected Color[] colorsToPickFrom;
 
-    private RectTransform selectionBox;
+    protected RectTransform selectionBox;
 
 
-    [SerializeField] Transform deckSelectionPrefab;
+    [SerializeField] protected Transform deckSelectionPrefab;
 
     [Serializable]
     public enum ActionTaken
@@ -125,7 +125,7 @@ public class Controller : NetworkBehaviour
 
     }
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         GrabAllObjectsFromGameManager();
 
@@ -185,7 +185,7 @@ public class Controller : NetworkBehaviour
         SetStateToPlacingCastle();
     }
 
-    private void SetStateToPlacingCastle()
+    protected void SetStateToPlacingCastle()
     {
         state = State.PlacingCastle;
     }
@@ -218,7 +218,7 @@ public class Controller : NetworkBehaviour
     }
 
 
-    void GrabAllObjectsFromGameManager()
+    protected void GrabAllObjectsFromGameManager()
     {
         canvasMain = GameManager.singleton.canvasMain.GetComponent<Canvas>();
         highlightTile = GameManager.singleton.highlightTile;
@@ -230,7 +230,7 @@ public class Controller : NetworkBehaviour
         castle = GameManager.singleton.castleTransform;
         GameManager.singleton.playerList.Add(this);
     }
-    void SpawnHUDAndHideOnAllNonOwners()
+    protected void SpawnHUDAndHideOnAllNonOwners()
     {
         instantiatedPlayerUI = Instantiate(playerHud, canvasMain.transform);
         cardParent = instantiatedPlayerUI.GetComponent<HudElements>().cardParent;
@@ -246,14 +246,14 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    private void OnTurn()
+    protected virtual void OnTurn()
     {
         StartTurnPhase();
     }
 
 
 
-    public void StartTurnPhase()
+    public virtual void StartTurnPhase()
     {
         HandleHarvestTiles();
         switch (state)
@@ -283,7 +283,7 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    private void HandleHarvestTiles()
+    protected virtual void HandleHarvestTiles()
     {
 
         if (canPurchaseHarvestTile == true)
@@ -309,7 +309,7 @@ public class Controller : NetworkBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if (!IsOwner)
         {
@@ -628,7 +628,7 @@ public class Controller : NetworkBehaviour
 
     }
 
-    private void TriggerAllCreatureAbilities()
+    protected void TriggerAllCreatureAbilities()
     {
         foreach (KeyValuePair<int, Creature> kp in creaturesOwned)
         {
@@ -643,13 +643,13 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    private void HandleDrawCards()
+    protected void HandleDrawCards()
     {
         DrawCard();
     }
 
 
-    private void HandleMana()
+    protected void HandleMana()
     {
         ClearMana();
         AddToMana();
@@ -718,7 +718,7 @@ public class Controller : NetworkBehaviour
         SelectCreatureOnBoardServerRpc(index);
     }
 
-    private void PurchaseHarvestTile(Vector3Int vector3Int)
+    protected void PurchaseHarvestTile(Vector3Int vector3Int)
     {
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).isBeingHarvested)
         {
@@ -777,14 +777,14 @@ public class Controller : NetworkBehaviour
         GameManager.singleton.AddPlayerToReady(this);
     }
 
-    private void AddStructureToTile(Structure structure, Vector3Int positionSent)
+    protected void AddStructureToTile(Structure structure, Vector3Int positionSent)
     {
         BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).structureOnTile = structure;
         structure.tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent);
         structure.playerOwningStructure = this;
     }
 
-    public void AddTileToHarvestedTilesList(BaseTile baseTileSent)
+    public virtual void AddTileToHarvestedTilesList(BaseTile baseTileSent)
     {
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Green)
         {
@@ -993,7 +993,7 @@ public class Controller : NetworkBehaviour
         creature.ShowPathfinderLinerRendererAsync(currentLocalHoverCellPosition);
     }
 
-    void LocalSelectCardWithIndex(int indexOfCardSelected)
+    protected void LocalSelectCardWithIndex(int indexOfCardSelected)
     {
         CardInHand cardToSelect;
         for (int i = 0; i < cardsInHand.Count; i++)
@@ -1048,6 +1048,7 @@ public class Controller : NetworkBehaviour
         targetedCellPosition = positionSent;
         if (creatureSelectedSent != null)
         {
+            Debug.Log("Setting structure to follow");
             int numOfTicksPassed = (int)MathF.Round((Vector3.Distance(positionOfCreatureSent, creatureSelectedSent.actualPosition) / Time.fixedDeltaTime * creatureSelectedSent.speed));
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
             {
@@ -1083,11 +1084,11 @@ public class Controller : NetworkBehaviour
 
     void HandleCreatureInHandSelected(Vector3Int cellSent)
     {
-        SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+        SpendManaToCast(cardSelected);
         CastCreatureOnTile(cardSelected, cellSent);
         SetStateToNothingSelected();
     }
-    private bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
+    protected bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
     {
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent) == null)
         {
@@ -1274,14 +1275,14 @@ public class Controller : NetworkBehaviour
 
     }
 
-    private void SpendManaToCast(CardInHand cardSelected)
+    protected void SpendManaToCast(CardInHand cardSelectedSent)
     {
-        resources.blueMana -= cardSelected.blueManaCost;
-        resources.redMana -= cardSelected.redManaCost;
-        resources.whiteMana -= cardSelected.whiteManaCost;
-        resources.blackMana -= cardSelected.blackManaCost;
-        resources.greenMana -= cardSelected.greenManaCost;
-        SpendGenericMana(cardSelected.genericManaCost);
+        resources.blueMana -= cardSelectedSent.blueManaCost;
+        resources.redMana -= cardSelectedSent.redManaCost;
+        resources.whiteMana -= cardSelectedSent.whiteManaCost;
+        resources.blackMana -= cardSelectedSent.blackManaCost;
+        resources.greenMana -= cardSelectedSent.greenManaCost;
+        SpendGenericMana(cardSelectedSent.genericManaCost);
         resourcesChanged.Invoke(resources);
     }
 
@@ -1324,7 +1325,7 @@ public class Controller : NetworkBehaviour
         resourcesChanged.Invoke(resources);
     }
 
-    void SetOwningTile(Vector3Int cellPosition)
+    protected void SetOwningTile(Vector3Int cellPosition)
     {
         if (!tilesOwned.ContainsKey(cellPosition))
         {
@@ -1427,13 +1428,13 @@ public class Controller : NetworkBehaviour
         selectedCreaturesWithBox.Clear();
         state = State.NothingSelected;
     }
-    void SetStateToWaiting()
+    protected void SetStateToWaiting()
     {
         cardSelected = null;
         state = State.Waiting;
     }
 
-    public void ClearMana()
+    public virtual void ClearMana()
     {
         resources.blueMana = 0;
         resources.greenMana = 0;
@@ -1443,7 +1444,7 @@ public class Controller : NetworkBehaviour
 
         resourcesChanged.Invoke(resources);
     }
-    public void AddToMana()
+    public virtual void AddToMana()
     {
         for (int i = 0; i < harvestedTiles.Count; i++)
         {
@@ -1500,7 +1501,7 @@ public class Controller : NetworkBehaviour
         resourcesChanged.Invoke(resources);
     }
     int totalMana;
-    private void UpdateHudForResourcesChanged(PlayerResources resources)
+    protected virtual void UpdateHudForResourcesChanged(PlayerResources resources)
     {
         if (IsOwner)
         {
