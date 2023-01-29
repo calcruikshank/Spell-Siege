@@ -63,6 +63,32 @@ public class AI : Controller
             }
         }
     }
+    protected override bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
+    {
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent) == null)
+        {
+            //show error
+            return false;
+        }
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).traverseType == SpellSiegeData.traversableType.Untraversable)
+        {
+            //show error
+            return false;
+        }
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).traverseType == SpellSiegeData.traversableType.SwimmingAndFlying && cardSelected.GameObjectToInstantiate.GetComponent<Creature>().thisTraversableType == SpellSiegeData.travType.Walking)
+        {
+            return false;
+        }
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).playerOwningTile == this)
+        {
+            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).structureOnTile == null && BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).CreatureOnTile() == null)
+            {
+                SetVisualsToNothingSelectedLocally();
+                return true;
+            }
+        }
+        return false;
+    }
     public override void StartTurnPhase()
     {
         HandleHarvestTiles();
@@ -120,13 +146,14 @@ public class AI : Controller
             {
                 LocalSelectCardWithIndex(cih.indexOfCard);
                 break;
+
             }
         }
     }
 
     private void PlaceCastle()
     {
-        placedCellPosition = new Vector3Int(0,0,0);
+        placedCellPosition= FindForestMountainTiles();
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).traverseType == SpellSiegeData.traversableType.Untraversable)
         {
             return;
@@ -145,8 +172,26 @@ public class AI : Controller
         GameManager.singleton.AddPlayerToReady(this);
         SetStateToWaiting();
     }
+
+    private Vector3Int FindForestMountainTiles()
+    {
+        for (int x = GameManager.singleton.startingX; x < GameManager.singleton.endingX; x++)
+        {
+            for (int y = GameManager.singleton.startingY; y < GameManager.singleton.endingY; y++)
+            {
+                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(x,y)).manaType == SpellSiegeData.ManaType.Green)
+                {
+                    return new Vector3Int(x, y);
+                }
+            }
+        }
+        return Vector3Int.zero;
+        Debug.Log("couldnt fid green");
+    }
+
     public override void AddTileToHarvestedTilesList(BaseTile baseTileSent)
     {
+        Debug.Log(resources.greenMana + " green mana available");
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Green)
         {
             resources.greenManaCap++;
@@ -178,6 +223,8 @@ public class AI : Controller
             harvestedTiles.Add(baseTileSent);
             baseTileSent.SetBeingHarvested();
         }
+        resourcesChanged.Invoke(resources);
+
     }
     public override void ClearMana()
     {
@@ -186,8 +233,7 @@ public class AI : Controller
         resources.redMana = 0;
         resources.blackMana = 0;
         resources.whiteMana = 0;
-    }
-    protected override void UpdateHudForResourcesChanged(PlayerResources resources)
-    {
+        resourcesChanged.Invoke(resources);
+
     }
 }
