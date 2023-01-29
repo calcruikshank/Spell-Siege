@@ -288,7 +288,9 @@ public class BaseTile : MonoBehaviour
     {
         instantiatedManaSymbol.gameObject.SetActive(true);
     }
+    float lifeTime;
 
+    Color highlightTileCOlor = new Color();
     private void Update()
     {
         if (instantiatedManaSymbol != null)
@@ -296,6 +298,17 @@ public class BaseTile : MonoBehaviour
             instantiatedManaSymbol.transform.position = GameManager.singleton.mainCam.WorldToScreenPoint(this.transform.position);
             
             instantiatedManaSymbol.transform.localScale = Vector3.one * 10 * highlightMultiplierForManaSymbol / instantiatedManaSymbol.transform.position.z;
+        }
+        if (instantiatedHighlightTile != null)
+        {
+            highlightTileCOlor = Color.white;
+            //get the objects current position and put it in a variable so we can access it later with less code
+            //calculate what the new Y position will be
+            float newY = Mathf.Sin(Time.time * 4) * .2f;
+            //set the object's Y to the new calculated Y
+
+            highlightTileCOlor.a = newY + .8f;
+            instantiatedHighlightTile.GetComponent<MeshRenderer>().material.color = highlightTileCOlor;
         }
     }
 
@@ -318,6 +331,7 @@ public class BaseTile : MonoBehaviour
         {
 
             instantiatedHighlightTile = Instantiate(GameManager.singleton.highlightForBaseTiles, this.transform);
+            instantiatedHighlightTile.transform.position = new Vector3(this.transform.position.x, .03f, this.transform.position.z);
         }
         else
         {
