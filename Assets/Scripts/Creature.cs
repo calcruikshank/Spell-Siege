@@ -445,6 +445,12 @@ public class Creature : MonoBehaviour
         {
             playerOwningCreature.DieServerRpc(this.creatureID);
         }
+
+        if (this.playerOwningCreature.isAI)
+        {
+            playerOwningCreature.LocalDie(this.creatureID);
+        }
+
     }
     public void LocalDie()
     {
@@ -513,6 +519,10 @@ public class Creature : MonoBehaviour
         if (playerOwningCreature.IsOwner)
         {
             playerOwningCreature.GiveCounterServerRpc(this.creatureID, numOfCounters);
+        }
+        if (playerOwningCreature.isAI)
+        {
+            LocalGiveCounter(numOfCounters);
         }
     }
 

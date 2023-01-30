@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 public class Controller : NetworkBehaviour
 {
+    public bool isAI = false;
     public State state;
     public enum State
     {
@@ -1148,7 +1149,6 @@ public class Controller : NetworkBehaviour
         }
 
         instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
-
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
         cardSelectedSent.transform.parent = null;
@@ -1621,6 +1621,11 @@ public class Controller : NetworkBehaviour
     [ClientRpc]
     internal void DieClientRpc(int creatureToDie)
     {
+        GameManager.singleton.allCreaturesOnField[creatureToDie].LocalDie();
+    }
+    internal void LocalDie(int creatureToDie)
+    {
+        Debug.Log("killing creature " + creatureToDie);
         GameManager.singleton.allCreaturesOnField[creatureToDie].LocalDie();
     }
 

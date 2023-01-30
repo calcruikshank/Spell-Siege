@@ -7,6 +7,7 @@ public class AI : Controller
 {
     protected override void Start()
     {
+        isAI = true;
         GrabAllObjectsFromGameManager();
         turn += OnTurn;
         SpawnHUDAndHideOnAllNonOwners();
@@ -38,6 +39,7 @@ public class AI : Controller
                 PlaceCastle();
                 break;
             case State.NothingSelected:
+                CheckForAnyCreaturesOnField();
                 CheckForAnyCreaturesYouCanAfford();
                 break;
             case State.CreatureInHandSelected:
@@ -47,6 +49,29 @@ public class AI : Controller
                 break;
             case State.StructureInHandSeleced:
                 break;
+        }
+    }
+
+    private void CheckForAnyCreaturesOnField()
+    {
+        foreach (KeyValuePair<int, Creature> kvp in creaturesOwned)
+        {
+            if (kvp.Value.creatureState != Creature.CreatureState.Moving)
+            {
+                foreach (Controller c in GameManager.singleton.playersThatHavePlacedCastle)
+                {
+                    if (c != this)
+                    {
+                        foreach (KeyValuePair<int, Creature> co in c.creaturesOwned)
+                        {
+                            if (co.Value != null)
+                            {
+                                kvp.Value.SetTargetToFollow(co.Value, kvp.Value.actualPosition);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -62,6 +87,7 @@ public class AI : Controller
                 break;
             }
         }
+        SetStateToNothingSelected();
     }
     protected override bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
     {
