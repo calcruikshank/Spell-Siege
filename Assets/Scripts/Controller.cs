@@ -1049,7 +1049,6 @@ public class Controller : NetworkBehaviour
         targetedCellPosition = positionSent;
         if (creatureSelectedSent != null)
         {
-            Debug.Log("Setting structure to follow");
             int numOfTicksPassed = (int)MathF.Round((Vector3.Distance(positionOfCreatureSent, creatureSelectedSent.actualPosition) / Time.fixedDeltaTime * creatureSelectedSent.speed));
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
             {

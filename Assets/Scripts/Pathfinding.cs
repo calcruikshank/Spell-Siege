@@ -139,6 +139,9 @@ public class Pathfinding
 
     private int CalculateDistanceCost(BaseTile a, BaseTile b)
     {
+        return Mathf.RoundToInt(10 * Vector3.Distance(BaseMapTileState.singleton.GetWorldPositionOfCell(a.tilePosition), BaseMapTileState.singleton.GetWorldPositionOfCell(b.tilePosition)));
+
+
         int potentialRange = Mathf.Abs(a.tilePosition.x - b.tilePosition.x);
         if (Mathf.Abs(a.tilePosition.y - b.tilePosition.y) > potentialRange)
         {
