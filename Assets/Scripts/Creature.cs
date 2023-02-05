@@ -375,7 +375,10 @@ public class Creature : MonoBehaviour
         if (playerOwningCreature.IsOwner)
         {
             playerOwningCreature.AttackCreatureServerRpc(this.creatureID, creatureToAttack.creatureID);
-
+        }
+        if (playerOwningCreature.isAI)
+        {
+            LocalAttackCreature(creatureToAttack);
         }
     }
     public virtual void LocalAttackCreature(Creature creatureToAttack)
@@ -406,6 +409,10 @@ public class Creature : MonoBehaviour
         if (playerOwningCreature.IsOwner)
         {
             playerOwningCreature.AttackStructureServerRpc(this.creatureID, structureToAttack.currentCellPosition);
+        }
+        if (playerOwningCreature.isAI)
+        {
+            LocalAttackStructure(structureToAttack);
         }
     }
     public void LocalAttackStructure(Structure structureToAttack)
