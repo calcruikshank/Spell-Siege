@@ -107,6 +107,7 @@ public class Controller : NetworkBehaviour
 
     protected RectTransform selectionBox;
 
+    public List<Structure> structuresOwned = new List<Structure>();
 
     [SerializeField] protected Transform deckSelectionPrefab;
 
@@ -797,6 +798,7 @@ public class Controller : NetworkBehaviour
         BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).structureOnTile = structure;
         structure.tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent);
         structure.playerOwningStructure = this;
+        structuresOwned.Add(structure);
     }
 
     public virtual void AddTileToHarvestedTilesList(BaseTile baseTileSent)

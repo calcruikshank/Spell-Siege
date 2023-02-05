@@ -1265,15 +1265,14 @@ public class Creature : MonoBehaviour
         {
             targetToFollow = null;
         }
-        if (structureToFollowSent.playerOwningStructure != this.playerOwningCreature)
+        if (structureToFollowSent.playerOwningStructure != this.playerOwningCreature || playerOwningCreature.isAI)
         {
-            Debug.Log("Targeting structure");
             structureToFollow = structureToFollowSent;
-            if (IsStructureInRange(structureToFollow))
+            if (IsStructureInRange(structureToFollowSent))
             {
                 return;
             }
-            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollowSent.tileCurrentlyOn.tilePosition), originalCreaturePosition);
         }
     }
 

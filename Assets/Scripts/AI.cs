@@ -31,24 +31,56 @@ public class AI : Controller
         SetStateToPlacingCastle();
     }
 
+    float checkAITimer = 1f;
+    float decisionTimer = 0;
     protected override void Update()
     {
-        switch (state)
+        decisionTimer += Time.deltaTime;
+        if (decisionTimer >= checkAITimer)
         {
-            case State.PlacingCastle:
-                PlaceCastle();
-                break;
-            case State.NothingSelected:
-                CheckForAnyCreaturesOnField();
-                CheckForAnyCreaturesYouCanAfford();
-                break;
-            case State.CreatureInHandSelected:
-                PlayCreature();
-                break;
-            case State.SpellInHandSelected:
-                break;
-            case State.StructureInHandSeleced:
-                break;
+            decisionTimer = 0;
+            switch (state)
+            {
+                case State.PlacingCastle:
+                    PlaceCastle();
+                    break;
+                case State.NothingSelected:
+                    CheckForAnyCreaturesOnField();
+                    CheckForAnyCreaturesYouCanAfford();
+                    CheckForAnyStructuresOnField();
+                    break;
+                case State.CreatureInHandSelected:
+                    PlayCreature();
+                    break;
+                case State.SpellInHandSelected:
+                    break;
+                case State.StructureInHandSeleced:
+                    break;
+            }
+        }
+
+    }
+
+    private void CheckForAnyStructuresOnField()
+    {
+        foreach (Controller c in GameManager.singleton.playersThatHavePlacedCastle)
+        {
+            if (c != this)
+            {
+                foreach (KeyValuePair<int, Creature> creatureOwned in creaturesOwned)
+                {
+                    if (creatureOwned.Value.targetToFollow == null && creatureOwned.Value.structureToFollow == null)
+                    {
+                        for (int i = 0; i < c.structuresOwned.Count; i++)
+                        {
+                            creatureOwned.Value.SetStructureToFollow(c.structuresOwned[i], creatureOwned.Value.actualPosition);
+                        }
+                    }
+                    else
+                    {
+                    }
+                }
+            }
         }
     }
 
@@ -179,7 +211,7 @@ public class AI : Controller
 
     private void PlaceCastle()
     {
-        placedCellPosition= FindForestMountainTiles();
+        placedCellPosition = FindForestMountainTiles();
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).traverseType == SpellSiegeData.traversableType.Untraversable)
         {
             return;
@@ -205,7 +237,7 @@ public class AI : Controller
         {
             for (int y = GameManager.singleton.startingY; y < GameManager.singleton.endingY; y++)
             {
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(x,y)).manaType == SpellSiegeData.ManaType.Green)
+                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(x, y)).manaType == SpellSiegeData.ManaType.Green)
                 {
                     return new Vector3Int(x, y);
                 }
