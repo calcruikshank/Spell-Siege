@@ -649,7 +649,6 @@ public class Creature : MonoBehaviour
         if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) != null && tileCurrentlyOn.tilePosition != currentCellPosition)
         {
             SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
-            Debug.Log(BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) + " the creature at path index + 1 is not null");
         }
         if (previousTilePosition != tileCurrentlyOn)
         {
@@ -1233,7 +1232,6 @@ public class Creature : MonoBehaviour
         {
             if (creatureToFollow.playerOwningCreature != this.playerOwningCreature)
             {
-                Debug.Log("Targeting creature");
                 targetToFollow = creatureToFollow;
                 if (targetToFollow != null)
                 {

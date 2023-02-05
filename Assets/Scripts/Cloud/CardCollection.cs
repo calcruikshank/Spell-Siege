@@ -43,6 +43,11 @@ public class CardCollection : MonoBehaviour
     {
         for (int i = 0; i < CardCollectionData.singleton.decks.Length; i++)
         {
+            if (deckNames[i] == null)
+            {
+                LoadCardCollection(CardCollectionData.singleton.loadedCollection);
+                return;
+            }
             deckNames[i].text = CardCollectionData.singleton.decks[i].deckName;
         }
         for (int i = lastInstantiatedInt; i < myObject.cardsCollected.Count; i++)

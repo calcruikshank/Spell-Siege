@@ -126,7 +126,7 @@ public class Controller : NetworkBehaviour
 
     }
     // Start is called before the first frame update
-    protected virtual void Start()
+    protected virtual  void Start()
     {
         GrabAllObjectsFromGameManager();
 
@@ -177,7 +177,7 @@ public class Controller : NetworkBehaviour
         List<CardInHand> translatedCards = new List<CardInHand>();
         for (int i = 0; i < deckChosenAsInts.deck.Count; i++)
         {
-            translatedCards.Add( CardCollectionData.singleton.GetCardAssociatedWithType((SpellSiegeData.Cards)deckChosenAsInts.deck[i]));
+            translatedCards.Add(CardCollectionData.singleton.GetCardAssociatedWithType((SpellSiegeData.Cards)deckChosenAsInts.deck[i]));
         }
         cardsInDeck = new List<CardInHand>();
         cardsInDeck = translatedCards;
@@ -455,7 +455,7 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    
+
 
     private void FindPathsForAllCreaturesSelected()
     {
@@ -675,6 +675,20 @@ public class Controller : NetworkBehaviour
     {
         if (selectedCreaturesWithBox.Count > 0)
         {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit raycastHitCreatureOnBoard, Mathf.Infinity, creatureMask))
+            {
+                Creature hitCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
+                if (hitCreature != null)
+                {
+                    for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
+                    {
+                        TargetACreature(hitCreature, selectedCreaturesWithBox[i]);
+                    }
+                    SetStateToNothingSelected();
+                    return;
+                }
+            }
             for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
             {
                 HandleCreatureOnBoardSelected(positionSent, selectedCreaturesWithBox[i].actualPosition, selectedCreaturesWithBox[i]);
@@ -899,7 +913,8 @@ public class Controller : NetworkBehaviour
                 }
                 if (locallySelectedCreature != null)
                 {
-                    TargetACreature(raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
+                    TargetACreature(raycastHitCreatureOnBoard.transform.GetComponent<Creature>(), locallySelectedCreature);
+                    SetStateToNothingSelected();
                     return true;
                 }
             }
@@ -949,14 +964,13 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    private void TargetACreature(Creature creatureToTarget)
+    private void TargetACreature(Creature creatureToTarget, Creature targetingCreature)
     {
         if (IsOwner)
         {
-            locallySelectedCreature.SetTargetToFollow(creatureToTarget, locallySelectedCreature.actualPosition);
-            TargetACreatureServerRpc(locallySelectedCreature.creatureID, creatureToTarget.creatureID, locallySelectedCreature.actualPosition);
+            targetingCreature.SetTargetToFollow(creatureToTarget, targetingCreature.actualPosition);
+            TargetACreatureServerRpc(targetingCreature.creatureID, creatureToTarget.creatureID, targetingCreature.actualPosition);
             SetVisualsToNothingSelectedLocally();
-            SetStateToNothingSelected();
         }
     }
     private void TargetACreatureLocal(int selectedCreatureID, int creatureToTargetID, Vector3 actualPosition)
@@ -964,7 +978,6 @@ public class Controller : NetworkBehaviour
         if (!IsOwner)
         {
             GameManager.singleton.allCreaturesOnField[selectedCreatureID].SetTargetToFollow(GameManager.singleton.allCreaturesOnField[creatureToTargetID], actualPosition);
-            SetStateToNothingSelected();
         }
     }
 
@@ -1021,6 +1034,7 @@ public class Controller : NetworkBehaviour
     }
     void HandleCreatureOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent, Creature creatureSelected)
     {
+       
         MoveCreatureServerRpc(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
         MoveCreatureLocally(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
     }

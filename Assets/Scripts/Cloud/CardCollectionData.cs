@@ -11,7 +11,7 @@ public class CardCollectionData : MonoBehaviour
     // Start is called before the first frame update
 
     public Deck[] decks;
-    private void Awake()
+    private async void Awake()
     {
         if (singleton != null)
         {
@@ -20,7 +20,12 @@ public class CardCollectionData : MonoBehaviour
         DontDestroyOnLoad(this);
         singleton = this;
         decks = new Deck[6];
-        LoadAllDecks();
+        LoadDeck0FromCloudSave();
+        LoadDeck1FromCloudSave();
+        LoadDeck2FromCloudSave();
+        LoadDeck3FromCloudSave();
+        LoadDeck4FromCloudSave();
+        LoadDeck5FromCloudSave();
         LoadSomeData();
     }
     void Start()
@@ -29,12 +34,6 @@ public class CardCollectionData : MonoBehaviour
 
     public void LoadAllDecks()
     {
-        LoadDeck0FromCloudSave();
-        LoadDeck1FromCloudSave();
-        LoadDeck2FromCloudSave();
-        LoadDeck3FromCloudSave();
-        LoadDeck4FromCloudSave();
-        LoadDeck5FromCloudSave();
     }
     public void SaveDecklists()
     {

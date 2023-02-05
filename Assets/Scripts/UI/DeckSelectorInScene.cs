@@ -86,7 +86,7 @@ public class DeckSelectorInScene : MonoBehaviour
         showCardsButton.gameObject.SetActive(false);
         chooseDeckText.gameObject.SetActive(true);
     }
-    public void ChooseDeck(int deckChosen)
+    public void ChooseDeckButton(int deckChosen)
     {
         SelectedDeck = CardCollectionData.singleton.decks[deckChosen];
         this.gameObject.SetActive(false);
@@ -98,5 +98,6 @@ public class DeckSelectorInScene : MonoBehaviour
     public void AssignLocalPlayer(Controller playerSent)
     {
         localPlayerInScene = playerSent;
+        ShowDecks();
     }
 }
