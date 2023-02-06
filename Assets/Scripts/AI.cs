@@ -39,6 +39,7 @@ public class AI : Controller
         if (decisionTimer >= checkAITimer)
         {
             decisionTimer = 0;
+            checkAITimer = UnityEngine.Random.Range(.5f, 2);
             switch (state)
             {
                 case State.PlacingCastle:
@@ -76,9 +77,6 @@ public class AI : Controller
                             creatureOwned.Value.SetStructureToFollow(c.structuresOwned[i], creatureOwned.Value.actualPosition);
                         }
                     }
-                    else
-                    {
-                    }
                 }
             }
         }
@@ -88,23 +86,42 @@ public class AI : Controller
     {
         foreach (KeyValuePair<int, Creature> kvp in creaturesOwned)
         {
-            if (kvp.Value.creatureState != Creature.CreatureState.Moving)
+            foreach (Controller c in GameManager.singleton.playersThatHavePlacedCastle)
             {
-                foreach (Controller c in GameManager.singleton.playersThatHavePlacedCastle)
+                if (c != this)
                 {
-                    if (c != this)
+                    Creature creatureToTarget = FindClosestEnemyCreature(c, kvp.Value);
+
+                    if (creatureToTarget != null)
                     {
-                        foreach (KeyValuePair<int, Creature> co in c.creaturesOwned)
-                        {
-                            if (co.Value != null)
-                            {
-                                kvp.Value.SetTargetToFollow(co.Value, kvp.Value.actualPosition);
-                            }
-                        }
+                        kvp.Value.SetTargetToFollow(creatureToTarget, kvp.Value.actualPosition);
                     }
                 }
             }
         }
+    }
+
+    private Creature FindClosestEnemyCreature(Controller c, Creature creatureTaregting)
+    {
+        Creature currentClosestCreature = null;
+        foreach (KeyValuePair<int, Creature> co in c.creaturesOwned)
+        {
+            if (co.Value != null)
+            {
+                if (currentClosestCreature == null)
+                {
+                    currentClosestCreature = co.Value;
+                }
+                else
+                {
+                    if (Vector3.Distance(creatureTaregting.actualPosition, co.Value.actualPosition) < Vector3.Distance(creatureTaregting.actualPosition, currentClosestCreature.actualPosition))
+                    {
+                        currentClosestCreature = co.Value;
+                    }
+                }
+            }
+        }
+        return currentClosestCreature;
     }
 
     private void PlayCreature()
@@ -233,23 +250,37 @@ public class AI : Controller
 
     private Vector3Int FindForestMountainTiles()
     {
+        int mostGreenTiles = 0;
+        int tempGreenTiles = 0;
+        BaseTile forestBaseTile = new BaseTile();
         for (int x = GameManager.singleton.startingX; x < GameManager.singleton.endingX; x++)
         {
             for (int y = GameManager.singleton.startingY; y < GameManager.singleton.endingY; y++)
             {
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(x, y)).manaType == SpellSiegeData.ManaType.Green)
+                BaseTile tileToCheck = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(x, y));
+                if (tileToCheck.manaType == SpellSiegeData.ManaType.Green)
                 {
-                    return new Vector3Int(x, y);
+                    tempGreenTiles = 0;
+                    foreach (BaseTile neighbor in tileToCheck.neighborTiles)
+                    {
+                        if (neighbor.manaType == SpellSiegeData.ManaType.Green)
+                        {
+                            tempGreenTiles++;
+                        }
+                    }
+                    if (tempGreenTiles > mostGreenTiles)
+                    {
+                        mostGreenTiles = tempGreenTiles;
+                        forestBaseTile = tileToCheck;
+                    }
                 }
             }
         }
-        return Vector3Int.zero;
-        Debug.Log("couldnt fid green");
+        return forestBaseTile.tilePosition;
     }
 
     public override void AddTileToHarvestedTilesList(BaseTile baseTileSent)
     {
-        Debug.Log(resources.greenMana + " green mana available");
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Green)
         {
             resources.greenManaCap++;
