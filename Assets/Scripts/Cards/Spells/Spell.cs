@@ -196,6 +196,7 @@ public class Spell : MonoBehaviour
     {
         //rangeLr.enabled = true;
 
+        rangeLr.enabled = true;
         rangeLr.positionCount = rangePositionsSent.Count;
         rangeLr.SetPositions(rangePositionsSent.ToArray());
     }
@@ -205,7 +206,7 @@ public class Spell : MonoBehaviour
     {
         rangeLrGO = new GameObject("LineRendererGameObjectForRange", typeof(LineRenderer));
         rangeLr = rangeLrGO.GetComponent<LineRenderer>();
-        rangeLr.enabled = true;
+        rangeLr.enabled = false;
         rangeLr.alignment = LineAlignment.TransformZ;
         rangeLr.transform.localEulerAngles = new Vector3(90, 0, 0);
         rangeLr.sortingOrder = 1000;

@@ -116,7 +116,14 @@ public class AI : Controller
                 {
                     if (Vector3.Distance(creatureTaregting.actualPosition, co.Value.actualPosition) < Vector3.Distance(creatureTaregting.actualPosition, currentClosestCreature.actualPosition))
                     {
-                        currentClosestCreature = co.Value;
+                        if (creatureTaregting.IsCreatureWithinRange(co.Value) || co.Value.tileCurrentlyOn.traverseType == SpellSiegeData.traversableType.TraversableByAll)
+                        {
+                            currentClosestCreature = co.Value;
+                        }
+                        if (!currentClosestCreature.IsCreatureWithinRange(co.Value) && co.Value.tileCurrentlyOn.traverseType != SpellSiegeData.traversableType.TraversableByAll)
+                        {
+                            currentClosestCreature = null;
+                        }
                     }
                 }
             }

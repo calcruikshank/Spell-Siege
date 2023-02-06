@@ -1050,7 +1050,7 @@ public class Creature : MonoBehaviour
     internal void SetOriginalCard(CardInHand cardSelected)
     {
         this.Attack = cardSelected.currentAttack;
-        this.MaxHealth = cardSelected.currentAttack;
+        this.MaxHealth = cardSelected.currentHealth;
         this.CurrentAttack = cardSelected.currentAttack;
         this.CurrentHealth = cardSelected.currentHealth;
         this.creatureType = cardSelected.creatureType;

@@ -59,6 +59,8 @@ public class CardInHand : MonoBehaviour
     public SpellSiegeData.travType traversableType;
     // Start is called before the first frame update
 
+    float discardPositiony;
+
     private void Awake()
     {
         UpdateMana();
@@ -183,10 +185,8 @@ public class CardInHand : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
     }
 
     internal void CheckToSeeIfPurchasable(PlayerResources resources)
@@ -308,5 +308,11 @@ public class CardInHand : MonoBehaviour
         {
             Destroy(visualVersion);
         }
+    }
+
+    internal void DiscardAnimation()
+    {
+        this.GetComponent<Collider>().enabled = false;
+        this.transform.parent = null;
     }
 }

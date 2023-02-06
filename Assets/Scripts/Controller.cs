@@ -1358,7 +1358,7 @@ public class Controller : NetworkBehaviour
         }
         if (cardsInHand.Count >= maxHandSize)
         {
-            return;
+            DiscardCard();
         }
         CardInHand cardAddingToHand = cardsInDeck[cardsInDeck.Count - 1]; //todo this might cause problems when dealing with shuffling cards back into the deck
 
@@ -1373,6 +1373,13 @@ public class Controller : NetworkBehaviour
         instantiatedCardInHandBehaviour.playerOwningCard = this;
         instantiatedCardInHandBehaviour.CheckToSeeIfPurchasable(resources);
     }
+
+    private void DiscardCard()
+    {
+        cardsInHand[0].DiscardAnimation();
+        RemoveCardFromHand(cardsInHand[0]);
+    }
+
     public void DrawCardWithIndex(int indexOfCard)
     {
         if (cardsInDeck.Count <= 0)
@@ -1403,6 +1410,7 @@ public class Controller : NetworkBehaviour
         {
             if (cardToRemove.cardType != SpellSiegeData.CardType.Creature)
             {
+                cardToRemove.DiscardAnimation();
                 cardToRemove.transform.parent = null;
             }
         }
