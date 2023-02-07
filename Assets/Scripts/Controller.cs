@@ -59,7 +59,7 @@ public class Controller : NetworkBehaviour
     protected Vector3Int placedCellPosition;
 
     public int turnTimer;
-    protected int turnThreshold = 1200; //todo make this 1200
+    protected int turnThreshold = 80; //todo make this 1200
     protected int maxHandSize = 7;
     [SerializeField] protected List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] protected List<CardInHand> demonDeck = new List<CardInHand>();

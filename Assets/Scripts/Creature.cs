@@ -1069,14 +1069,17 @@ public class Creature : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if (playerOwningCreature.ShowingPurchasableHarvestTiles)
+        if (playerOwningCreature.IsOwner)
         {
-            if (playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn))
+            if (playerOwningCreature.ShowingPurchasableHarvestTiles)
             {
-                if (!playerOwningCreature.harvestedTiles.Contains(tileCurrentlyOn))
+                if (playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn))
                 {
-                    OnMouseExit();
-                    return;
+                    if (!playerOwningCreature.harvestedTiles.Contains(tileCurrentlyOn))
+                    {
+                        OnMouseExit();
+                        return;
+                    }
                 }
             }
         }
