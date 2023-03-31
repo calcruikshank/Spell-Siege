@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6785383560820262615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6785383560820262612}
+  - component: {fileID: 6785383560820262613}
+  - component: {fileID: 6785383560820262610}
+  m_Layer: 0
+  m_Name: GameManager 1 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6785383560820262612
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6785383560820262615}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6785383560820262613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6785383560820262615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51bc68f72838c194bbab46894d4de355, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 8164691875682251412, guid: 90e69f4d79e06574f88d430fe6e8999f, type: 3}
+  aiPrefab: {fileID: 8164691875682251412, guid: f5cb831c405769046a46a01b0f1a2c11, type: 3}
+  state: 0
+  grid: {fileID: 0}
+  baseMap: {fileID: 0}
+  enviornmentMap: {fileID: 0}
+  waterTileMap: {fileID: 0}
+  highlightMap: {fileID: 0}
+  RenderInFrontMat: {fileID: 2100000, guid: 2603743ee5548ef42832d5fc889ac9ce, type: 2}
+  TransparentSharedMat: {fileID: 2100000, guid: 293ce87cad5790147a3a67a85abaef59, type: 2}
+  rangeIndicatorMat: {fileID: 2100000, guid: 556d2c1d83ba63b4fa76d7ac502a9a33, type: 2}
+  OpaqueSharedMat: {fileID: 2100000, guid: cf051fba995609b459f0eb4baf4bb478, type: 2}
+  castleTransform: {fileID: 93194238494730789, guid: 686d43d1302e4a447917903c2d11f2c0, type: 3}
+  highlightTile: {fileID: 11400000, guid: a2e0a1bfbd59d6c48a78b8ba9e1bcdeb, type: 2}
+  highlightForBaseTiles: {fileID: 7364862864276254007, guid: a2adf6b3bbb65c140902d935cae8621e, type: 3}
+  cardParent: {fileID: 208376561471265153, guid: 3e21a26925e157d43a8ffd858d07f429, type: 3}
+  canvasMain: {fileID: 0}
+  playerList: []
+  playersThatHavePlacedCastle: []
+  playersThatHaveBeenReceived: []
+  canAttackIcon: {fileID: 3734821113512360881, guid: c21725a1a919b5c44950c8f901794b66, type: 3}
+  mainCam: {fileID: 0}
+  allCreatureGuidCounter: 0
+  endingX: 0
+  endingY: 0
+  startingX: 0
+  startingY: 0
+  blueManaSymbol: {fileID: 7687682601667013928, guid: 1addac50b70c7b6449c80112a0b1b639, type: 3}
+  redManaSymbol: {fileID: 3860921828132964407, guid: c65969212036a704eb94a5e83bc7d6b2, type: 3}
+  greenManaSymbol: {fileID: 2834243347094383069, guid: c09b9a7a6e7359e4ca71a5231ea6c366, type: 3}
+  blackManaSymbol: {fileID: 6610081234085726886, guid: 80c2aef096354174e99f8ea5162d5328, type: 3}
+  whiteManaSymbol: {fileID: 937214673105440898, guid: e17214aa9c7a20b4793e8cfce0330d99, type: 3}
+  purchasableGlow: {fileID: 4796196056771451437, guid: 043a9a2fe7d15e240821ddbfd1acbbb4, type: 3}
+  damageText: {fileID: 8194793535069230839, guid: 879f3ce3394402541ac95e47df507c8f, type: 3}
+  onDeathEffect: {fileID: 6777932572600773468, guid: 47f46edf5b4392c48ad75011d064daed, type: 3}
+  RectCanvas: {fileID: 0}
+  scalableUICanvas: {fileID: 0}
+  healParticle: {fileID: 4007389156555894, guid: da7875cab77480d49972b42ca872af40, type: 3}
+--- !u!114 &6785383560820262610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6785383560820262615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1

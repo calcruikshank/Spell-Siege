@@ -74,22 +74,17 @@ public class GameManager : NetworkBehaviour
 
     void Start()
     {
-        if (!IsHost)
-        {
-            Debug.Log("Spawn players");
-            SpawnPlayersServerRpc();
-        }
         if (IsHost)
         {
+            SpawnPlayersServerRpc();
             if (NetworkManager.Singleton.ConnectedClientsIds.Count == 1)
             {
                 GameObject instantiatedAI = Instantiate(aiPrefab);
-                SpawnPlayersServerRpc();
             }
         }
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc]
     void SpawnPlayersServerRpc()
     {
         SpawnPlayersClientRpc();
@@ -99,6 +94,7 @@ public class GameManager : NetworkBehaviour
     {
         if (IsHost)
         {
+            Debug.Log(NetworkManager.Singleton.ConnectedClients.Count  + " count of players connected");
             for (int i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
             {
                 GameObject instantiatedObject = Instantiate(playerPrefab);

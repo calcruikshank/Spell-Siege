@@ -127,8 +127,16 @@ public class Controller : NetworkBehaviour
 
     }
     // Start is called before the first frame update
-    protected virtual  void Start()
+    protected virtual void Start()
     {
+        StartCoroutine(StartGameCoroutine());
+        
+
+    }
+
+    private IEnumerator StartGameCoroutine()
+    {
+        yield return new WaitUntil(() => GameManager.singleton != null);
         GrabAllObjectsFromGameManager();
 
 
@@ -169,8 +177,15 @@ public class Controller : NetworkBehaviour
             DeckSelectorInScene.singleton.AssignLocalPlayer(this);
             SpawnSelectionBox();
         }
+    }
+
+    IEnumerator GrabGameManager()
+    {
+
+        yield return new WaitUntil(() => GameManager.singleton != null);
 
     }
+
 
     private void LocalChooseDeckForPlayer(string selectedDeck)
     {
@@ -313,6 +328,10 @@ public class Controller : NetworkBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        if (GameManager.singleton == null || grid == null)
+        {
+            return;
+        }
         if (!IsOwner)
         {
             return;
@@ -564,6 +583,10 @@ public class Controller : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (GameManager.singleton == null)
+        {
+            return;
+        }
         switch (state)
         {
             case State.PlacingCastle:
