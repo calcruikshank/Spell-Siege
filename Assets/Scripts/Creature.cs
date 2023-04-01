@@ -149,6 +149,11 @@ public class Creature : MonoBehaviour
                 VisualMove();
                 break;
         }
+
+        if (canAttackIcon != null)
+        {
+            canAttackIcon.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z) ;
+        }
     }
     void FixedUpdate()
     {
@@ -355,7 +360,6 @@ public class Creature : MonoBehaviour
             {
                 VisualAttackAnimation(currentTargetedCreature);
                 canAttack = false;
-                canAttackIcon.gameObject.SetActive(false);
                 OnAttack();
             }
         }
@@ -365,7 +369,6 @@ public class Creature : MonoBehaviour
             {
                 VisualAttackAnimationOnStructure(currentTargetedStructure);
                 canAttack = false;
-                canAttackIcon.gameObject.SetActive(false);
                 OnAttack();
             }
         }
@@ -390,6 +393,8 @@ public class Creature : MonoBehaviour
             if (creatureToAttack != null)
             {
 
+                canAttackIcon.GetComponent<SpawnAnimatedSword>().SpawnSword(creatureToAttack.transform);
+                canAttackIcon.gameObject.SetActive(false);
                 Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .1f, this.transform.position.z), Quaternion.identity);
                 instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, CurrentAttack);
                 if (deathtouch)
@@ -421,6 +426,8 @@ public class Creature : MonoBehaviour
     {
         if (visualAttackParticle != null)
         {
+            canAttackIcon.GetComponent<SpawnAnimatedSword>().SpawnSword(structureToAttack.transform);
+            canAttackIcon.gameObject.SetActive(false);
             Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
             instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, CurrentAttack);
             if (range == 1)
@@ -772,10 +779,10 @@ public class Creature : MonoBehaviour
         OnETB();
         canAttack = true;
         canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon);
-        canAttackIcon.parent = transform;
+        //canAttackIcon.parent = transform;
         canAttackIcon.localScale = new Vector3(.4f, .4f, .4f);
-        canAttackIcon.localPosition = new Vector3(0, 1.6f, 0);
-        canAttackIcon.localEulerAngles = new Vector3(90, 90, 130);
+        canAttackIcon.position = new Vector3(0, 1.6f, 0);
+        canAttackIcon.localEulerAngles = new Vector3(0, -45, 0);
     }
 
     public void SetStateToIdle()
