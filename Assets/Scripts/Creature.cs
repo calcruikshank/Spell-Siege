@@ -1063,7 +1063,7 @@ public class Creature : MonoBehaviour
         originalCardTransform = Instantiate(cardSelected.transform, GameManager.singleton.scalableUICanvas.transform);
         originalCardTransform.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
         originalCardTransform.transform.localEulerAngles = Vector3.zero;
-        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 1f;
+        originalCardTransform.transform.localScale = originalCardTransform.transform.localScale * 2f;
 
         originalCardTransform.GetComponentInChildren<BoxCollider>().enabled = false;
         originalCardTransform.gameObject.SetActive(false);
@@ -1102,7 +1102,7 @@ public class Creature : MonoBehaviour
         }
         originalCardTransform.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
 
-        originalCardTransform.transform.localScale = Vector3.one * 100 / originalCardTransform.transform.position.z;
+        originalCardTransform.transform.localScale = Vector3.one * 200 / originalCardTransform.transform.position.z;
         originalCardTransform.gameObject.SetActive(true);
 
     }
