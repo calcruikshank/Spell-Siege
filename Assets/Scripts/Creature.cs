@@ -480,6 +480,7 @@ public class Creature : MonoBehaviour
         rangeLrGO.SetActive(false);
         OnDeath();
         GameManager.singleton.CreatureDied(this.creatureID);
+        canAttackIcon.gameObject.SetActive(false);
         Destroy(this.gameObject);
     }
 

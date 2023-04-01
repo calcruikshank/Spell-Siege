@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class DestroyAfter2Seconds : MonoBehaviour
 {
-    [SerializeField] float timeToDestory = .2f;
+    float timeToDestory = .1f;
     float timer = 0;
 
     Transform targetTransform;
