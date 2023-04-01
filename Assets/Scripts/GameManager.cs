@@ -79,7 +79,7 @@ public class GameManager : NetworkBehaviour
             SpawnPlayersServerRpc();
             if (NetworkManager.Singleton.ConnectedClientsIds.Count == 1)
             {
-                GameObject instantiatedAI = Instantiate(aiPrefab);
+                //GameObject instantiatedAI = Instantiate(aiPrefab);
             }
         }
     }

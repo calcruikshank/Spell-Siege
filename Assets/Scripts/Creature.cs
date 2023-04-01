@@ -16,6 +16,8 @@ public class Creature : MonoBehaviour
     [SerializeField] float UsageRate = 1f; // the rate at which the minion can use abilities/ attack 
 
 
+    [SerializeField] Transform highlightForCreatureSelected;
+
     [SerializeField] public float Attack;
     public float CurrentAttack;
     float AttackRate = 4;
@@ -535,6 +537,7 @@ public class Creature : MonoBehaviour
 
     public void LocalGiveCounter(int numOfCounters)
     {
+        Debug.Log("Giving counter");
         if (this != null && this.transform != null)
         {
             MaxHealth += numOfCounters;
@@ -976,6 +979,7 @@ public class Creature : MonoBehaviour
         SetNewPositionsForRangeLr(rangePositions);
     }
 
+
     public bool lifelink = false;
     public bool deathtouch = false;
     public bool taunt = false;
@@ -1101,6 +1105,15 @@ public class Creature : MonoBehaviour
         originalCardTransform.transform.localScale = Vector3.one * 100 / originalCardTransform.transform.position.z;
         originalCardTransform.gameObject.SetActive(true);
 
+    }
+
+    internal void VisuallySelect()
+    {
+        highlightForCreatureSelected.gameObject.SetActive(true);
+    }
+    internal void VisuallyDeSelect()
+    {
+        highlightForCreatureSelected.gameObject.SetActive(false);
     }
 
     private void OnMouseExit()

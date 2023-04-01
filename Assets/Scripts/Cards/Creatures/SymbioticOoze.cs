@@ -9,7 +9,7 @@ public class SymbioticOoze : Creature
         base.OtherCreatureEntered(creatureThatETB);
         if (this != null)
         {
-            if (creatureThatETB.playerOwningCreature == this.playerOwningCreature)
+            if (creatureThatETB.playerOwningCreature == this.playerOwningCreature && creatureThatETB != this)
             {
                 GiveCounter(1);
             }

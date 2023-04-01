@@ -388,8 +388,6 @@ public class Controller : NetworkBehaviour
             {
                 SetVisualsToNothingSelectedLocally();
                 RightClickServerRpc();
-
-
             }
         }
         if (Input.GetMouseButtonUp(0))
@@ -541,7 +539,10 @@ public class Controller : NetworkBehaviour
     }
 
 
+    void ClearBoxSelection()
+    {
 
+    }
 
 
 
@@ -561,7 +562,9 @@ public class Controller : NetworkBehaviour
         }
         if (locallySelectedCreature != null)
         {
+            locallySelectedCreature.VisuallyDeSelect();
             locallySelectedCreature.HidePathfinderLR();
+
             locallySelectedCreature = null;
         }
 
@@ -715,6 +718,7 @@ public class Controller : NetworkBehaviour
             }
             for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
             {
+                selectedCreaturesWithBox[i].VisuallySelect();
                 HandleCreatureOnBoardSelected(positionSent, selectedCreaturesWithBox[i].actualPosition, selectedCreaturesWithBox[i]);
             }
             SetStateToNothingSelected();
@@ -896,9 +900,11 @@ public class Controller : NetworkBehaviour
             if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null)
             {
                 SetVisualsToNothingSelectedLocally();
+                SetStateToNothingSelected();
                 if (raycastHitCardInHand.transform.GetComponent<CardInHand>().isPurchasable)
                 {
                     SetVisualsToNothingSelectedLocally();
+                    //todo
                     locallySelectedCardInHandToTurnOff = raycastHitCardInHand.transform.GetComponent<CardInHand>();
                     locallySelectedCardInHandToTurnOff.TurnOffVisualCard();
                     locallySelectedCard = Instantiate(locallySelectedCardInHandToTurnOff.gameObject, canvasMain.transform).GetComponent<CardInHand>();
@@ -939,7 +945,6 @@ public class Controller : NetworkBehaviour
                 if (locallySelectedCreature != null)
                 {
                     TargetACreature(raycastHitCreatureOnBoard.transform.GetComponent<Creature>(), locallySelectedCreature);
-                    SetStateToNothingSelected();
                     return true;
                 }
             }
@@ -1009,6 +1014,7 @@ public class Controller : NetworkBehaviour
     private void VisualPathfinderOnCreatureSelected(Creature creature)
     {
         if (creaturePathLockedIn) return;
+        creature.VisuallySelect();
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType == SpellSiegeData.traversableType.Untraversable || creature.thisTraversableType == SpellSiegeData.travType.Walking && BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType != SpellSiegeData.traversableType.TraversableByAll)
         {
             creature.HidePathfinderLR();
@@ -1110,7 +1116,12 @@ public class Controller : NetworkBehaviour
                 }
             }
         }
-        locallySelectedCreature = null;
+        creatureSelectedSent.VisuallyDeSelect();
+        if (locallySelectedCreature != null)
+        {
+            locallySelectedCreature.VisuallyDeSelect();
+            locallySelectedCreature = null;
+        }
     }
 
 
@@ -1381,7 +1392,8 @@ public class Controller : NetworkBehaviour
         }
         if (cardsInHand.Count >= maxHandSize)
         {
-            DiscardCard();
+            return;
+            //DiscardCard();
         }
         CardInHand cardAddingToHand = cardsInDeck[cardsInDeck.Count - 1]; //todo this might cause problems when dealing with shuffling cards back into the deck
 
@@ -1468,9 +1480,22 @@ public class Controller : NetworkBehaviour
     {
         if (locallySelectedCard != null)
         {
+            locallySelectedCard = null;
+            //SetVisualsToNothingSelectedLocally();
+        }
+        if (locallySelectedCreature != null)
+        {
+            locallySelectedCreature.VisuallyDeSelect();
+            locallySelectedCreature = null;
             //SetVisualsToNothingSelectedLocally();
         }
         cardSelected = null;
+
+        foreach (Creature c in selectedCreaturesWithBox)
+        {
+            c.HidePathfinderLR();
+            c.VisuallyDeSelect();
+        }
         selectedCreaturesWithBox.Clear();
         state = State.NothingSelected;
     }
