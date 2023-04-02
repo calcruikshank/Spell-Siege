@@ -59,7 +59,7 @@ public class Controller : NetworkBehaviour
     protected Vector3Int placedCellPosition;
 
     public int turnTimer;
-    protected int turnThreshold = 80; //todo make this 1200
+    protected int turnThreshold = 1400; //todo make this 1400
     protected int maxHandSize = 10;
     [SerializeField] protected List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] protected List<CardInHand> demonDeck = new List<CardInHand>();
@@ -1184,8 +1184,8 @@ public class Controller : NetworkBehaviour
                     SetOwningTile(cellSent);
 
                     SpendManaToCast(cardSelected.GetComponent<CardInHand>());
-                    GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-                    instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
+                    //GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+                    //instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
 
                     foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
                     {

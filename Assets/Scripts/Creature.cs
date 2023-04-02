@@ -779,11 +779,12 @@ public class Creature : MonoBehaviour
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
         OnETB();
         canAttack = true;
-        canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon);
+        canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon, this.transform.position, Quaternion.identity);
         //canAttackIcon.parent = transform;
         canAttackIcon.localScale = new Vector3(.4f, .4f, .4f);
         canAttackIcon.position = new Vector3(0, 1.6f, 0);
         canAttackIcon.localEulerAngles = new Vector3(0, -45, 0);
+        canAttackIcon.gameObject.SetActive(true);
     }
 
     public void SetStateToIdle()
