@@ -23,6 +23,11 @@ public class FlyingCreature : Creature
                 HandleFlyingAnimation();
                 break;
         }
+
+        if (canAttackIcon != null)
+        {
+            canAttackIcon.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z);
+        }
     }
 
     void HandleFlyingAnimation()

@@ -22,13 +22,15 @@ public struct SpellSiegeData
         Dissolve,
         LightningStrike,
         MeteorStrike,
-        Factory,
         OvercommitedCleric,
         DragonWhisperer,
         Archer,
         ArcanePortal,
         LeylineOfTheHarvest,
         CaptainOfTheGuard,
+        Harvest,
+        NaturalGrowth,
+        Bear,
         NumOfCardTypes
     }
 
@@ -71,7 +73,8 @@ public struct SpellSiegeData
         Human,
         Angel,
         Wizard,
-        Demon
+        Demon,
+        Beast
 
         //not sure if i need a tapped state yet trying to keep it as simple as possible
     }

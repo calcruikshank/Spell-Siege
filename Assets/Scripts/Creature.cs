@@ -779,11 +779,12 @@ public class Creature : MonoBehaviour
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
         OnETB();
         canAttack = true;
-        canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon);
+        canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon, this.transform.position, Quaternion.identity);
         //canAttackIcon.parent = transform;
         canAttackIcon.localScale = new Vector3(.4f, .4f, .4f);
         canAttackIcon.position = new Vector3(0, 1.6f, 0);
         canAttackIcon.localEulerAngles = new Vector3(0, -45, 0);
+        canAttackIcon.gameObject.SetActive(true);
     }
 
     public void SetStateToIdle()
@@ -1081,20 +1082,6 @@ public class Creature : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if (playerOwningCreature.IsOwner)
-        {
-            if (playerOwningCreature.ShowingPurchasableHarvestTiles)
-            {
-                if (playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn))
-                {
-                    if (!playerOwningCreature.harvestedTiles.Contains(tileCurrentlyOn))
-                    {
-                        OnMouseExit();
-                        return;
-                    }
-                }
-            }
-        }
         rangeLr.enabled = true;
         if (playerOwningCreature.locallySelectedCard != null)
         {
@@ -1102,11 +1089,6 @@ public class Creature : MonoBehaviour
             {
                 playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
             }
-        }
-        if (playerOwningCreature.ShowingPurchasableHarvestTiles && playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn) && !tileCurrentlyOn.isBeingHarvested)
-        {
-            originalCardTransform.gameObject.SetActive(false);
-            return;
         }
         originalCardTransform.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
 

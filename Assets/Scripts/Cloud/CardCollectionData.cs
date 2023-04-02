@@ -11,7 +11,7 @@ public class CardCollectionData : MonoBehaviour
     // Start is called before the first frame update
 
     public Deck[] decks;
-    private async void Awake()
+    private void Awake()
     {
         if (singleton != null)
         {
@@ -241,9 +241,10 @@ public class CardCollectionData : MonoBehaviour
     [SerializeField] List<CardInHand> allCardsInGame = new List<CardInHand>();
     public CardInHand GetCardAssociatedWithType(SpellSiegeData.Cards cardGrabbed)
     {
+        Debug.Log(cardGrabbed);
         CardInHand selectedObject;
 
-        selectedObject = allCardsInGame.FirstOrDefault(s => s.cardAssignedToObject == cardGrabbed);
+        selectedObject = allCardsInGame.First(s => s.cardAssignedToObject == cardGrabbed);
 
         if (selectedObject == null)
         {

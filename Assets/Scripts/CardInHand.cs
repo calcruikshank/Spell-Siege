@@ -189,8 +189,16 @@ public class CardInHand : MonoBehaviour
     {
     }
 
-    internal void CheckToSeeIfPurchasable(PlayerResources resources)
+    public virtual void CheckToSeeIfPurchasable(PlayerResources resources)
     {
+        if (this.cardAssignedToObject == SpellSiegeData.Cards.Harvest)
+        {
+            if (playerOwningCard.numberOfLandsPlayedThisTurn >= playerOwningCard.numberOfLandsYouCanPlayThisTurn)
+            {
+                SetToNotPurchasable();
+                return;
+            }
+        }
         if (purchasableGlow == null)
         {
             purchasableGlow = Instantiate(GameManager.singleton.purchasableGlow, this.transform);
@@ -245,6 +253,7 @@ public class CardInHand : MonoBehaviour
             SetToNotPurchasable();
             return;
         }
+
         SetToPurchasable();
 
         /*remainingMana = tempBlueMana + tempRedMana + tempGreenMana + tempWhiteMana + tempBlackMana;

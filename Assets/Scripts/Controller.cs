@@ -59,8 +59,8 @@ public class Controller : NetworkBehaviour
     protected Vector3Int placedCellPosition;
 
     public int turnTimer;
-    protected int turnThreshold = 80; //todo make this 1200
-    protected int maxHandSize = 7;
+    protected int turnThreshold = 1400; //todo make this 1400
+    protected int maxHandSize = 10;
     [SerializeField] protected List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] protected List<CardInHand> demonDeck = new List<CardInHand>();
     public List<CardInHand> cardsInDeck = new List<CardInHand>();
@@ -100,8 +100,8 @@ public class Controller : NetworkBehaviour
 
     public bool creaturePathLockedIn = false;
 
-
-    protected bool canPurchaseHarvestTile = false;
+    public int numberOfLandsYouCanPlayThisTurn = 1;
+    public int numberOfLandsPlayedThisTurn = 0;
 
     [SerializeField] protected Color[] colorsToPickFrom;
 
@@ -130,7 +130,7 @@ public class Controller : NetworkBehaviour
     protected virtual void Start()
     {
         StartCoroutine(StartGameCoroutine());
-        
+
 
     }
 
@@ -227,7 +227,7 @@ public class Controller : NetworkBehaviour
         {
             instantiatedPlayerUI.gameObject.SetActive(true);
         }
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 7; i++)
         {
             DrawCard();
         }
@@ -272,7 +272,6 @@ public class Controller : NetworkBehaviour
 
     public virtual void StartTurnPhase()
     {
-        HandleHarvestTiles();
         switch (state)
         {
             case State.PlacingCastle:
@@ -300,30 +299,6 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    protected virtual void HandleHarvestTiles()
-    {
-
-        if (canPurchaseHarvestTile == true)
-        {
-
-        }
-        canPurchaseHarvestTile = true;
-
-        if (IsOwner)
-        {
-            if (locallySelectedCard == null)
-            {
-                ShowHarvestedTiles();
-                foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
-                {
-                    if (ShowingPurchasableHarvestTiles)
-                    {
-                        ShowHarvestedTiles();
-                    }
-                }
-            }
-        }
-    }
 
     // Update is called once per frame
     protected virtual void Update()
@@ -345,10 +320,6 @@ public class Controller : NetworkBehaviour
             highlightMap.SetTile(previousCellPosition, null);
             highlightMap.SetTile(currentLocalHoverCellPosition, highlightTile);
 
-
-            BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).OnMouseEnterTile();
-
-            BaseMapTileState.singleton.GetBaseTileAtCellPosition(previousCellPosition).OnMouseExitTile();
             previousCellPosition = currentLocalHoverCellPosition;
 
             if (locallySelectedCreature != null && !creaturePathLockedIn)
@@ -441,17 +412,6 @@ public class Controller : NetworkBehaviour
                 {
 
                     AddToTickQueueLocal(cellPositionSentToClients);
-                }
-            }
-            if (state == State.NothingSelected)
-            {
-                if (ShowingPurchasableHarvestTiles)
-                {
-                    if (CheckToSeeIfClickedHarvestTileCanBePurchased(cellPositionSentToClients))
-                    {
-                        canPurchaseHarvestTile = false;
-                        AddToPuchaseTileQueueLocal(cellPositionSentToClients);
-                    }
                 }
             }
 
@@ -609,37 +569,6 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    public bool ShowingPurchasableHarvestTiles = false;
-
-
-
-    private void ShowHarvestedTiles()
-    {
-        foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
-        {
-            if (harvestedTiles.Contains(bt.Value) || canPurchaseHarvestTile)
-            {
-                bt.Value.ShowHarvestIcon();
-            }
-            if (!harvestedTiles.Contains(bt.Value) && canPurchaseHarvestTile)
-            {
-                bt.Value.HighlightTile();
-                highlightedTiles.Add(bt.Value);
-            }
-        }
-        ShowingPurchasableHarvestTiles = true;
-    }
-
-    private void HideHarvestedTiles()
-    {
-        foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
-        {
-            bt.Value.HideHarvestIcon();
-            bt.Value.UnHighlightTile();
-        }
-        highlightedTiles.Clear();
-        ShowingPurchasableHarvestTiles = false;
-    }
 
     private void HandleTurn()
     {
@@ -679,24 +608,12 @@ public class Controller : NetworkBehaviour
 
     protected void HandleMana()
     {
+        numberOfLandsYouCanPlayThisTurn = 1;
+        numberOfLandsPlayedThisTurn = 0;
         ClearMana();
         AddToMana();
     }
 
-    private bool CheckToSeeIfClickedHarvestTileCanBePurchased(Vector3Int tilePositionSent)
-    {
-        if (!harvestedTiles.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent)))
-        {
-            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent))
-            {
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent).playerOwningTile == this && canPurchaseHarvestTile)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     void AddToTickQueueLocal(Vector3Int positionSent)
     {
@@ -747,11 +664,6 @@ public class Controller : NetworkBehaviour
         LeftClickBaseMapServerRpc(positionSent);
     }
 
-
-    private void AddToPuchaseTileQueueLocal(Vector3Int cellPositionSentToClients)
-    {
-        SelectTileToPurchaseServerRpc(cellPositionSentToClients);
-    }
     void AddIndexOfCardInHandToTickQueueLocal(int index)
     {
         SelectCardInHandServerRpc(index);
@@ -761,20 +673,6 @@ public class Controller : NetworkBehaviour
         SelectCreatureOnBoardServerRpc(index);
     }
 
-    protected void PurchaseHarvestTile(Vector3Int vector3Int)
-    {
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).isBeingHarvested)
-        {
-            return;
-        }
-
-        canPurchaseHarvestTile = false;
-        AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int));
-
-
-        HideHarvestedTiles();
-        //IncreaseCostOfHarvestTiles();
-    }
 
 
     void LocalLeftClick(Vector3Int positionSent)
@@ -855,13 +753,14 @@ public class Controller : NetworkBehaviour
             resources.redManaCap++;
             resources.redMana++;
         }
-
         if (!harvestedTiles.Contains(baseTileSent))
         {
             harvestedTiles.Add(baseTileSent);
             baseTileSent.SetBeingHarvested();
         }
-
+        baseTileSent.ShowHarvestIcon();
+        baseTileSent.HighlightTile();
+        numberOfLandsPlayedThisTurn++;
 
         resourcesChanged.Invoke(resources);
     }
@@ -873,28 +772,7 @@ public class Controller : NetworkBehaviour
     bool CheckForRaycast()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit raycastHitKeep, Mathf.Infinity))
-        {
-            if (raycastHitKeep.transform.GetComponent<PlayerKeep>() != null)
-            {
-                if (raycastHitKeep.transform.GetComponent<PlayerKeep>().playerOwningStructure == this)
-                {
-                    if (locallySelectedCard == null || locallySelectedCard.cardType != SpellSiegeData.CardType.Spell)
-                    {
-                        if (!ShowingPurchasableHarvestTiles)
-                        {
-                            ShowHarvestedTiles();
-                            return true;
-                        }
-                        if (ShowingPurchasableHarvestTiles)
-                        {
-                            HideHarvestedTiles();
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
+        
         if (Physics.Raycast(ray, out RaycastHit raycastHitCardInHand, Mathf.Infinity))
         {
             if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null)
@@ -917,10 +795,6 @@ public class Controller : NetworkBehaviour
                 }
             }
         }
-        if (ShowingPurchasableHarvestTiles && CheckToSeeIfClickedHarvestTileCanBePurchased(currentLocalHoverCellPosition))
-        {
-            return false;
-        }
         if (Physics.Raycast(ray, out RaycastHit raycastHitCreatureOnBoard, Mathf.Infinity, creatureMask))
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
@@ -936,10 +810,13 @@ public class Controller : NetworkBehaviour
                 if (state == State.SpellInHandSelected || state == State.StructureInHandSeleced)
                 {
                     SetVisualsToNothingSelectedLocally();
-                    if (cardSelected.GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
+                    if (cardSelected.GameObjectToInstantiate != null)
                     {
-                        AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
-                        return true;
+                        if (cardSelected.GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
+                        {
+                            AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
+                            return true;
+                        }
                     }
                 }
                 if (locallySelectedCreature != null)
@@ -955,7 +832,6 @@ public class Controller : NetworkBehaviour
     List<BaseTile> highlightedTiles = new List<BaseTile>();
     private void ShowViablePlacableTiles(CardInHand locallySelectedCardInHandToTurnOff)
     {
-        HideHarvestedTiles();
         if (locallySelectedCardInHandToTurnOff.cardType == SpellSiegeData.CardType.Creature)
         {
             foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
@@ -968,16 +844,27 @@ public class Controller : NetworkBehaviour
         {
             foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
             {
-                foreach (BaseTile neighbor in kvp.Value.neighborTiles)
+                if (!harvestedTiles.Contains(kvp.Value))
                 {
-                    if (!tilesOwned.ContainsValue(neighbor))
-                    {
-                        neighbor.HighlightTile();
-                        highlightedTiles.Add(neighbor);
-                    }
+                    kvp.Value.HighlightTile();
+                    highlightedTiles.Add(kvp.Value);
                 }
             }
         }
+        /*
+    if (locallySelectedCardInHandToTurnOff.cardType == SpellSiegeData.CardType.Structure)
+    {
+        foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
+        {
+            foreach (BaseTile neighbor in kvp.Value.neighborTiles)
+            {
+                if (!tilesOwned.ContainsValue(neighbor))
+                {
+                    neighbor.HighlightTile();
+                    highlightedTiles.Add(neighbor);
+                }
+            }
+        }*/
         if (locallySelectedCardInHandToTurnOff.cardType == SpellSiegeData.CardType.Spell)
         {
             if (locallySelectedCardInHandToTurnOff.GameObjectToInstantiate.GetComponent<Spell>() != null)
@@ -1065,7 +952,7 @@ public class Controller : NetworkBehaviour
     }
     void HandleCreatureOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent, Creature creatureSelected)
     {
-       
+
         MoveCreatureServerRpc(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
         MoveCreatureLocally(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
     }
@@ -1279,50 +1166,43 @@ public class Controller : NetworkBehaviour
         }
         if (cardSelected != null)
         {
-            foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
+            if (!harvestedTiles.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)) && tilesOwned.ContainsValue(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
             {
-                if (cardSelected != null)
+                Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+                if (environmentMap.GetInstantiatedObject(cellSent))
                 {
-                    if (kvp.Value.neighborTiles.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
+                    GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
+                    if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
                     {
-                        if (!tilesOwned.ContainsValue(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
-                        {
-                            Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
-                            if (environmentMap.GetInstantiatedObject(cellSent))
-                            {
-                                GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
-                                if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
-                                {
-                                    instantiatedObject.AddComponent<ChangeTransparency>();
-                                }
-                                ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
-                                instantiatedObjectsChangeTransparency.ChangeTransparent(100);
-
-                                Destroy(instantiatedObject);
-                            }
-
-                            SetOwningTile(cellSent);
-
-                            SpendManaToCast(cardSelected.GetComponent<CardInHand>()); //she works out too much 
-                            GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-                            instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
-
-                            foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
-                            {
-                                SetOwningTile(bt.tilePosition);
-                            }
-                            AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
-                            RemoveCardFromHand(cardSelected);
-                            SetVisualsToNothingSelectedLocally();
-                            SetStateToNothingSelected();
-                            return;
-                        }
+                        instantiatedObject.AddComponent<ChangeTransparency>();
                     }
+                    ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
+                    instantiatedObjectsChangeTransparency.ChangeTransparent(100);
+
+                    Destroy(instantiatedObject);
                 }
+
+                SetOwningTile(cellSent);
+
+                SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+                //GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+                //instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
+
+                foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
+                {
+                    SetOwningTile(bt.tilePosition);
+                }
+                AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
+                RemoveCardFromHand(cardSelected);
+                SetVisualsToNothingSelectedLocally();
+                SetStateToNothingSelected();
+                return;
             }
         }
 
     }
+
+
 
     protected void SpendManaToCast(CardInHand cardSelectedSent)
     {
@@ -1572,19 +1452,25 @@ public class Controller : NetworkBehaviour
         resourcesChanged.Invoke(resources);
     }
     int totalMana;
-    protected virtual void UpdateHudForResourcesChanged(PlayerResources resources)
+    public virtual void UpdateHudForResourcesChanged(PlayerResources resources)
     {
         if (IsOwner)
         {
             hudElements.UpdateHudElements(resources);
         }
+        CheckAffordableCards();
+        totalMana = resources.blackMana + resources.blueMana + resources.whiteMana + resources.greenMana + resources.redMana;
+    }
+
+
+    public void CheckAffordableCards()
+    {
+
         foreach (CardInHand cardInHand in cardsInHand)
         {
             cardInHand.CheckToSeeIfPurchasable(resources);
         }
-        totalMana = resources.blackMana + resources.blueMana + resources.whiteMana + resources.greenMana + resources.redMana;
     }
-
 
 
 
@@ -1741,16 +1627,6 @@ public class Controller : NetworkBehaviour
     private void LeftClickBaseMapClientRpc(Vector3Int positionSent)
     {
         LocalLeftClick(positionSent);
-    }
-    [ServerRpc]
-    private void SelectTileToPurchaseServerRpc(Vector3Int positionSent)
-    {
-        SelectTileToPurchaseClientRpc(positionSent);
-    }
-    [ClientRpc]
-    private void SelectTileToPurchaseClientRpc(Vector3Int positionSent)
-    {
-        PurchaseHarvestTile(positionSent);
     }
     [ServerRpc]
     private void SelectCreatureOnBoardServerRpc(int creatureIDSent)
