@@ -173,7 +173,6 @@ public class AI : Controller
     }
     public override void StartTurnPhase()
     {
-        HandleHarvestTiles();
         switch (state)
         {
             case State.PlacingCastle:
@@ -200,14 +199,6 @@ public class AI : Controller
                 break;
         }
     }
-    protected override void HandleHarvestTiles()
-    {
-        canPurchaseHarvestTile = true;
-        if (canPurchaseHarvestTile)
-        {
-            BuyRandomHarvestTile();
-        }
-    }
 
     void BuyRandomHarvestTile()
     {
@@ -215,7 +206,7 @@ public class AI : Controller
         {
             if (!harvestedTiles.Contains(bt.Value))
             {
-                PurchaseHarvestTile(bt.Key);
+                //PurchaseHarvestTile(bt.Key);
                 break;
             }
         }

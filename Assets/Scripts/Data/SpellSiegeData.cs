@@ -22,13 +22,13 @@ public struct SpellSiegeData
         Dissolve,
         LightningStrike,
         MeteorStrike,
-        Factory,
         OvercommitedCleric,
         DragonWhisperer,
         Archer,
         ArcanePortal,
         LeylineOfTheHarvest,
         CaptainOfTheGuard,
+        Harvest,
         NumOfCardTypes
     }
 

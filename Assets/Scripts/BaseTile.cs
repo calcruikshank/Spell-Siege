@@ -346,9 +346,9 @@ public class BaseTile : MonoBehaviour
         }
     }
 
-
+    
     float highlightMultiplierForManaSymbol = 1;
-    public void OnMouseEnterTile()
+    /*public void OnMouseEnterTile()
     {
         if (playerOwningTile != null)
         {
@@ -367,5 +367,5 @@ public class BaseTile : MonoBehaviour
         {
             highlightMultiplierForManaSymbol = 1f;
         }
-    }
+    }*/
 }

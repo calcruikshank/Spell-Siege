@@ -1081,20 +1081,6 @@ public class Creature : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if (playerOwningCreature.IsOwner)
-        {
-            if (playerOwningCreature.ShowingPurchasableHarvestTiles)
-            {
-                if (playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn))
-                {
-                    if (!playerOwningCreature.harvestedTiles.Contains(tileCurrentlyOn))
-                    {
-                        OnMouseExit();
-                        return;
-                    }
-                }
-            }
-        }
         rangeLr.enabled = true;
         if (playerOwningCreature.locallySelectedCard != null)
         {
@@ -1102,11 +1088,6 @@ public class Creature : MonoBehaviour
             {
                 playerOwningCreature.locallySelectedCard.gameObject.SetActive(false);
             }
-        }
-        if (playerOwningCreature.ShowingPurchasableHarvestTiles && playerOwningCreature.tilesOwned.ContainsValue(tileCurrentlyOn) && !tileCurrentlyOn.isBeingHarvested)
-        {
-            originalCardTransform.gameObject.SetActive(false);
-            return;
         }
         originalCardTransform.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
 

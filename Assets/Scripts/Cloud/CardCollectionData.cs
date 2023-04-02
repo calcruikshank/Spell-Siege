@@ -11,7 +11,7 @@ public class CardCollectionData : MonoBehaviour
     // Start is called before the first frame update
 
     public Deck[] decks;
-    private async void Awake()
+    private void Awake()
     {
         if (singleton != null)
         {
