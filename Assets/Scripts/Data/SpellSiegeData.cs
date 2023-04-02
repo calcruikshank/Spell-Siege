@@ -29,6 +29,7 @@ public struct SpellSiegeData
         LeylineOfTheHarvest,
         CaptainOfTheGuard,
         Harvest,
+        NaturalGrowth,
         NumOfCardTypes
     }
 

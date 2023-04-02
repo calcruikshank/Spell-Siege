@@ -100,7 +100,8 @@ public class Controller : NetworkBehaviour
 
     public bool creaturePathLockedIn = false;
 
-    protected bool canPlayLand = true;
+    public int numberOfLandsYouCanPlayThisTurn = 1;
+    public int numberOfLandsPlayedThisTurn = 0;
 
     [SerializeField] protected Color[] colorsToPickFrom;
 
@@ -607,6 +608,8 @@ public class Controller : NetworkBehaviour
 
     protected void HandleMana()
     {
+        numberOfLandsYouCanPlayThisTurn = 1;
+        numberOfLandsPlayedThisTurn = 0;
         ClearMana();
         AddToMana();
     }
@@ -757,6 +760,8 @@ public class Controller : NetworkBehaviour
         }
         baseTileSent.ShowHarvestIcon();
         baseTileSent.HighlightTile();
+        numberOfLandsPlayedThisTurn++;
+
         resourcesChanged.Invoke(resources);
     }
 
@@ -805,10 +810,13 @@ public class Controller : NetworkBehaviour
                 if (state == State.SpellInHandSelected || state == State.StructureInHandSeleced)
                 {
                     SetVisualsToNothingSelectedLocally();
-                    if (cardSelected.GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
+                    if (cardSelected.GameObjectToInstantiate != null)
                     {
-                        AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
-                        return true;
+                        if (cardSelected.GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
+                        {
+                            AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
+                            return true;
+                        }
                     }
                 }
                 if (locallySelectedCreature != null)
@@ -1158,45 +1166,37 @@ public class Controller : NetworkBehaviour
         }
         if (cardSelected != null)
         {
-            foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
+            if (!harvestedTiles.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)) && tilesOwned.ContainsValue(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent)))
             {
-                if (cardSelected != null)
+                Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+                if (environmentMap.GetInstantiatedObject(cellSent))
                 {
-                    if (!harvestedTiles.Contains(kvp.Value))
+                    GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
+                    if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
                     {
-                        kvp.Value.HighlightTile();
-                        highlightedTiles.Add(kvp.Value);
+                        instantiatedObject.AddComponent<ChangeTransparency>();
                     }
-                    Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
-                    if (environmentMap.GetInstantiatedObject(cellSent))
-                    {
-                        GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
-                        if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
-                        {
-                            instantiatedObject.AddComponent<ChangeTransparency>();
-                        }
-                        ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
-                        instantiatedObjectsChangeTransparency.ChangeTransparent(100);
+                    ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
+                    instantiatedObjectsChangeTransparency.ChangeTransparent(100);
 
-                        Destroy(instantiatedObject);
-                    }
-
-                    SetOwningTile(cellSent);
-
-                    SpendManaToCast(cardSelected.GetComponent<CardInHand>());
-                    //GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-                    //instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
-
-                    foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
-                    {
-                        SetOwningTile(bt.tilePosition);
-                    }
-                    AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
-                    RemoveCardFromHand(cardSelected);
-                    SetVisualsToNothingSelectedLocally();
-                    SetStateToNothingSelected();
-                    return;
+                    Destroy(instantiatedObject);
                 }
+
+                SetOwningTile(cellSent);
+
+                SpendManaToCast(cardSelected.GetComponent<CardInHand>());
+                //GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
+                //instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
+
+                foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
+                {
+                    SetOwningTile(bt.tilePosition);
+                }
+                AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent));
+                RemoveCardFromHand(cardSelected);
+                SetVisualsToNothingSelectedLocally();
+                SetStateToNothingSelected();
+                return;
             }
         }
 
@@ -1452,19 +1452,25 @@ public class Controller : NetworkBehaviour
         resourcesChanged.Invoke(resources);
     }
     int totalMana;
-    protected virtual void UpdateHudForResourcesChanged(PlayerResources resources)
+    public virtual void UpdateHudForResourcesChanged(PlayerResources resources)
     {
         if (IsOwner)
         {
             hudElements.UpdateHudElements(resources);
         }
+        CheckAffordableCards();
+        totalMana = resources.blackMana + resources.blueMana + resources.whiteMana + resources.greenMana + resources.redMana;
+    }
+
+
+    public void CheckAffordableCards()
+    {
+
         foreach (CardInHand cardInHand in cardsInHand)
         {
             cardInHand.CheckToSeeIfPurchasable(resources);
         }
-        totalMana = resources.blackMana + resources.blueMana + resources.whiteMana + resources.greenMana + resources.redMana;
     }
-
 
 
 
