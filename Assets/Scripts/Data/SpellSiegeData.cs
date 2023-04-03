@@ -31,6 +31,7 @@ public struct SpellSiegeData
         Harvest,
         NaturalGrowth,
         Bear,
+        BottomFeeder,
         NumOfCardTypes
     }
 
