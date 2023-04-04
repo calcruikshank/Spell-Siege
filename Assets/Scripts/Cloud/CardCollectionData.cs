@@ -244,11 +244,11 @@ public class CardCollectionData : MonoBehaviour
         Debug.Log(cardGrabbed);
         CardInHand selectedObject;
 
-        selectedObject = allCardsInGame.First(s => s.cardAssignedToObject == cardGrabbed);
+        selectedObject = allCardsInGame.FirstOrDefault(s => s.cardAssignedToObject == cardGrabbed);
 
         if (selectedObject == null)
         {
-            //Debug.LogError("Could not find prefab associated with -> " + buildingType + " defaulting to 0"); 
+            Debug.LogError("Could not find prefab associated with -> " + cardGrabbed + " defaulting to 0"); 
             //TODO when we have enough building prefabs created we can uncomment this to figure out what we're missing
             selectedObject = allCardsInGame[0];
         }

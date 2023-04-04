@@ -546,7 +546,7 @@ GameObject:
   - component: {fileID: 6239865746917987992}
   - component: {fileID: 6239865746917987999}
   - component: {fileID: 6239865746917987998}
-  - component: {fileID: 952679022429820367}
+  - component: {fileID: 5536155771228290309}
   m_Layer: 6
   m_Name: Thenas
   m_TagString: Untagged
@@ -646,7 +646,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &952679022429820367
+--- !u!114 &5536155771228290309
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -655,17 +655,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 6239865746917987997}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71993d2be2273814f99ef1f5bd7a6b48, type: 3}
+  m_Script: {fileID: 11500000, guid: d998393e6c2d38649aa53f1d2720f7ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
-  range: 3
+  range: 1
   UsageRate: 1
   highlightForCreatureSelected: {fileID: 393357177330383385}
-  Attack: 1
+  Attack: 0
   CurrentAttack: 0
   CurrentHealth: 0
-  MaxHealth: 1
+  MaxHealth: 0
   attackText: {fileID: 3298186682565764544}
   healthText: {fileID: 7534283529393728702}
   numOfTargetables: 1
@@ -680,7 +680,7 @@ MonoBehaviour:
   previousTilePosition: {fileID: 0}
   actualPosition: {x: 0, y: 0, z: 0}
   targetedPosition: {x: 0, y: 0, z: 0}
-  visualAttackParticle: {fileID: 420905379914296888, guid: 6a73103765723cb4bb65855a803ac760, type: 3}
+  visualAttackParticle: {fileID: 6131268248031804042, guid: 58eb57a8db9362b49a2c9d078230ae67, type: 3}
   pathVectorList: []
   tempLineRendererBetweenCreaturesGameObject: {fileID: 0}
   canAttackIcon: {fileID: 0}

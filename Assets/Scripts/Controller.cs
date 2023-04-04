@@ -59,7 +59,7 @@ public class Controller : NetworkBehaviour
     protected Vector3Int placedCellPosition;
 
     public int turnTimer;
-    protected int turnThreshold = 1400; //todo make this 1400
+    protected int turnThreshold = 80; //todo make this 1400
     protected int maxHandSize = 10;
     [SerializeField] protected List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] protected List<CardInHand> demonDeck = new List<CardInHand>();
@@ -759,7 +759,7 @@ public class Controller : NetworkBehaviour
             baseTileSent.SetBeingHarvested();
         }
         baseTileSent.ShowHarvestIcon();
-        baseTileSent.HighlightTile();
+        //baseTileSent.HighlightTile();
         numberOfLandsPlayedThisTurn++;
 
         resourcesChanged.Invoke(resources);
@@ -1085,8 +1085,11 @@ public class Controller : NetworkBehaviour
         }
 
         instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
-        instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
+        instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
+
+        instantiatedCreature.GetComponent<Creature>().OnETB();
+
         cardSelectedSent.transform.parent = null;
         RemoveCardFromHand(cardSelectedSent);
         if (instantiatedSpawnPArticle != null)

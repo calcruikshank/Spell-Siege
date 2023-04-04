@@ -89,28 +89,8 @@ public class Creature : MonoBehaviour
         this.colorIndicator = transform;
     }
 
-    protected virtual void Start()
-    {
-        grid = GameManager.singleton.grid;
-        baseTileMap = GameManager.singleton.baseMap;
-        currentCellPosition = grid.WorldToCell(this.transform.position);
-        tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
-        previousTilePosition = tileCurrentlyOn;
 
-        creatureImage = this.transform.GetChild(0);
 
-        tileCurrentlyOn.AddCreatureToTile(this);
-        SetupLR();
-        SetupLR2();
-        SetRangeLineRenderer();
-        actualPosition = this.transform.position;
-
-        CalculateAllTilesWithinRange();
-        SetTravType();
-        pathfinder1 = new Pathfinding();
-        pathfinder2 = new Pathfinding();
-        UpdateCreatureHUD();
-    }
     protected virtual void SetTravType()
     {
     }
@@ -497,7 +477,11 @@ public class Creature : MonoBehaviour
         rangeLrGO.SetActive(false);
         OnDeath();
         GameManager.singleton.CreatureDied(this.creatureID);
-        canAttackIcon.gameObject.SetActive(false);
+
+        if (canAttackIcon != null)
+        {
+            canAttackIcon.gameObject.SetActive(false);
+        }
         Destroy(this.gameObject);
     }
 
@@ -791,14 +775,34 @@ public class Creature : MonoBehaviour
     public Transform canAttackIcon;
     internal void SetToPlayerOwningCreature(Controller controller)
     {
+        this.playerOwningCreature = controller;
+
+        grid = GameManager.singleton.grid;
+        baseTileMap = GameManager.singleton.baseMap;
+
+        creatureImage = this.transform.GetChild(0);
+
+        SetRangeLineRenderer();
+
+        SetTravType();
+        pathfinder1 = new Pathfinding();
+        pathfinder2 = new Pathfinding();
+        UpdateCreatureHUD();
+        currentCellPosition = grid.WorldToCell(this.transform.position);
+        tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
+        previousTilePosition = tileCurrentlyOn;
+        tileCurrentlyOn.AddCreatureToTile(this);
+        actualPosition = this.transform.position;
+
+        CalculateAllTilesWithinRange();
+        SetupLR();
+        SetupLR2();
         creatureState = CreatureState.Summoned;
         creatureID = GameManager.singleton.allCreatureGuidCounter;
         GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
         GameManager.singleton.allCreatureGuidCounter++;
-        this.playerOwningCreature = controller;
         this.transform.GetComponent<MeshRenderer>().material.color = controller.col;
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
-        OnETB();
         canAttack = true;
         canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon, this.transform.position, Quaternion.identity);
         //canAttackIcon.parent = transform;
