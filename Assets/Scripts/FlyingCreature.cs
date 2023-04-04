@@ -10,6 +10,16 @@ public class FlyingCreature : Creature
 
     protected override void Update()
     {
+        if (targetToFollow != null)
+        {
+            Vector3 targetRotation = new Vector3(targetToFollow.transform.position.x, transform.position.y, targetToFollow.transform.position.z) - this.transform.position;
+            creatureImage.forward = Vector3.RotateTowards(creatureImage.forward, targetRotation, 10 * Time.deltaTime, 0);
+        }
+        if (structureToFollow != null)
+        {
+            Vector3 targetRotation = new Vector3(structureToFollow.transform.position.x, transform.position.y, structureToFollow.transform.position.z) - this.transform.position;
+            creatureImage.forward = Vector3.RotateTowards(creatureImage.forward, targetRotation, 10 * Time.deltaTime, 0);
+        }
         switch (creatureState)
         {
             case CreatureState.Moving:

@@ -32,6 +32,7 @@ public struct SpellSiegeData
         NaturalGrowth,
         Bear,
         BottomFeeder,
+        Thenas,
         NumOfCardTypes
     }
 

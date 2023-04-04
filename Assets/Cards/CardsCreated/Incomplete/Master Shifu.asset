@@ -10,22 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d41eafbf0d43d4c41a99da699ad02934, type: 3}
-  m_Name: NAN 1
+  m_Name: Master Shifu
   m_EditorClassIdentifier: 
   cardAssigned: 25
-  cardName: Bottom Feeder
+  cardName: Master Shifu
   gameObjectToInstantiate: {fileID: 0}
-  attack: 2
-  health: 2
-  blueManaCost: 2
-  redManaCost: 0
+  attack: 1
+  health: 1
+  blueManaCost: 0
+  redManaCost: 2
   whiteManaCost: 0
   blackManaCost: 0
-  greenManaCost: 2
+  greenManaCost: 0
   genericManaCost: 0
   cardArt: {fileID: 0}
-  cardText: Whenever a creature comes into play draw a harvest card.
-  rarity: 2
+  cardText: When Master Shifu enters gain red mana equal to the number of creatures
+    you control.
+  rarity: 4
   cardType: 0
   traversableType: 2
   creatureType: 4

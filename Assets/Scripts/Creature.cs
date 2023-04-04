@@ -18,6 +18,8 @@ public class Creature : MonoBehaviour
 
     [SerializeField] Transform highlightForCreatureSelected;
 
+    protected Transform creatureImage;
+
     [SerializeField] public float Attack;
     public float CurrentAttack;
     float AttackRate = 4;
@@ -94,6 +96,9 @@ public class Creature : MonoBehaviour
         currentCellPosition = grid.WorldToCell(this.transform.position);
         tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
         previousTilePosition = tileCurrentlyOn;
+
+        creatureImage = this.transform.GetChild(0);
+
         tileCurrentlyOn.AddCreatureToTile(this);
         SetupLR();
         SetupLR2();
@@ -149,11 +154,23 @@ public class Creature : MonoBehaviour
                 VisualMove();
                 break;
         }
+        if (targetToFollow != null)
+        {
+            Vector3 targetRotation = new Vector3(targetToFollow.transform.position.x, transform.position.y, targetToFollow.transform.position.z) - this.transform.position;
+            creatureImage.forward = Vector3.RotateTowards(creatureImage.forward, targetRotation, 10 * Time.deltaTime, 0);
+        }
+        if (structureToFollow != null)
+        {
+            Vector3 targetRotation = new Vector3(structureToFollow.transform.position.x, transform.position.y, structureToFollow.transform.position.z) - this.transform.position;
+            creatureImage.forward = Vector3.RotateTowards(creatureImage.forward, targetRotation, 10 * Time.deltaTime, 0);
+        }
 
         if (canAttackIcon != null)
         {
             canAttackIcon.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z) ;
+            canAttackIcon.transform.localEulerAngles = new Vector3(creatureImage.localEulerAngles.x, creatureImage.localEulerAngles.y + 45, creatureImage.localEulerAngles.z) ;
         }
+
     }
     void FixedUpdate()
     {
@@ -757,6 +774,8 @@ public class Creature : MonoBehaviour
     protected void VisualMove()
     {
         this.transform.position = actualPosition;
+        Vector3 targetRotation = targetedPosition - this.transform.position;
+        creatureImage.forward = Vector3.RotateTowards(creatureImage.forward, targetRotation, 10 * Time.deltaTime, 0);
         return;
         float valueToAdd = 0f;
         positions[0] = this.transform.position;
@@ -765,6 +784,8 @@ public class Creature : MonoBehaviour
         lr.endColor = playerOwningCreature.col;
         float distanceFromActualPosition = (this.transform.position - actualPosition).magnitude;
         this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3(targetedPosition.x, actualPosition.y, targetedPosition.z), speed * Time.deltaTime);
+
+
     }
 
     public Transform canAttackIcon;
