@@ -7,4 +7,6 @@ using UnityEngine;
 public class CardsCollectedForPlayer
 {
     public List<int> cardsCollected = new List<int>();
+
+    public int numberOfCorePacks = 10;
 }

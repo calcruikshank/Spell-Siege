@@ -77,32 +77,6 @@ public class CardCollection : MonoBehaviour
     }
 
 
-
-
-    
-
-
-
-    public async void TempOpenPack()
-    {
-        if (CardCollectionData.singleton.loadedCollection == null)
-        {
-            CardCollectionData.singleton.LoadSomeData();
-        }
-        List<int> cardsOpened = new List<int>();
-        for (int i = 0; i < 5; i++)
-        {
-            cardsOpened.Add(UnityEngine.Random.Range(0, (int)SpellSiegeData.Cards.NumOfCardTypes));
-        }
-        foreach (int i in cardsOpened)
-        {
-            CardCollectionData.singleton.loadedCollection.cardsCollected.Add(i);
-        }
-        var data = new Dictionary<string, object> { { "CardsCollected", CardCollectionData.singleton.loadedCollection } };
-        await CloudSaveService.Instance.Data.ForceSaveAsync(data);
-        LoadCardCollection(CardCollectionData.singleton.loadedCollection);
-    }
-
     public void ChooseDeck(int deckChosen)
     {
         currentSelectedDeck = CardCollectionData.singleton.decks[deckChosen];

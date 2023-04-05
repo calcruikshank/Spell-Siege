@@ -241,7 +241,6 @@ public class CardCollectionData : MonoBehaviour
     [SerializeField] List<CardInHand> allCardsInGame = new List<CardInHand>();
     public CardInHand GetCardAssociatedWithType(SpellSiegeData.Cards cardGrabbed)
     {
-        Debug.Log(cardGrabbed);
         CardInHand selectedObject;
 
         selectedObject = allCardsInGame.FirstOrDefault(s => s.cardAssignedToObject == cardGrabbed);
@@ -249,10 +248,34 @@ public class CardCollectionData : MonoBehaviour
         if (selectedObject == null)
         {
             Debug.LogError("Could not find prefab associated with -> " + cardGrabbed + " defaulting to 0"); 
-            //TODO when we have enough building prefabs created we can uncomment this to figure out what we're missing
             selectedObject = allCardsInGame[0];
         }
         return selectedObject;
+    }
+    public SpellSiegeData.Cards GetCardAssociatedWithRarity(SpellSiegeData.cardRarity cardRaritySent)
+    {
+        CardInHand selectedObject;
+
+        List<CardInHand> shuffledListOfAllCards = Shuffle(allCardsInGame);
+        selectedObject = shuffledListOfAllCards.FirstOrDefault(s => s.rarity == cardRaritySent);
+
+        if (selectedObject == null)
+        {
+            Debug.LogError("Could not find rarity associated with -> " + cardRaritySent + " defaulting to null");
+        }
+        return selectedObject.cardAssignedToObject;
+    }
+
+    public List<CardInHand> Shuffle(List<CardInHand> alpha)
+    {
+        for (int i = 0; i < alpha.Count; i++)
+        {
+            CardInHand temp = alpha[i];
+            int randomIndex = UnityEngine.Random.Range(i, alpha.Count);
+            alpha[i] = alpha[randomIndex];
+            alpha[randomIndex] = temp;
+        }
+        return alpha;
     }
 
 }

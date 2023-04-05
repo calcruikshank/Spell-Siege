@@ -33,6 +33,7 @@ public struct SpellSiegeData
         Bear,
         BottomFeeder,
         Thenas,
+        Kyoshi,
         NumOfCardTypes
     }
 

@@ -16,7 +16,7 @@ public class SceneHandler : MonoBehaviour
     }
     public void LoadPacks()
     {
-        SceneManager.LoadSceneAsync("Packs");
+        SceneManager.LoadSceneAsync("Gamble");
     }
     public void LoadMainMenu()
     {
