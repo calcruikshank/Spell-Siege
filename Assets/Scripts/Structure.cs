@@ -18,6 +18,7 @@ public class Structure : MonoBehaviour
 
     private void Start()
     {
+        return;
         grid = GameManager.singleton.grid;
         baseTileMap = GameManager.singleton.baseMap;
         currentCellPosition = grid.WorldToCell(this.transform.position);

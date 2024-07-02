@@ -68,9 +68,6 @@ public class GameManager : NetworkBehaviour
         singleton = this;
         state = State.Setup;
     }
-    private void Update()
-    {
-    }
 
     void Start()
     {
@@ -109,13 +106,6 @@ public class GameManager : NetworkBehaviour
         Setup, //The state for placing your castle
         Game,
         End //Setup for scaling
-    }
-    public void AddToPlayersThatHaveBeenReceived(Controller controller)
-    {
-        playersThatHaveBeenReceived.Add(controller);
-        if (playersThatHaveBeenReceived.Count == playerList.Count)
-        {
-        }
     }
     public List<CardInHand> Shuffle(List<CardInHand> alpha)
     {

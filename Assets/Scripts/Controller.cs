@@ -75,11 +75,6 @@ public class Controller : NetworkBehaviour
 
     protected Canvas canvasMain;
 
-    public int tick = 0; //this is for determining basically everything
-    public float tickTimer = 0f;
-    float tickThreshold = .12f;
-
-    public Creature locallySelectedCreature;
 
     protected PlayerResources resources;
 
@@ -98,7 +93,6 @@ public class Controller : NetworkBehaviour
 
     public int spellCounter = 0;
 
-    public bool creaturePathLockedIn = false;
 
     public int numberOfLandsYouCanPlayThisTurn = 1;
     public int numberOfLandsPlayedThisTurn = 0;
@@ -109,13 +103,9 @@ public class Controller : NetworkBehaviour
 
     public List<Structure> structuresOwned = new List<Structure>();
 
-    [SerializeField] protected Transform deckSelectionPrefab;
-
-    [Serializable]
     public enum ActionTaken
     {
         LeftClickBaseMap,
-        SelectedCreature,
         SelectedCardInHand,
         RightClick,
         TilePurchased
@@ -150,21 +140,29 @@ public class Controller : NetworkBehaviour
         resourcesChanged += UpdateHudForResourcesChanged;
         mousePositionScript = GetComponent<MousePositionScript>();
 
-        state = State.SelectingDeck;
-        if (NetworkManager.Singleton.IsHost && IsOwner)
-        {
-            col = colorsToPickFrom[0];
-        }
-        if (!IsHost && IsOwner)
-        {
-            col = colorsToPickFrom[1];
-        }
+        state = State.NothingSelected;
 
-        if (!IsOwner && IsHost)
+        if (NetworkManager.Singleton != null)
         {
-            col = colorsToPickFrom[1];
+            if (NetworkManager.Singleton.IsHost && IsOwner)
+            {
+                col = colorsToPickFrom[0];
+            }
+            if (!IsHost && IsOwner)
+            {
+                col = colorsToPickFrom[1];
+            }
+
+            if (!IsOwner && IsHost)
+            {
+                col = colorsToPickFrom[1];
+            }
+            if (!IsOwner && !IsHost)
+            {
+                col = colorsToPickFrom[0];
+            }
         }
-        if (!IsOwner && !IsHost)
+        else
         {
             col = colorsToPickFrom[0];
         }
@@ -172,10 +170,13 @@ public class Controller : NetworkBehaviour
         transparentCol = col;
         transparentCol.a = .5f;
 
-        if (IsOwner)
+        if (NetworkManager.Singleton != null)
         {
-            DeckSelectorInScene.singleton.AssignLocalPlayer(this);
-            SpawnSelectionBox();
+            if (IsOwner)
+            {
+                DeckSelectorInScene.singleton.AssignLocalPlayer(this);
+                SpawnSelectionBox();
+            }
         }
     }
 
@@ -223,7 +224,7 @@ public class Controller : NetworkBehaviour
 
     internal void StartGame()
     {
-        if (IsOwner)
+        if (IsOwner || NetworkManager.Singleton == null)
         {
             instantiatedPlayerUI.gameObject.SetActive(true);
         }
@@ -309,7 +310,7 @@ public class Controller : NetworkBehaviour
         }
         if (!IsOwner)
         {
-            return;
+            //return;
         }
 
 
@@ -322,13 +323,8 @@ public class Controller : NetworkBehaviour
 
             previousCellPosition = currentLocalHoverCellPosition;
 
-            if (locallySelectedCreature != null && !creaturePathLockedIn)
-            {
-                VisualPathfinderOnCreatureSelected(locallySelectedCreature);
-            }
         }
 
-        tickTimer += Time.deltaTime;
         if (locallySelectedCard != null)
         {
             if (locallySelectedCard.GetComponentInChildren<BoxCollider>().enabled == true)
@@ -363,11 +359,7 @@ public class Controller : NetworkBehaviour
         }
         if (Input.GetMouseButtonUp(0))
         {
-            if (isDragginSelectionBox)
-            {
-                EndDragOfSelectionBox();
-            }
-            if (locallySelectedCreature != null || locallySelectedCard != null)
+            if (locallySelectedCard != null)
             {
                 if (cellPositionSentToClients != null)
                 {
@@ -377,20 +369,12 @@ public class Controller : NetworkBehaviour
                         {
                             AddToTickQueueLocal(grid.WorldToCell(mousePosition));
                         }
-                        if (locallySelectedCreature != null)
-                        {
-                            LockInVisualPathfinder();
-                        }
                     }
                 }
             }
         }
         if (Input.GetMouseButtonDown(0))
         {
-            if (locallySelectedCreature != null)
-            {
-                LockInVisualPathfinder();
-            }
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Vector3 mousePositionWorldPoint;
             if (Physics.Raycast(ray, out RaycastHit raycastHit, Mathf.Infinity, mousePositionScript.baseTileMap))
@@ -399,134 +383,27 @@ public class Controller : NetworkBehaviour
                 cellPositionSentToClients = grid.WorldToCell(mousePositionWorldPoint);
             }
 
-            if (state == State.NothingSelected)
-            {
-                if (!CheckForRaycast())
-                {
-                    AddToTickQueueLocal(cellPositionSentToClients);
-                }
-            }
-            else
-            {
-                if (!CheckForRaycast())
-                {
-
-                    AddToTickQueueLocal(cellPositionSentToClients);
-                }
-            }
-
-
-            if (locallySelectedCreature == null && locallySelectedCard == null && selectedCreaturesWithBox.Count == 0 && !isDragginSelectionBox)
-            {
-                StartDragOfSelectionBox();
-            }
+            AddToTickQueueLocal(cellPositionSentToClients);
         }
 
-        if (isDragginSelectionBox)
+    }
+    void AddToTickQueueLocal(Vector3Int positionSent)
+    {
+        //visual section for spawning creatures
+        if (locallySelectedCard != null && locallySelectedCard.cardType == SpellSiegeData.CardType.Creature)
         {
-            DragSelectionBox();
-        }
-
-        if (selectedCreaturesWithBox.Count > 0)
-        {
-            FindPathsForAllCreaturesSelected();
-        }
-    }
-
-
-
-    private void FindPathsForAllCreaturesSelected()
-    {
-        for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
-        {
-            VisualPathfinderOnCreatureSelected(selectedCreaturesWithBox[i]);
-        }
-    }
-
-    float distanceOfDrag = 0f;
-    Vector2 startingPoint;
-    Vector2 currentPositionOfDrag;
-    public bool isDragginSelectionBox;
-    float width;
-    float height;
-
-    public List<Creature> selectedCreaturesWithBox = new List<Creature>();
-    private void EndDragOfSelectionBox()
-    {
-        selectedCreaturesWithBox = new List<Creature>();
-        isDragginSelectionBox = false;
-        selectionBox.gameObject.SetActive(false);
-
-        Vector2 bottomLeft = selectionBox.anchoredPosition - (selectionBox.sizeDelta / 2);
-        Vector2 topRight = selectionBox.anchoredPosition + (selectionBox.sizeDelta / 2);
-        foreach (KeyValuePair<int, Creature> kvp in creaturesOwned)
-        {
-            Vector3 screenPositionOfCreature = Camera.main.WorldToScreenPoint(kvp.Value.transform.position);
-            if (screenPositionOfCreature.x > bottomLeft.x && screenPositionOfCreature.x < topRight.x && screenPositionOfCreature.y > bottomLeft.y && screenPositionOfCreature.y < topRight.y)
+            if (CheckToSeeIfCanSpawnCreature(positionSent))
             {
-                Debug.Log(kvp.Value);
-                selectedCreaturesWithBox.Add(kvp.Value);
+                SpawnVisualCreatureOnTile(positionSent);
+                LeftClickBaseMapServerRpc(positionSent);
             }
+            return;
         }
-    }
-
-    private void StartDragOfSelectionBox()
-    {
-        isDragginSelectionBox = true;
-        var screenPoint = Input.mousePosition;
-        startingPoint = screenPoint;
-        this.transform.position = Vector3.zero;
-        selectionBox.sizeDelta = new Vector2(0, 0);
-    }
-    private void DragSelectionBox()
-    {
-        var screenPoint = Input.mousePosition;
-        currentPositionOfDrag = screenPoint;
-        distanceOfDrag = Vector3.Distance(startingPoint, currentPositionOfDrag);
-        if (distanceOfDrag > .1f)
-        {
-            if (!selectionBox.gameObject.activeInHierarchy)
-            {
-                selectionBox.gameObject.SetActive(true);
-            }
-
-            width = currentPositionOfDrag.x - startingPoint.x;
-            height = currentPositionOfDrag.y - startingPoint.y;
-            selectionBox.sizeDelta = new Vector2(MathF.Abs(width), MathF.Abs(height));
-            selectionBox.anchoredPosition = new Vector3(startingPoint.x + width / 2, startingPoint.y + height / 2);
-
-        }
-    }
-
-
-    void ClearBoxSelection()
-    {
-
-    }
-
-
-
-    private void LockInVisualPathfinder()
-    {
-        creaturePathLockedIn = true;
+        LeftClickBaseMapServerRpc(positionSent);
     }
 
     public void SetVisualsToNothingSelectedLocally()
     {
-        if (selectedCreaturesWithBox.Count > 0)
-        {
-            foreach (Creature selectedC in selectedCreaturesWithBox)
-            {
-                selectedC.HidePathfinderLR();
-            }
-        }
-        if (locallySelectedCreature != null)
-        {
-            locallySelectedCreature.VisuallyDeSelect();
-            locallySelectedCreature.HidePathfinderLR();
-
-            locallySelectedCreature = null;
-        }
 
         if (locallySelectedCard != null)
         {
@@ -615,54 +492,6 @@ public class Controller : NetworkBehaviour
     }
 
 
-    void AddToTickQueueLocal(Vector3Int positionSent)
-    {
-        if (selectedCreaturesWithBox.Count > 0)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit raycastHitCreatureOnBoard, Mathf.Infinity, creatureMask))
-            {
-                Creature hitCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
-                if (hitCreature != null)
-                {
-                    for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
-                    {
-                        TargetACreature(hitCreature, selectedCreaturesWithBox[i]);
-                    }
-                    SetStateToNothingSelected();
-                    return;
-                }
-            }
-            for (int i = 0; i < selectedCreaturesWithBox.Count; i++)
-            {
-                selectedCreaturesWithBox[i].VisuallySelect();
-                HandleCreatureOnBoardSelected(positionSent, selectedCreaturesWithBox[i].actualPosition, selectedCreaturesWithBox[i]);
-            }
-            SetStateToNothingSelected();
-        }
-        Vector3 positionOfCreature = new Vector3();
-        if (locallySelectedCreature && IsOwner && state != State.SpellInHandSelected)
-        {
-            positionOfCreature = locallySelectedCreature.actualPosition;
-
-
-            HandleCreatureOnBoardSelected(positionSent, positionOfCreature, locallySelectedCreature);
-        }
-
-
-
-        //visual section for spawning creatures
-        if (locallySelectedCard != null && locallySelectedCard.cardType == SpellSiegeData.CardType.Creature)
-        {
-            if (CheckToSeeIfCanSpawnCreature(positionSent))
-            {
-                SpawnVisualCreatureOnTile(positionSent);
-                LeftClickBaseMapServerRpc(positionSent);
-            }
-            return;
-        }
-        LeftClickBaseMapServerRpc(positionSent);
-    }
 
     void AddIndexOfCardInHandToTickQueueLocal(int index)
     {
@@ -799,11 +628,9 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
-                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected && locallySelectedCreature == null)
+                if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected)
                 {
                     SetVisualsToNothingSelectedLocally();
-                    locallySelectedCreature = raycastHitCreatureOnBoard.transform.GetComponent<Creature>();
-                    creaturePathLockedIn = false;
                     AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
                     return true;
                 }
@@ -818,11 +645,6 @@ public class Controller : NetworkBehaviour
                             return true;
                         }
                     }
-                }
-                if (locallySelectedCreature != null)
-                {
-                    TargetACreature(raycastHitCreatureOnBoard.transform.GetComponent<Creature>(), locallySelectedCreature);
-                    return true;
                 }
             }
         }
@@ -898,32 +720,6 @@ public class Controller : NetworkBehaviour
         }
     }
 
-    private void VisualPathfinderOnCreatureSelected(Creature creature)
-    {
-        if (creaturePathLockedIn) return;
-        creature.VisuallySelect();
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType == SpellSiegeData.traversableType.Untraversable || creature.thisTraversableType == SpellSiegeData.travType.Walking && BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).traverseType != SpellSiegeData.traversableType.TraversableByAll)
-        {
-            creature.HidePathfinderLR();
-            return;
-        }
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).structureOnTile != null)
-        {
-            //creature.HidePathfinderLR();
-            //return;
-        }
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).CreatureOnTile() != null)
-        {
-            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentLocalHoverCellPosition).CreatureOnTile() == this)
-            {
-                creature.HidePathfinderLR();
-                return;
-            }
-            //creature.HidePathfinderLR();
-            //return;
-        }
-        creature.ShowPathfinderLinerRendererAsync(currentLocalHoverCellPosition);
-    }
 
     protected void LocalSelectCardWithIndex(int indexOfCardSelected)
     {
@@ -950,71 +746,6 @@ public class Controller : NetworkBehaviour
         }
 
     }
-    void HandleCreatureOnBoardSelected(Vector3Int positionSent, Vector3 positionOfCreatureSent, Creature creatureSelected)
-    {
-
-        MoveCreatureServerRpc(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
-        MoveCreatureLocally(positionSent, positionOfCreatureSent, creatureSelected.creatureID);
-    }
-
-
-
-
-
-    [ServerRpc]
-    private void MoveCreatureServerRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        MoveCreatureClientRpc(positionSent, positionOfCreatureSent, creatureID);
-    }
-    [ClientRpc]
-    private void MoveCreatureClientRpc(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        if (!IsOwner)
-        {
-            MoveCreatureLocally(positionSent, positionOfCreatureSent, creatureID);
-        }
-    }
-
-    public void MoveCreatureLocally(Vector3Int positionSent, Vector3 positionOfCreatureSent, int creatureID)
-    {
-        Creature creatureSelectedSent = GameManager.singleton.allCreaturesOnField[creatureID];
-        targetedCellPosition = positionSent;
-        if (creatureSelectedSent != null)
-        {
-            int numOfTicksPassed = (int)MathF.Round((Vector3.Distance(positionOfCreatureSent, creatureSelectedSent.actualPosition) / Time.fixedDeltaTime * creatureSelectedSent.speed));
-            if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile != null)
-            {
-                creatureSelectedSent.SetStructureToFollow(BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).structureOnTile, positionOfCreatureSent);
-
-                for (int i = 0; i < numOfTicksPassed; i++)
-                {
-                    creatureSelectedSent.Move();
-                }
-            }
-            else
-            {
-                creatureSelectedSent.targetToFollow = null;
-                creatureSelectedSent.structureToFollow = null;
-                creatureSelectedSent.SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(targetedCellPosition), positionOfCreatureSent);
-
-                for (int i = 0; i < numOfTicksPassed; i++)
-                {
-                    creatureSelectedSent.Move();
-                }
-            }
-        }
-        creatureSelectedSent.VisuallyDeSelect();
-        if (locallySelectedCreature != null)
-        {
-            locallySelectedCreature.VisuallyDeSelect();
-            locallySelectedCreature = null;
-        }
-    }
-
-
-
-
-
 
     public Dictionary<int, Creature> creaturesOwned = new Dictionary<int, Creature>();
 
@@ -1052,17 +783,7 @@ public class Controller : NetworkBehaviour
     private void SpawnVisualCreatureOnTile(Vector3Int positionSent)
     {
         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(positionSent);
-
-        //localVisualCreture = Instantiate(locallySelectedCard.GameObjectToInstantiate, new Vector3(positionToSpawn.x, -2f, positionToSpawn.z), Quaternion.identity).gameObject;
-        //Destroy(localVisualCreture.GetComponent<Creature>());
-        //localVisualCreture.GetComponent<MeshRenderer>().material.color = col;
-        //localVisualCreture.AddComponent<VisualSpawnCreature>();
-        //localVisualCreture.transform.localScale *= .5f;
-
-        /*foreach (TextMeshPro tmp in localVisualCreture.GetComponentsInChildren<TextMeshPro>())
-        {
-            tmp.enabled = false;
-        }*/
+        
         instantiatedSpawnPArticle = Instantiate(visualSpawnEffect, new Vector3(positionToSpawn.x, positionToSpawn.y + .2f, positionToSpawn.z), Quaternion.identity).gameObject;
         Destroy(locallySelectedCard.gameObject);
 
@@ -1366,20 +1087,8 @@ public class Controller : NetworkBehaviour
             locallySelectedCard = null;
             //SetVisualsToNothingSelectedLocally();
         }
-        if (locallySelectedCreature != null)
-        {
-            locallySelectedCreature.VisuallyDeSelect();
-            locallySelectedCreature = null;
-            //SetVisualsToNothingSelectedLocally();
-        }
         cardSelected = null;
 
-        foreach (Creature c in selectedCreaturesWithBox)
-        {
-            c.HidePathfinderLR();
-            c.VisuallyDeSelect();
-        }
-        selectedCreaturesWithBox.Clear();
         state = State.NothingSelected;
     }
     protected void SetStateToWaiting()

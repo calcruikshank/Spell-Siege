@@ -301,14 +301,11 @@ public class CardInHand : MonoBehaviour
 
     private void OnMouseExit()
     {
-        if (playerOwningCard.locallySelectedCreature != this)
+        if (playerOwningCard.locallySelectedCard != null)
         {
-            if (playerOwningCard.locallySelectedCard != null)
-            {
-                playerOwningCard.locallySelectedCard.gameObject.SetActive(true);
-            }
-            TurnOffVisualCard();
+            playerOwningCard.locallySelectedCard.gameObject.SetActive(true);
         }
+        TurnOffVisualCard();
     }
 
     internal void TurnOffVisualCard()

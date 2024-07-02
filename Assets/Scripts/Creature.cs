@@ -468,10 +468,6 @@ public class Creature : MonoBehaviour
     public void LocalDie()
     {
         Instantiate(GameManager.singleton.onDeathEffect, new Vector3(actualPosition.x, .4f, actualPosition.z), Quaternion.identity);
-        if (this.playerOwningCreature.locallySelectedCreature == this)
-        {
-            playerOwningCreature.SetStateToNothingSelected();
-        }
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);
         rangeLrGO.SetActive(false);
@@ -1221,10 +1217,6 @@ public class Creature : MonoBehaviour
         {
             pathVectorList = null;
         }
-        if (this.playerOwningCreature.selectedCreaturesWithBox.Contains(this))
-        {
-            this.playerOwningCreature.selectedCreaturesWithBox.Remove(this);
-        }
         this.playerOwningCreature.creaturesOwned.Remove(this.creatureID);
         OnMouseExit();
         creatureState = CreatureState.Dead;
@@ -1246,10 +1238,6 @@ public class Creature : MonoBehaviour
         if (pathVectorList != null)
         {
             pathVectorList = null;
-        }
-        if (this.playerOwningCreature.selectedCreaturesWithBox.Contains(this))
-        {
-            this.playerOwningCreature.selectedCreaturesWithBox.Remove(this);
         }
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);
