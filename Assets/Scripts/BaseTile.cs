@@ -47,10 +47,9 @@ public class BaseTile : MonoBehaviour
 
         CalculateAllPoints();
 
-        SetAllNeighborTiles();
     }
 
-    void SetAllNeighborTiles()
+    public void SetAllNeighborTiles()
     {
         if (Mathf.Abs(tilePosition.y % 2) == 1)
         {
@@ -74,11 +73,7 @@ public class BaseTile : MonoBehaviour
 
     public void SetNeighborTile(Vector3Int cellPosiitonSent)
     {
-        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellPosiitonSent))
-        {
-            neighborTiles.Add(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellPosiitonSent));
-            return;
-        }
+        neighborTiles.Add(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellPosiitonSent));
     }
 
     internal Creature CreatureOnTile()

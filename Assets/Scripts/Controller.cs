@@ -506,6 +506,11 @@ public class Controller : NetworkBehaviour
 
     void LocalPlaceCastle(Vector3Int positionSent)
     {
+        foreach (KeyValuePair<Vector3Int, BaseTile> bt in BaseMapTileState.singleton.baseTiles)
+        {
+            bt.Value.SetAllNeighborTiles();
+        }
+            
         placedCellPosition = positionSent;
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).traverseType == SpellSiegeData.traversableType.Untraversable)
         {
