@@ -12,7 +12,6 @@ public class BaseTile : MonoBehaviour
     Grid grid;
     Tilemap environmentMap;
     Tilemap baseTileMap;
-    Tilemap waterTileMap;
     Creature creatureOnTile;
     GameObject environmentOnTile;
     public Structure structureOnTile;
@@ -34,17 +33,17 @@ public class BaseTile : MonoBehaviour
     public SpellSiegeData.ManaType manaType;
     [SerializeField] public SpellSiegeData.traversableType traverseType;
 
+    public Vector3Int cellPosition;
     private void Start()
     {
         SetupLR();
         grid = GameManager.singleton.grid;
         environmentMap = GameManager.singleton.enviornmentMap;
         baseTileMap = GameManager.singleton.baseMap;
-        waterTileMap = GameManager.singleton.waterTileMap;
-        tilePosition = grid.WorldToCell(this.transform.position);
-        
+
+        tilePosition = baseTileMap.WorldToCell(this.transform.position);
         BaseMapTileState.singleton.AddToBaseTiles(tilePosition, this);
-        
+
         environmentOnTile = environmentMap.GetInstantiatedObject(tilePosition);
 
         CalculateAllPoints();
@@ -76,14 +75,9 @@ public class BaseTile : MonoBehaviour
 
     public void SetNeighborTile(Vector3Int cellPosiitonSent)
     {
-        if (baseTileMap.GetInstantiatedObject(cellPosiitonSent) != null)
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellPosiitonSent))
         {
-            neighborTiles.Add(baseTileMap.GetInstantiatedObject(cellPosiitonSent).GetComponent<BaseTile>());
-            return;
-        }
-        if (waterTileMap.GetInstantiatedObject(cellPosiitonSent) != null)
-        {
-            neighborTiles.Add(waterTileMap.GetInstantiatedObject(cellPosiitonSent).GetComponent<BaseTile>());
+            neighborTiles.Add(BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellPosiitonSent));
             return;
         }
     }

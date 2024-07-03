@@ -99,7 +99,6 @@ public class Controller : NetworkBehaviour
 
     [SerializeField] protected Color[] colorsToPickFrom;
 
-    protected RectTransform selectionBox;
 
     public List<Structure> structuresOwned = new List<Structure>();
 
@@ -111,7 +110,7 @@ public class Controller : NetworkBehaviour
         TilePurchased
     }
 
-
+    Vector3Int startingPlayerLeftPosition = new Vector3Int(0, 0, 0);
     public override void OnNetworkSpawn()
     {
 
@@ -120,7 +119,7 @@ public class Controller : NetworkBehaviour
     protected virtual void Start()
     {
         StartCoroutine(StartGameCoroutine());
-
+        SetStateToPlacingCastle();
 
     }
 
@@ -175,7 +174,6 @@ public class Controller : NetworkBehaviour
             if (IsOwner)
             {
                 DeckSelectorInScene.singleton.AssignLocalPlayer(this);
-                SpawnSelectionBox();
             }
         }
     }
@@ -200,7 +198,6 @@ public class Controller : NetworkBehaviour
         cardsInDeck = translatedCards;
         cardsInDeck = GameManager.singleton.Shuffle(cardsInDeck);
 
-        SetStateToPlacingCastle();
     }
 
     protected void SetStateToPlacingCastle()
@@ -208,31 +205,16 @@ public class Controller : NetworkBehaviour
         state = State.PlacingCastle;
     }
 
-
-    private void SpawnSelectionBox()
-    {
-        selectionBox = new GameObject("selectionBoxGameObject", typeof(RectTransform), typeof(Image)).gameObject.GetComponent<RectTransform>();
-        selectionBox.transform.parent = GameManager.singleton.RectCanvas.transform;
-        selectionBox.transform.localEulerAngles = Vector3.zero;
-        selectionBox.transform.GetComponent<Image>().color = transparentCol;
-        selectionBox.transform.localScale = Vector3.one;
-        selectionBox.transform.localPosition = Vector3.zero;
-        selectionBox.gameObject.SetActive(false);
-        selectionBox.anchorMin = Vector2.zero;
-        selectionBox.anchorMax = Vector2.zero;
-    }
-
     internal void StartGame()
     {
-        if (IsOwner || NetworkManager.Singleton == null)
+        if (IsOwner)
         {
-            instantiatedPlayerUI.gameObject.SetActive(true);
+        instantiatedPlayerUI.gameObject.SetActive(true);
         }
         for (int i = 0; i < 7; i++)
         {
             DrawCard();
         }
-        SetStateToNothingSelected();
     }
 
 
@@ -382,7 +364,6 @@ public class Controller : NetworkBehaviour
                 mousePositionWorldPoint = raycastHit.point;
                 cellPositionSentToClients = grid.WorldToCell(mousePositionWorldPoint);
             }
-
             AddToTickQueueLocal(cellPositionSentToClients);
         }
 
@@ -509,7 +490,7 @@ public class Controller : NetworkBehaviour
         switch (state)
         {
             case State.PlacingCastle:
-                LocalPlaceCastle(positionSent);
+                LocalPlaceCastle(startingPlayerLeftPosition);
                 break;
             case State.NothingSelected:
                 break;
@@ -532,14 +513,14 @@ public class Controller : NetworkBehaviour
         {
             return;
         }
-        Vector3 positionToSpawn = highlightMap.GetCellCenterWorld(placedCellPosition);
-
+        Debug.Log(positionSent + "pos");
+        //Vector3 positionToSpawn = baseMap.GetCellCenterWorld(placedCellPosition);
         SetOwningTile(placedCellPosition);
-        for (int i = 0; i < BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).neighborTiles.Count; i++)
+        for (int i = 0; i < BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).neighborTiles.Count; i++)
         {
             SetOwningTile(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).neighborTiles[i].tilePosition);
         }
-        instantiatedCaste = Instantiate(castle, positionToSpawn, Quaternion.identity);
+        instantiatedCaste = Instantiate(castle, positionSent, Quaternion.identity);
         //instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
         AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));

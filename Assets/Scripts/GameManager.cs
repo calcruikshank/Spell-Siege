@@ -121,15 +121,16 @@ public class GameManager : NetworkBehaviour
 
     internal void AddPlayerToReady(Controller controller)
     {
+        state = State.Game;
+        foreach (Controller player in playerList)
+        {
+            player.StartGame();
+        }
         playersThatHavePlacedCastle.Add(controller);
 
         if (playersThatHavePlacedCastle.Count == playerList.Count)
         {
-            state = State.Game;
-            foreach (Controller player in playerList)
-            {
-                player.StartGame();
-            }
+            
         }
     }
 

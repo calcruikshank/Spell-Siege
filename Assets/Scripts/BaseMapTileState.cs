@@ -38,19 +38,7 @@ public class BaseMapTileState : MonoBehaviour
 
     internal void AddToBaseTiles(Vector3Int currentCellPosition, BaseTile baseTile)
     {
-        if (baseMap.GetInstantiatedObject(currentCellPosition))
-        {
-            if (!baseTiles.ContainsKey(currentCellPosition))
-            {
-                baseTiles.Add(currentCellPosition, baseMap.GetInstantiatedObject(currentCellPosition).GetComponent<BaseTile>());
-            }
-            //has a non water tile
-        }
-        else
-        {
-            //is a water tile
-            baseTiles.Add(currentCellPosition, baseTile);
-        }
+        baseTiles.Add(currentCellPosition, baseTile);
     }
 
     public BaseTile GetBaseTileAtCellPosition(Vector3Int currentCellPosition)
