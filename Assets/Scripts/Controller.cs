@@ -24,6 +24,8 @@ public class Controller : NetworkBehaviour
     }
 
 
+
+
     //Could use a state machine if creature is selected change state to creature selected 
     //if card in hand is selected change state to placing card
     //if neither are selected change state to selecting
@@ -110,7 +112,6 @@ public class Controller : NetworkBehaviour
         TilePurchased
     }
 
-    Vector3Int startingPlayerLeftPosition = new Vector3Int(-7, 0, 0);
     public override void OnNetworkSpawn()
     {
 
@@ -118,14 +119,57 @@ public class Controller : NetworkBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        StartCoroutine(StartGameCoroutine());
+        if (IsHost && IsOwner)
+        {
+            NetworkManager.OnClientConnectedCallback += OnClientConnected;
+        }
         SetStateToPlacingCastle();
 
     }
-
-    private IEnumerator StartGameCoroutine()
+    private void OnDestroy()
     {
-        yield return new WaitUntil(() => GameManager.singleton != null);
+        if (IsHost && IsOwner)
+        {
+            NetworkManager.OnClientConnectedCallback -= OnClientConnected;
+        }
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        if (IsHost && IsOwner && NetworkManager.Singleton.ConnectedClientsList.Count >= 2 && !gameStarted)
+        {
+            gameStarted = true;
+            StartGame();
+            Debug.Log(IsHost + " host");
+        }
+    }
+    private bool gameStarted = false;
+    private void StartGame()
+    {
+        if (!IsServer)
+            return;
+
+        Debug.Log("Starting the game as there are now 2 players connected.");
+
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            Vector3 spawnPosition = client.ClientId == NetworkManager.Singleton.LocalClientId ? serverCastlePosition : clientCastlePosition;
+            Debug.Log($"Spawning castle for client {client.ClientId} at position {spawnPosition}");
+            SpawnCastleForPlayer(client.ClientId, spawnPosition);
+        }
+    }
+
+    [SerializeField] GameObject castlePrefab;
+    private void SpawnCastleForPlayer(ulong clientId, Vector3 position)
+    {
+        GameObject castleInstance = Instantiate(castlePrefab, position, Quaternion.identity);
+        NetworkObject networkObject = castleInstance.GetComponent<NetworkObject>();
+
+        // Spawn the castle for the client
+        networkObject.SpawnWithOwnership(clientId);
+    }
+    private void StartGameCoroutine()
+    {
         GrabAllObjectsFromGameManager();
 
 
@@ -203,18 +247,10 @@ public class Controller : NetworkBehaviour
     {
         state = State.PlacingCastle;
     }
+    private readonly Vector3 serverCastlePosition = new Vector3(-9, 0, 0);
+    private readonly Vector3 clientCastlePosition = new Vector3(10, 0, 0);
 
-    internal void StartGame()
-    {
-        if (IsOwner)
-        {
-        instantiatedPlayerUI.gameObject.SetActive(true);
-        }
-        for (int i = 0; i < 7; i++)
-        {
-            DrawCard();
-        }
-    }
+    
 
 
     protected void GrabAllObjectsFromGameManager()
@@ -488,7 +524,6 @@ public class Controller : NetworkBehaviour
         switch (state)
         {
             case State.PlacingCastle:
-                LocalPlaceCastle(startingPlayerLeftPosition);
                 break;
             case State.NothingSelected:
                 break;
@@ -510,7 +545,7 @@ public class Controller : NetworkBehaviour
         {
             bt.Value.SetAllNeighborTiles();
         }
-            
+
         placedCellPosition = positionSent;
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).traverseType == SpellSiegeData.traversableType.Untraversable)
         {
@@ -588,7 +623,7 @@ public class Controller : NetworkBehaviour
     bool CheckForRaycast()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        
+
         if (Physics.Raycast(ray, out RaycastHit raycastHitCardInHand, Mathf.Infinity))
         {
             if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null)
@@ -770,7 +805,7 @@ public class Controller : NetworkBehaviour
     private void SpawnVisualCreatureOnTile(Vector3Int positionSent)
     {
         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(positionSent);
-        
+
         instantiatedSpawnPArticle = Instantiate(visualSpawnEffect, new Vector3(positionToSpawn.x, positionToSpawn.y + .2f, positionToSpawn.z), Quaternion.identity).gameObject;
         Destroy(locallySelectedCard.gameObject);
 

@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Structure : MonoBehaviour
+public class Structure : NetworkBehaviour
 {
     [SerializeField] TextMeshPro keepHealth;
     Grid grid;
@@ -18,7 +19,6 @@ public class Structure : MonoBehaviour
 
     private void Start()
     {
-        return;
         grid = GameManager.singleton.grid;
         baseTileMap = GameManager.singleton.baseMap;
         currentCellPosition = grid.WorldToCell(this.transform.position);

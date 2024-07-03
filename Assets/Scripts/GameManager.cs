@@ -6,7 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class GameManager : NetworkBehaviour
+public class GameManager : MonoBehaviour
 {
     [SerializeField] GameObject playerPrefab;
     [SerializeField] GameObject aiPrefab;
@@ -71,35 +71,10 @@ public class GameManager : NetworkBehaviour
 
     void Start()
     {
-        if (IsHost)
-        {
-            SpawnPlayersServerRpc();
-            if (NetworkManager.Singleton.ConnectedClientsIds.Count == 1)
-            {
-                //GameObject instantiatedAI = Instantiate(aiPrefab);
-            }
-        }
     }
-
-    [ServerRpc]
-    void SpawnPlayersServerRpc()
+    private void OnDestroy()
     {
-        SpawnPlayersClientRpc();
     }
-    [ClientRpc]
-    private void SpawnPlayersClientRpc()
-    {
-        if (IsHost)
-        {
-            Debug.Log(NetworkManager.Singleton.ConnectedClients.Count  + " count of players connected");
-            for (int i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
-            {
-                GameObject instantiatedObject = Instantiate(playerPrefab);
-                instantiatedObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.ConnectedClientsIds[i]);
-            }
-        }
-    }
-
 
     public enum State
     {
@@ -121,17 +96,8 @@ public class GameManager : NetworkBehaviour
 
     internal void AddPlayerToReady(Controller controller)
     {
-        state = State.Game;
-        foreach (Controller player in playerList)
-        {
-            player.StartGame();
-        }
-        playersThatHavePlacedCastle.Add(controller);
-
-        if (playersThatHavePlacedCastle.Count == playerList.Count)
-        {
-            
-        }
+        //state = State.Game;
+        //playersThatHavePlacedCastle.Add(controller);
     }
 
     public void SpawnDamageText(Vector3 positionSent, float damageSent)
