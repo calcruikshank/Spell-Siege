@@ -33,7 +33,6 @@ public class BaseTile : MonoBehaviour
     public SpellSiegeData.ManaType manaType;
     [SerializeField] public SpellSiegeData.traversableType traverseType;
 
-    public Vector3Int cellPosition;
     private void Start()
     {
         SetupLR();

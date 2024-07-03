@@ -511,7 +511,6 @@ public class Controller : NetworkBehaviour
         {
             return;
         }
-        Debug.Log(positionSent + "pos");
         //Vector3 positionToSpawn = baseMap.GetCellCenterWorld(placedCellPosition);
         SetOwningTile(placedCellPosition);
 
@@ -519,7 +518,7 @@ public class Controller : NetworkBehaviour
         {
             foreach (BaseTile neighborOfNeighbor in neighbor.neighborTiles)
             {
-                SetOwningTile(neighborOfNeighbor.cellPosition);
+                SetOwningTile(neighborOfNeighbor.tilePosition);
             }
         }
         instantiatedCaste = Instantiate(castle, positionSent, Quaternion.identity);
