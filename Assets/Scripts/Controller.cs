@@ -116,9 +116,12 @@ public class Controller : NetworkBehaviour
     {
 
     }
+
     // Start is called before the first frame update
     protected virtual void Start()
     {
+        GrabAllObjectsFromGameManager();
+        mousePositionScript = GetComponent<MousePositionScript>();
         if (IsHost && IsOwner)
         {
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
@@ -170,7 +173,6 @@ public class Controller : NetworkBehaviour
     }
     private void StartGameCoroutine()
     {
-        GrabAllObjectsFromGameManager();
 
 
         col.a = 1;
@@ -181,7 +183,6 @@ public class Controller : NetworkBehaviour
         turn += OnTurn;
         resources = new PlayerResources();
         resourcesChanged += UpdateHudForResourcesChanged;
-        mousePositionScript = GetComponent<MousePositionScript>();
 
 
         if (NetworkManager.Singleton != null)
@@ -212,22 +213,7 @@ public class Controller : NetworkBehaviour
         transparentCol = col;
         transparentCol.a = .5f;
 
-        if (NetworkManager.Singleton != null)
-        {
-            if (IsOwner)
-            {
-                //DeckSelectorInScene.singleton.AssignLocalPlayer(this);
-            }
-        }
     }
-
-    IEnumerator GrabGameManager()
-    {
-
-        yield return new WaitUntil(() => GameManager.singleton != null);
-
-    }
-
 
     private void LocalChooseDeckForPlayer(string selectedDeck)
     {
@@ -321,10 +307,6 @@ public class Controller : NetworkBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        if (GameManager.singleton == null || grid == null)
-        {
-            return;
-        }
         if (!IsOwner)
         {
             return;
@@ -333,6 +315,7 @@ public class Controller : NetworkBehaviour
 
         currentLocalHoverCellPosition = grid.WorldToCell(mousePosition);
         mousePosition = mousePositionScript.GetMousePositionWorldPoint();
+        Debug.Log(mousePosition);
         if (currentLocalHoverCellPosition != previousCellPosition)
         {
             highlightMap.SetTile(previousCellPosition, null);
