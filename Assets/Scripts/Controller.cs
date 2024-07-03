@@ -138,6 +138,7 @@ public class Controller : NetworkBehaviour
 
     private void OnClientConnected(ulong clientId)
     {
+        Debug.Log($"Client connected with ID: {clientId}");
         if (IsHost && IsOwner && NetworkManager.Singleton.ConnectedClientsList.Count >= 2 && !gameStarted)
         {
             gameStarted = true;
@@ -158,19 +159,32 @@ public class Controller : NetworkBehaviour
             Debug.Log($"Spawning castle for client {client.ClientId} at position {spawnPosition}");
             SpawnCastleForPlayer(client.ClientId, spawnPosition);
         }
+        SetupCastlesServerRpc();
     }
 
     [SerializeField] GameObject castlePrefab;
+
     private void SpawnCastleForPlayer(ulong clientId, Vector3 position)
     {
+        Debug.Log($"Attempting to spawn castle for client {clientId} at position {position}");
+
         GameObject castleInstance = Instantiate(castlePrefab, position, Quaternion.identity);
         NetworkObject networkObject = castleInstance.GetComponent<NetworkObject>();
 
-        // Spawn the castle for the client
+        if (networkObject == null)
+        {
+            Debug.LogError("NetworkObject component is missing from the castle prefab.");
+            return;
+        }
+
+        // Assign ownership to the client
         networkObject.SpawnWithOwnership(clientId);
 
-        SetupCastlesServerRpc();
+        // Log the owner client ID after spawning
+        Debug.Log($"Castle spawned with OwnerClientId: {networkObject.OwnerClientId}");
+
     }
+
 
     [ServerRpc]
     void SetupCastlesServerRpc()
@@ -188,7 +202,11 @@ public class Controller : NetworkBehaviour
         {
             LocalPlaceCastle(new Vector3Int(8, 0, 0));
         }
-        StartGameCoroutine();
+        Debug.Log("controller " + GameManager.singleton.playerList.Count);
+        foreach (Controller controller in GameManager.singleton.playerList)
+        {
+            controller.StartGameCoroutine();
+        }
     }
     private void StartGameCoroutine()
     {
@@ -265,17 +283,20 @@ public class Controller : NetworkBehaviour
     }
     protected void SpawnHUDAndHideOnAllNonOwners()
     {
-        Debug.Log("spawning player ui");
+        Debug.Log("Spawning player UI");
         instantiatedPlayerUI = Instantiate(playerHud, canvasMain.transform);
 
-        instantiatedPlayerUI.gameObject.SetActive(false);
         cardParent = instantiatedPlayerUI.GetComponent<HudElements>().cardParent;
+        Debug.Log($"IsOwner: {IsOwner}, OwnerClientId: {OwnerClientId}");
+
         if (!IsOwner)
         {
+            Debug.Log("Not the owner, hiding UI");
             instantiatedPlayerUI.gameObject.SetActive(false);
         }
-        if (IsOwner)
+        else
         {
+            Debug.Log("Is the owner, showing and setting up UI");
             cardParent.gameObject.GetComponent<Image>().color = transparentCol;
             hudElements = instantiatedPlayerUI.GetComponent<HudElements>();
             hudElements.UpdateHudVisuals(this, turnThreshold);
