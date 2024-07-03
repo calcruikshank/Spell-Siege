@@ -110,7 +110,7 @@ public class Controller : NetworkBehaviour
         TilePurchased
     }
 
-    Vector3Int startingPlayerLeftPosition = new Vector3Int(0, 0, 0);
+    Vector3Int startingPlayerLeftPosition = new Vector3Int(-7, 0, 0);
     public override void OnNetworkSpawn()
     {
 
@@ -139,7 +139,6 @@ public class Controller : NetworkBehaviour
         resourcesChanged += UpdateHudForResourcesChanged;
         mousePositionScript = GetComponent<MousePositionScript>();
 
-        state = State.NothingSelected;
 
         if (NetworkManager.Singleton != null)
         {
@@ -173,7 +172,7 @@ public class Controller : NetworkBehaviour
         {
             if (IsOwner)
             {
-                DeckSelectorInScene.singleton.AssignLocalPlayer(this);
+                //DeckSelectorInScene.singleton.AssignLocalPlayer(this);
             }
         }
     }
@@ -292,7 +291,7 @@ public class Controller : NetworkBehaviour
         }
         if (!IsOwner)
         {
-            //return;
+            return;
         }
 
 
@@ -333,11 +332,7 @@ public class Controller : NetworkBehaviour
         }
         if (Input.GetMouseButtonDown(1))
         {
-            if (instantiatedCaste != null)
-            {
-                SetVisualsToNothingSelectedLocally();
-                RightClickServerRpc();
-            }
+            SetVisualsToNothingSelectedLocally();
         }
         if (Input.GetMouseButtonUp(0))
         {
@@ -349,7 +344,7 @@ public class Controller : NetworkBehaviour
                     {
                         if (!CheckForRaycast())
                         {
-                            AddToTickQueueLocal(grid.WorldToCell(mousePosition));
+                            LeftClickQueue(grid.WorldToCell(mousePosition));
                         }
                     }
                 }
@@ -364,11 +359,11 @@ public class Controller : NetworkBehaviour
                 mousePositionWorldPoint = raycastHit.point;
                 cellPositionSentToClients = grid.WorldToCell(mousePositionWorldPoint);
             }
-            AddToTickQueueLocal(cellPositionSentToClients);
+            LeftClickQueue(cellPositionSentToClients);
         }
 
     }
-    void AddToTickQueueLocal(Vector3Int positionSent)
+    void LeftClickQueue(Vector3Int positionSent)
     {
         //visual section for spawning creatures
         if (locallySelectedCard != null && locallySelectedCard.cardType == SpellSiegeData.CardType.Creature)
@@ -380,7 +375,10 @@ public class Controller : NetworkBehaviour
             }
             return;
         }
-        LeftClickBaseMapServerRpc(positionSent);
+        if (state == State.PlacingCastle)
+        {
+            LeftClickBaseMapServerRpc(positionSent);
+        }
     }
 
     public void SetVisualsToNothingSelectedLocally()
@@ -516,9 +514,13 @@ public class Controller : NetworkBehaviour
         Debug.Log(positionSent + "pos");
         //Vector3 positionToSpawn = baseMap.GetCellCenterWorld(placedCellPosition);
         SetOwningTile(placedCellPosition);
-        for (int i = 0; i < BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).neighborTiles.Count; i++)
+
+        foreach (BaseTile neighbor in BaseMapTileState.singleton.GetBaseTileAtCellPosition(positionSent).neighborTiles)
         {
-            SetOwningTile(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).neighborTiles[i].tilePosition);
+            foreach (BaseTile neighborOfNeighbor in neighbor.neighborTiles)
+            {
+                SetOwningTile(neighborOfNeighbor.cellPosition);
+            }
         }
         instantiatedCaste = Instantiate(castle, positionSent, Quaternion.identity);
         //instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
@@ -1289,18 +1291,6 @@ public class Controller : NetworkBehaviour
     {
         TargetACreatureLocal(selectedCreatureID, creatureToTargetID, actualPosition);
     }
-    [ServerRpc]
-    private void RightClickServerRpc()
-    {
-        RightClickClientRpc();
-    }
-    [ClientRpc]
-    private void RightClickClientRpc()
-    {
-        SetStateToNothingSelected();
-    }
-
-
     [ServerRpc]
     private void SelectCardInHandServerRpc(int cardIndex)
     {
