@@ -22,6 +22,20 @@ public class Controller : NetworkBehaviour
         SelectingDeck,
         Waiting
     }
+    NetworkVariable<int> seed = new NetworkVariable<int>();
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsHost)
+        {
+            seed.Value = UnityEngine.Random.Range(0, 2147483646);
+        }
+        if (IsClient)
+        {
+            Debug.Log(seed.Value);
+            UnityEngine.Random.InitState(seed.Value);
+        }
+    }
 
 
 
@@ -112,10 +126,6 @@ public class Controller : NetworkBehaviour
         TilePurchased
     }
 
-    public override void OnNetworkSpawn()
-    {
-
-    }
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -210,6 +220,7 @@ public class Controller : NetworkBehaviour
     }
     private void StartGameCoroutine()
     {
+        cardsInDeck = new List<CardInHand>( demonDeck );
         col.a = 1;
         transparentCol = col;
         transparentCol.a = .5f;
@@ -246,7 +257,21 @@ public class Controller : NetworkBehaviour
         col.a = 1;
         transparentCol = col;
         transparentCol.a = .5f;
-
+        GameManager.singleton.Shuffle(cardsInDeck);
+        for (int i = 0; i < 7; i++) 
+        {
+                resources.greenManaCap++;
+                resources.greenMana++;
+                resources.blackManaCap++;
+                resources.blackMana++;
+                resources.whiteManaCap++;
+                resources.whiteMana++;
+                resources.blueManaCap++;
+                resources.blueMana++;
+                resources.redManaCap++;
+                resources.redMana++;
+            DrawCard();
+        }
     }
 
     private void LocalChooseDeckForPlayer(string selectedDeck)
@@ -529,6 +554,7 @@ public class Controller : NetworkBehaviour
 
     void AddIndexOfCardInHandToTickQueueLocal(int index)
     {
+        Debug.Log("got here card");
         SelectCardInHandServerRpc(index);
     }
     void AddIndexOfCreatureOnBoard(int index)

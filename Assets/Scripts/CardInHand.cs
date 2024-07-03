@@ -293,7 +293,7 @@ public class CardInHand : MonoBehaviour
                 visualVersion = Instantiate(this.gameObject, GameManager.singleton.canvasMain.transform);
                 visualVersion.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z + .525f);
                 visualVersion.transform.localEulerAngles = Vector3.zero;
-                visualVersion.transform.localScale = visualVersion.transform.localScale * 2;
+                visualVersion.transform.localScale = visualVersion.transform.localScale * 2.5f;
                 visualVersion.GetComponentInChildren<Collider>().enabled = false;
             }
         }
