@@ -28,7 +28,6 @@ public class AI : Controller
         cardsInDeck = translatedCards;
         cardsInDeck = GameManager.singleton.Shuffle(cardsInDeck);
 
-        SetStateToPlacingCastle();
     }
 
     float checkAITimer = 1f;

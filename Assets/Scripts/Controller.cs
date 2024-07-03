@@ -43,7 +43,7 @@ public class Controller : NetworkBehaviour
 
     protected Vector3 mousePosition;
     protected TileBase highlightTile;
-    protected Tilemap highlightMap;// set these = to gamemanage.singleton.highlightmap TODO
+    protected Tilemap highlightMap;
     protected Tilemap baseMap;
     protected Tilemap environmentMap;
     protected Tilemap waterMap;
@@ -126,7 +126,6 @@ public class Controller : NetworkBehaviour
         {
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
         }
-        SetStateToPlacingCastle();
 
     }
     private void OnDestroy()
@@ -143,7 +142,6 @@ public class Controller : NetworkBehaviour
         {
             gameStarted = true;
             StartGame();
-            Debug.Log(IsHost + " host");
         }
     }
     private bool gameStarted = false;
@@ -170,16 +168,34 @@ public class Controller : NetworkBehaviour
 
         // Spawn the castle for the client
         networkObject.SpawnWithOwnership(clientId);
+
+        SetupCastlesServerRpc();
+    }
+
+    [ServerRpc]
+    void SetupCastlesServerRpc()
+    {
+        SetupCastlesClientRpc();
+    }
+    [ClientRpc]
+    void SetupCastlesClientRpc()
+    {
+        if (IsHost)
+        {
+            LocalPlaceCastle(new Vector3Int( -7,0,0 ));
+        }
+        else
+        {
+            LocalPlaceCastle(new Vector3Int(8, 0, 0));
+        }
+        StartGameCoroutine();
     }
     private void StartGameCoroutine()
     {
-
-
         col.a = 1;
         transparentCol = col;
         transparentCol.a = .5f;
         SpawnHUDAndHideOnAllNonOwners();
-        instantiatedPlayerUI.gameObject.SetActive(false);
         turn += OnTurn;
         resources = new PlayerResources();
         resourcesChanged += UpdateHudForResourcesChanged;
@@ -229,10 +245,6 @@ public class Controller : NetworkBehaviour
 
     }
 
-    protected void SetStateToPlacingCastle()
-    {
-        state = State.PlacingCastle;
-    }
     private readonly Vector3 serverCastlePosition = new Vector3(-9, 0, 0);
     private readonly Vector3 clientCastlePosition = new Vector3(10, 0, 0);
 
@@ -253,7 +265,10 @@ public class Controller : NetworkBehaviour
     }
     protected void SpawnHUDAndHideOnAllNonOwners()
     {
+        Debug.Log("spawning player ui");
         instantiatedPlayerUI = Instantiate(playerHud, canvasMain.transform);
+
+        instantiatedPlayerUI.gameObject.SetActive(false);
         cardParent = instantiatedPlayerUI.GetComponent<HudElements>().cardParent;
         if (!IsOwner)
         {
@@ -264,6 +279,7 @@ public class Controller : NetworkBehaviour
             cardParent.gameObject.GetComponent<Image>().color = transparentCol;
             hudElements = instantiatedPlayerUI.GetComponent<HudElements>();
             hudElements.UpdateHudVisuals(this, turnThreshold);
+            instantiatedPlayerUI.gameObject.SetActive(true);
         }
     }
 
@@ -315,7 +331,6 @@ public class Controller : NetworkBehaviour
 
         currentLocalHoverCellPosition = grid.WorldToCell(mousePosition);
         mousePosition = mousePositionScript.GetMousePositionWorldPoint();
-        Debug.Log(mousePosition);
         if (currentLocalHoverCellPosition != previousCellPosition)
         {
             highlightMap.SetTile(previousCellPosition, null);
@@ -454,7 +469,7 @@ public class Controller : NetworkBehaviour
         }
         if (turnTimer > turnThreshold)
         {
-            turn.Invoke();
+            //turn.Invoke();
             turnTimer = 0;
         }
 
@@ -544,12 +559,9 @@ public class Controller : NetworkBehaviour
                 SetOwningTile(neighborOfNeighbor.tilePosition);
             }
         }
-        instantiatedCaste = Instantiate(castle, positionSent, Quaternion.identity);
+        //instantiatedCaste = Instantiate(castle, positionSent, Quaternion.identity);
         //instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
-        AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
-        AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
-        SetStateToWaiting();
-        GameManager.singleton.AddPlayerToReady(this);
+        //AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), positionSent);
     }
 
     protected void AddStructureToTile(Structure structure, Vector3Int positionSent)
