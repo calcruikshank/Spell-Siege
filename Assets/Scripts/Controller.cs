@@ -439,7 +439,18 @@ public class Controller : NetworkBehaviour
                 mousePositionWorldPoint = raycastHit.point;
                 cellPositionSentToClients = grid.WorldToCell(mousePositionWorldPoint);
             }
-            LeftClickQueue(cellPositionSentToClients);
+            if (state == State.NothingSelected)
+            {
+                if (!CheckForRaycast())
+                {
+                    LeftClickQueue(cellPositionSentToClients);
+                }
+            }
+            else
+            {
+                LeftClickQueue(cellPositionSentToClients);
+            }
+
         }
 
     }
@@ -666,6 +677,7 @@ public class Controller : NetworkBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
+        Debug.Log("Checking for raycast");
         if (Physics.Raycast(ray, out RaycastHit raycastHitCardInHand, Mathf.Infinity))
         {
             if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null)
