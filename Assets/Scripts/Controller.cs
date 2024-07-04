@@ -203,19 +203,22 @@ public class Controller : NetworkBehaviour
     [ClientRpc]
     void SetupCastlesClientRpc()
     {
-        if (IsHost)
-        {
-            LocalPlaceCastle(new Vector3Int( -7,0,0 ));
-        }
-        else
-        {
-            LocalPlaceCastle(new Vector3Int(8, 0, 0));
-        }
-        Debug.Log("controller " + GameManager.singleton.playerList.Count);
         foreach (Controller controller in GameManager.singleton.playerList)
         {
+            Debug.Log("Client " + IsOwner);
+            if (controller.IsHost && controller.IsOwner)
+            {
+                controller.LocalPlaceCastle(new Vector3Int(-7, 0, 0));
+            }
+            if (!controller.IsHost && controller.IsOwner)
+            {
+                controller.LocalPlaceCastle(new Vector3Int(8, 0, 0));
+            }
+            Debug.Log("controller " + GameManager.singleton.playerList.Count);
+
             controller.StartGameCoroutine();
         }
+        
     }
     private void StartGameCoroutine()
     {
