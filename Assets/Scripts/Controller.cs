@@ -14,7 +14,6 @@ public class Controller : NetworkBehaviour
     public enum State
     {
         NothingSelected,
-        //CreatureSelected,
         CreatureInHandSelected,
         SpellInHandSelected,
         StructureInHandSeleced,
@@ -308,7 +307,6 @@ public class Controller : NetworkBehaviour
     }
     protected void SpawnHUDAndHideOnAllNonOwners()
     {
-        Debug.Log("Spawning player UI");
         instantiatedPlayerUI = Instantiate(playerHud, canvasMain.transform);
 
         cardParent = instantiatedPlayerUI.GetComponent<HudElements>().cardParent;
@@ -316,12 +314,10 @@ public class Controller : NetworkBehaviour
 
         if (!IsOwner)
         {
-            Debug.Log("Not the owner, hiding UI");
             instantiatedPlayerUI.gameObject.SetActive(false);
         }
         else
         {
-            Debug.Log("Is the owner, showing and setting up UI");
             cardParent.gameObject.GetComponent<Image>().color = transparentCol;
             hudElements = instantiatedPlayerUI.GetComponent<HudElements>();
             hudElements.UpdateHudVisuals(this, turnThreshold);
@@ -413,6 +409,7 @@ public class Controller : NetworkBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             SetVisualsToNothingSelectedLocally();
+            SetStateToNothingSelected();
         }
         if (Input.GetMouseButtonUp(0))
         {
@@ -456,6 +453,7 @@ public class Controller : NetworkBehaviour
     }
     void LeftClickQueue(Vector3Int positionSent)
     {
+        Debug.Log("Local creature " + locallySelectedCard);
         //visual section for spawning creatures
         if (locallySelectedCard != null && locallySelectedCard.cardType == SpellSiegeData.CardType.Creature)
         {
@@ -489,6 +487,8 @@ public class Controller : NetworkBehaviour
             bt.UnHighlightTile();
         }
         highlightedTiles.Clear();
+
+
     }
 
     private void FixedUpdate()
@@ -677,7 +677,6 @@ public class Controller : NetworkBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        Debug.Log("Checking for raycast");
         if (Physics.Raycast(ray, out RaycastHit raycastHitCardInHand, Mathf.Infinity))
         {
             if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null)
@@ -730,6 +729,7 @@ public class Controller : NetworkBehaviour
     List<BaseTile> highlightedTiles = new List<BaseTile>();
     private void ShowViablePlacableTiles(CardInHand locallySelectedCardInHandToTurnOff)
     {
+        Debug.Log("Showing viable placable tiles");
         if (locallySelectedCardInHandToTurnOff.cardType == SpellSiegeData.CardType.Creature)
         {
             foreach (KeyValuePair<Vector3Int, BaseTile> kvp in tilesOwned)
