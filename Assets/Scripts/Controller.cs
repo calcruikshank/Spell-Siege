@@ -64,7 +64,7 @@ public class Controller : NetworkBehaviour
     protected Vector3Int previousCellPosition;
 
     protected Transform castle;
-    protected Transform instantiatedCaste;
+    protected PlayerKeep instantiatedCaste;
     protected Vector3Int currentLocalHoverCellPosition;
     protected Vector3Int cellPositionSentToClients;
     protected Vector3Int targetedCellPosition;
@@ -203,9 +203,19 @@ public class Controller : NetworkBehaviour
     [ClientRpc]
     void SetupCastlesClientRpc()
     {
+        foreach (PlayerKeep playerKeepInScene in FindObjectsOfType<PlayerKeep>())
+        {
+            if (playerKeepInScene.IsOwner)
+            {
+                instantiatedCaste = playerKeepInScene;
+            }
+            else 
+            {
+                enemyPlayerKeep = playerKeepInScene;
+            }
+        }
         foreach (Controller controller in GameManager.singleton.playerList)
         {
-            Debug.Log("Client " + IsOwner);
             if (controller.IsHost && controller.IsOwner)
             {
                 controller.LocalPlaceCastle(new Vector3Int(-7, 0, 0));
@@ -869,6 +879,8 @@ public class Controller : NetworkBehaviour
         locallySelectedCardInHandToTurnOff.gameObject.SetActive(false);
     }
 
+
+    public PlayerKeep enemyPlayerKeep;
     public void CastCreatureOnTile(CardInHand cardSelectedSent, Vector3Int cellSent)
     {
         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
@@ -887,7 +899,9 @@ public class Controller : NetworkBehaviour
         instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
-
+        Debug.Log(enemyPlayerKeep + " name of keep ");
+        Debug.Log(enemyPlayerKeep.tileCurrentlyOn + " tile currently on ");
+        instantiatedCreature.GetComponent<Creature>().SetMove(new Vector3Int(enemyPlayerKeep.tileCurrentlyOn.tilePosition.x, instantiatedCreature.GetComponent<Creature>().tileCurrentlyOn.tilePosition.y, instantiatedCreature.GetComponent<Creature>().tileCurrentlyOn.tilePosition.z));
         instantiatedCreature.GetComponent<Creature>().OnETB();
 
         cardSelectedSent.transform.parent = null;

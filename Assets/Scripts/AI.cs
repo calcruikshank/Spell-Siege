@@ -42,7 +42,7 @@ public class AI : Controller
             switch (state)
             {
                 case State.PlacingCastle:
-                    PlaceCastle();
+                    //PlaceCastle();
                     break;
                 case State.NothingSelected:
                     CheckForAnyCreaturesOnField();
@@ -223,7 +223,7 @@ public class AI : Controller
         }
     }
 
-    private void PlaceCastle()
+    /*private void PlaceCastle()
     {
         placedCellPosition = FindForestMountainTiles();
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).traverseType == SpellSiegeData.traversableType.Untraversable)
@@ -237,13 +237,13 @@ public class AI : Controller
         {
             SetOwningTile(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition).neighborTiles[i].tilePosition);
         }
-        instantiatedCaste = Instantiate(castle, positionToSpawn, Quaternion.identity);
+        //instantiatedCaste = Instantiate(castle, positionToSpawn, Quaternion.identity);
         //instantiatedCaste.GetComponent<MeshRenderer>().material.color = col;
         AddStructureToTile(instantiatedCaste.GetComponent<Structure>(), placedCellPosition);
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(placedCellPosition));
         GameManager.singleton.AddPlayerToReady(this);
         SetStateToWaiting();
-    }
+    }*/
 
     private Vector3Int FindForestMountainTiles()
     {

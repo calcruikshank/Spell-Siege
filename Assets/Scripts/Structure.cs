@@ -23,6 +23,7 @@ public class Structure : NetworkBehaviour
         baseTileMap = GameManager.singleton.baseMap;
         currentCellPosition = grid.WorldToCell(this.transform.position);
         tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
+        Debug.Log(tileCurrentlyOn);
         tileCurrentlyOn.AddStructureToTile(this); 
         if (keepHealth != null)
         {
