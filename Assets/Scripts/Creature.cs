@@ -562,8 +562,9 @@ public class Creature : MonoBehaviour
 
 
 
-    public virtual void SetMove(Vector3 positionToTarget)
+    public virtual void SetMove(Vector3 positionToTarget, Vector3 originalPosition)
     {
+        actualPosition = originalPosition;
         HidePathfinderLR();
         rangeLr.enabled = false;
         Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(positionToTarget.x, 0, positionToTarget.z));
@@ -591,6 +592,9 @@ public class Creature : MonoBehaviour
 
     }
 
+    public void SetMoveRpc()
+    {
+    }
 
     protected void SetLRPoints()
     {
@@ -659,7 +663,7 @@ public class Creature : MonoBehaviour
         }
         if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) != null && tileCurrentlyOn.tilePosition != currentCellPosition)
         {
-            //SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
         }
         if (previousTilePosition != tileCurrentlyOn)
         {
@@ -742,7 +746,7 @@ public class Creature : MonoBehaviour
         {
             if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex + 1].tilePosition) != null)
             {
-                //SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
             }
         }
     }
@@ -1265,11 +1269,11 @@ public class Creature : MonoBehaviour
             }
             if (!IsCreatureWithinRange(creatureToFollow))
             {
-                //SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
             }
             if (creatureToFollow.playerOwningCreature == this.playerOwningCreature)
             {
-                //SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
+                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(creatureToFollow.tileCurrentlyOn.tilePosition), originalCreaturePosition);
             }
         }
     }
@@ -1287,7 +1291,7 @@ public class Creature : MonoBehaviour
             {
                 return;
             }
-            //SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollowSent.tileCurrentlyOn.tilePosition), originalCreaturePosition);
+            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(structureToFollowSent.tileCurrentlyOn.tilePosition), originalCreaturePosition);
         }
     }
 

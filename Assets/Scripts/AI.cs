@@ -73,7 +73,7 @@ public class AI : Controller
                     {
                         for (int i = 0; i < c.structuresOwned.Count; i++)
                         {
-                            creatureOwned.Value.SetStructureToFollow(c.structuresOwned[i], creatureOwned.Value.actualPosition);
+                            //creatureOwned.Value.SetStructureToFollow(c.structuresOwned[i], creatureOwned.Value.actualPosition);
                         }
                     }
                 }

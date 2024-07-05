@@ -908,7 +908,6 @@ public class Controller : NetworkBehaviour
         instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
-        instantiatedCreature.GetComponent<Creature>().SetMove(new Vector3Int(opponent.instantiatedCaste.tileCurrentlyOn.tilePosition.x, instantiatedCreature.GetComponent<Creature>().tileCurrentlyOn.tilePosition.y, instantiatedCreature.GetComponent<Creature>().tileCurrentlyOn.tilePosition.z));
         instantiatedCreature.GetComponent<Creature>().OnETB();
 
         cardSelectedSent.transform.parent = null;
@@ -917,6 +916,7 @@ public class Controller : NetworkBehaviour
         {
             Destroy(instantiatedSpawnPArticle);
         }
+        instantiatedCreature.GetComponent<Creature>().SetStructureToFollow(opponent.instantiatedCaste, instantiatedCreature.GetComponent<Creature>().actualPosition);
     }
 
     private void HandleSpellInHandSelected(Vector3Int cellSent)
