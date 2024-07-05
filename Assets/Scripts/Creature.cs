@@ -262,31 +262,6 @@ public class Creature : MonoBehaviour
         {
             currentTargetedCreature = targetToFollow;
         }
-        /*if (targetToFollow == null || !IsCreatureWithinRange(targetToFollow))
-        {
-            foreach (Creature creatureInRange in creaturesWithinRange)
-            {
-                if (creatureInRange.playerOwningCreature != this.playerOwningCreature)
-                {
-                    if (currentTargetedCreature == null)
-                    {
-                        lowestHealthCreatureWithinRange = creatureInRange.CurrentHealth;
-                        currentTargetedCreature = creatureInRange;
-                    }
-                    if (currentTargetedCreature != null)
-                    {
-                        if (creatureInRange.CurrentHealth < lowestHealthCreatureWithinRange)
-                        {
-                            currentTargetedCreature = creatureInRange;
-                            lowestHealthCreatureWithinRange = creatureInRange.CurrentHealth;
-                        }
-                    }
-                }
-
-
-            }
-        }*/
-
 
 
         if (currentTargetedStructure != null)
@@ -296,19 +271,6 @@ public class Creature : MonoBehaviour
                 currentTargetedStructure = null;
             }
         }
-        /*foreach (Structure structureInRange in structresWithinRange)
-        {
-            if (structureInRange.playerOwningStructure != this.playerOwningCreature)
-            {
-                if (currentTargetedStructure == null && currentTargetedCreature == null)
-                {
-                    if (structureInRange.playerOwningStructure != this.playerOwningCreature)
-                    {
-                        currentTargetedStructure = structureInRange;
-                    }
-                }
-            }
-        }*/
         if (structureToFollow != null)
         {
             if (structureToFollow.playerOwningStructure != this.playerOwningCreature)
@@ -568,6 +530,7 @@ public class Creature : MonoBehaviour
             tempLineRendererBetweenCreatures.enabled = false;
         }
 
+        targetedPosition = positionToTarget;
 
         //currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
         //List<BaseTile> tempPathVectorList = pathfinder1.FindPath(tileCurrentlyOn.tilePosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);
@@ -589,17 +552,19 @@ public class Creature : MonoBehaviour
     {
         if (currentTargetedStructure != null)
         {
+            BaseTile targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
             if (currentTargetedStructure.currentCellPosition.x < this.currentCellPosition.x)
             {
-                targetedPosition = new Vector3Int(tileCurrentlyOn.tilePosition.x - 1, tileCurrentlyOn.tilePosition.y, tileCurrentlyOn.tilePosition.z);
+                targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x - 1, currentCellPosition.y, currentCellPosition.z));
             }
             else
             {
-                targetedPosition = new Vector3Int(tileCurrentlyOn.tilePosition.x + 1, tileCurrentlyOn.tilePosition.y, tileCurrentlyOn.tilePosition.z);
+                targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x + 1, currentCellPosition.y, currentCellPosition.z));
             }
-            if (Vector3.Distance(actualPosition, targetedPosition) > .02f)
+
+            if (targetedCell.CreatureOnTile() == null && targetedCell.structureOnTile == null && targetedCell.traverseType == SpellSiegeData.traversableType.TraversableByAll)
             {
-                actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedPosition.x, actualPosition.y, targetedPosition.z), speed * Time.fixedDeltaTime);
+                actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime);
             }
         }
         currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
