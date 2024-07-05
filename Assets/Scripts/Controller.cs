@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
@@ -64,7 +65,7 @@ public class Controller : NetworkBehaviour
     protected Vector3Int previousCellPosition;
 
     protected Transform castle;
-    protected PlayerKeep instantiatedCaste;
+    public PlayerKeep instantiatedCaste;
     protected Vector3Int currentLocalHoverCellPosition;
     protected Vector3Int cellPositionSentToClients;
     protected Vector3Int targetedCellPosition;
@@ -126,6 +127,7 @@ public class Controller : NetworkBehaviour
     }
 
 
+    public Controller opponent;
     // Start is called before the first frame update
     protected virtual void Start()
     {
@@ -135,6 +137,8 @@ public class Controller : NetworkBehaviour
         {
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
         }
+
+        
 
     }
     private void OnDestroy()
@@ -203,19 +207,24 @@ public class Controller : NetworkBehaviour
     [ClientRpc]
     void SetupCastlesClientRpc()
     {
-        foreach (PlayerKeep playerKeepInScene in FindObjectsOfType<PlayerKeep>())
-        {
-            if (playerKeepInScene.IsOwner)
-            {
-                instantiatedCaste = playerKeepInScene;
-            }
-            else 
-            {
-                enemyPlayerKeep = playerKeepInScene;
-            }
-        }
+        GameManager.singleton.playerList[0].opponent = GameManager.singleton.playerList[1];
+        GameManager.singleton.playerList[1].opponent = GameManager.singleton.playerList[0];
+
+
+        
         foreach (Controller controller in GameManager.singleton.playerList)
         {
+            foreach (PlayerKeep pk in FindObjectsOfType<PlayerKeep>())
+            {
+                if (pk.IsOwner && controller.IsOwner)
+                {
+                    controller.instantiatedCaste = pk;
+                }
+                if (!pk.IsOwner && !controller.IsOwner)
+                {
+                    controller.instantiatedCaste = pk;
+                }
+            }
             if (controller.IsHost && controller.IsOwner)
             {
                 controller.LocalPlaceCastle(new Vector3Int(-7, 0, 0));
@@ -597,6 +606,7 @@ public class Controller : NetworkBehaviour
             case State.NothingSelected:
                 break;
             case State.CreatureInHandSelected:
+                Debug.Log("Local left click ddqwwd");
                 HandleCreatureInHandSelected(positionSent);
                 break;
             case State.SpellInHandSelected:
@@ -879,10 +889,9 @@ public class Controller : NetworkBehaviour
         locallySelectedCardInHandToTurnOff.gameObject.SetActive(false);
     }
 
-
-    public PlayerKeep enemyPlayerKeep;
     public void CastCreatureOnTile(CardInHand cardSelectedSent, Vector3Int cellSent)
     {
+        Debug.Log(IsOwner + " spawning creature on tile");
         Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
         GameObject instantiatedCreature = Instantiate(cardSelectedSent.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
         if (environmentMap.GetInstantiatedObject(cellSent))
@@ -899,16 +908,13 @@ public class Controller : NetworkBehaviour
         instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
         creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
-        Debug.Log(enemyPlayerKeep + " name of keep ");
-        Debug.Log(enemyPlayerKeep.tileCurrentlyOn + " tile currently on ");
-        instantiatedCreature.GetComponent<Creature>().SetMove(new Vector3Int(enemyPlayerKeep.tileCurrentlyOn.tilePosition.x, instantiatedCreature.GetComponent<Creature>().tileCurrentlyOn.tilePosition.y, instantiatedCreature.GetComponent<Creature>().tileCurrentlyOn.tilePosition.z));
+        instantiatedCreature.GetComponent<Creature>().SetMove(new Vector3Int(opponent.instantiatedCaste.tileCurrentlyOn.tilePosition.x, instantiatedCreature.GetComponent<Creature>().tileCurrentlyOn.tilePosition.y, instantiatedCreature.GetComponent<Creature>().tileCurrentlyOn.tilePosition.z));
         instantiatedCreature.GetComponent<Creature>().OnETB();
 
         cardSelectedSent.transform.parent = null;
         RemoveCardFromHand(cardSelectedSent);
         if (instantiatedSpawnPArticle != null)
         {
-            Debug.Log("destroying spawn particle");
             Destroy(instantiatedSpawnPArticle);
         }
     }
@@ -1002,8 +1008,6 @@ public class Controller : NetworkBehaviour
                 SetOwningTile(cellSent);
 
                 SpendManaToCast(cardSelected.GetComponent<CardInHand>());
-                //GameObject instantiatedStructure = Instantiate(cardSelected.GameObjectToInstantiate.gameObject, positionToSpawn, Quaternion.identity);
-                //instantiatedStructure.GetComponent<Structure>().InjectDependencies(cellSent, this);
 
                 foreach (BaseTile bt in BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent).neighborTiles)
                 {

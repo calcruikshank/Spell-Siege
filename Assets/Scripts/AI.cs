@@ -136,8 +136,8 @@ public class AI : Controller
         {
             if (CheckToSeeIfCanSpawnCreature(bt.Key))
             {
-                SpendManaToCast(cardSelected);
-                CastCreatureOnTile(cardSelected, bt.Key);
+                //SpendManaToCast(cardSelected);
+                //CastCreatureOnTile(cardSelected, bt.Key);
                 SetStateToNothingSelected();
                 break;
             }
