@@ -60,8 +60,6 @@ public class Creature : MonoBehaviour
 
     bool canAttack = false;
     [HideInInspector] public Controller playerOwningCreature;
-    Pathfinding pathfinder1;
-    Pathfinding pathfinder2;
 
     public SpellSiegeData.travType thisTraversableType;
 
@@ -557,9 +555,6 @@ public class Creature : MonoBehaviour
         }
     }
 
-    [HideInInspector] public List<BaseTile> pathVectorList = new List<BaseTile>();
-    int currentPathIndex;
-
 
 
     public virtual void SetMove(Vector3 positionToTarget, Vector3 originalPosition)
@@ -567,7 +562,6 @@ public class Creature : MonoBehaviour
         actualPosition = originalPosition;
         HidePathfinderLR();
         rangeLr.enabled = false;
-        Vector3Int targetedCellPosition = grid.WorldToCell(new Vector3(positionToTarget.x, 0, positionToTarget.z));
 
         if (tempLineRendererBetweenCreatures != null)
         {
@@ -576,17 +570,11 @@ public class Creature : MonoBehaviour
 
 
         //currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
-        List<BaseTile> tempPathVectorList = pathfinder1.FindPath(tileCurrentlyOn.tilePosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);
-        if (tempPathVectorList == null)
-        {
-            return;
-        }
-        List<BaseTile> path = tempPathVectorList;
-        pathVectorList = path;
+        //List<BaseTile> tempPathVectorList = pathfinder1.FindPath(tileCurrentlyOn.tilePosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(targetedCellPosition).tilePosition, thisTraversableType);
+        //List<BaseTile> path = tempPathVectorList;
+        //pathVectorList = path;
         //SetNewTargetPosition(BaseMapTileState.singleton.GetWorldPositionOfCell(path[1].tilePosition));
         //SetNewTargetPosition(positionToTarget);
-        SetLRPoints();
-        currentPathIndex = 0;
         creatureState = CreatureState.Moving;
 
 
@@ -596,74 +584,28 @@ public class Creature : MonoBehaviour
     {
     }
 
-    protected void SetLRPoints()
-    {
-        List<Vector3> lrList = new List<Vector3>();
-        //targetPosition = positionToTarget;
-
-        lrList.Add(actualPosition);
-        for (int i = currentPathIndex; i < pathVectorList.Count; i++)
-        {
-            lrList.Add(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[i].tilePosition));
-        }
-        positions = lrList.ToArray();
-        //positions[0] = this.transform.position;
-        //positions[1] = targetPosition;
-        lr.enabled = true;
-        lr.positionCount = positions.Length;
-        lr.SetPositions(positions);
-    }
 
     public void Move()
     {
-        if (pathVectorList != null)
+        if (currentTargetedStructure != null)
         {
-            CheckForCreaturesInPath();
-            if (currentPathIndex < pathVectorList.Count)
+            if (currentTargetedStructure.currentCellPosition.x < this.currentCellPosition.x)
             {
-                targetedPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[currentPathIndex].tilePosition);
+                targetedPosition = new Vector3Int(tileCurrentlyOn.tilePosition.x - 1, tileCurrentlyOn.tilePosition.y, tileCurrentlyOn.tilePosition.z);
             }
-
+            else
+            {
+                targetedPosition = new Vector3Int(tileCurrentlyOn.tilePosition.x + 1, tileCurrentlyOn.tilePosition.y, tileCurrentlyOn.tilePosition.z);
+            }
             if (Vector3.Distance(actualPosition, targetedPosition) > .02f)
             {
                 actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedPosition.x, actualPosition.y, targetedPosition.z), speed * Time.fixedDeltaTime);
-                SetLRPoints();
-            }
-
-            if (Vector3.Distance(actualPosition, targetedPosition) <= .02f)
-            {
-                if (currentPathIndex >= pathVectorList.Count - 1)
-                {
-                    SetStateToIdle();
-                }
-                else
-                {
-                    currentPathIndex++;
-                }
-            }
-            if (tileCurrentlyOn != null)
-            {
-                if (pathVectorList.Count > 0)
-                {
-                    if (tileCurrentlyOn == pathVectorList[0] && currentPathIndex == 0 && pathVectorList.Count > 1)
-                    {
-                        if (pathVectorList.Count > 1)
-                        {
-                            currentPathIndex++; //for keeping position
-                        }
-                    }
-                }
             }
         }
-
         currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
         if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
         {
             tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
-        }
-        if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) != null && tileCurrentlyOn.tilePosition != currentCellPosition)
-        {
-            SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
         }
         if (previousTilePosition != tileCurrentlyOn)
         {
@@ -739,31 +681,11 @@ public class Creature : MonoBehaviour
     }
 
 
-    //its not recursive i swear
-    private void CheckForCreaturesInPath()
-    {
-        if (currentPathIndex < pathVectorList.Count - 1)
-        {
-            if (BaseMapTileState.singleton.GetCreatureAtTile(pathVectorList[currentPathIndex + 1].tilePosition) != null)
-            {
-                SetMove(BaseMapTileState.singleton.GetWorldPositionOfCell(pathVectorList[pathVectorList.Count - 1].tilePosition), actualPosition);
-            }
-        }
-    }
-
     protected void VisualMove()
     {
         this.transform.position = actualPosition;
-        Vector3 targetRotation = targetedPosition - this.transform.position;
-        creatureImage.forward = Vector3.RotateTowards(creatureImage.forward, targetRotation, 10 * Time.deltaTime, 0);
-        return;
-        float valueToAdd = 0f;
-        positions[0] = this.transform.position;
-        lr.SetPositions(positions);
-        lr.startColor = playerOwningCreature.col;
-        lr.endColor = playerOwningCreature.col;
-        float distanceFromActualPosition = (this.transform.position - actualPosition).magnitude;
-        this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector3(targetedPosition.x, actualPosition.y, targetedPosition.z), speed * Time.deltaTime);
+        //Vector3 targetRotation = targetedPosition - this.transform.position;
+        //creatureImage.forward = Vector3.RotateTowards(creatureImage.forward, targetRotation, 10 * Time.deltaTime, 0);
 
 
     }
@@ -781,8 +703,8 @@ public class Creature : MonoBehaviour
         SetRangeLineRenderer();
 
         SetTravType();
-        pathfinder1 = new Pathfinding();
-        pathfinder2 = new Pathfinding();
+        //pathfinder1 = new Pathfinding();
+        //pathfinder2 = new Pathfinding();
         UpdateCreatureHUD();
         currentCellPosition = grid.WorldToCell(this.transform.position);
         tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
@@ -1037,29 +959,13 @@ public class Creature : MonoBehaviour
     internal void ShowPathfinderLinerRendererAsync(Vector3Int hoveredTilePosition)
     {
         s_cts = new CancellationTokenSource();
-        List<BaseTile> tempPathVectorList = pathfinder2.FindPath(currentCellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(hoveredTilePosition).tilePosition, thisTraversableType);
+        //List<BaseTile> tempPathVectorList = pathfinder2.FindPath(currentCellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(hoveredTilePosition).tilePosition, thisTraversableType);
         List<Vector3> lrList = new List<Vector3>();
         //targetPosition = positionToTarget;
-        if (tempPathVectorList == null)
-        {
-            lr2.enabled = false;
-            return;
-        }
-        if (tempPathVectorList != null)
-        {
-            for (int i = 0; i < tempPathVectorList.Count; i++)
-            {
-                lrList.Add(BaseMapTileState.singleton.GetWorldPositionOfCell(tempPathVectorList[i].tilePosition));
-            }
-        }
 
         lr2.enabled = true;
         lr2.positionCount = lrList.Count;
         lr2.SetPositions(lrList.ToArray());
-    }
-    public async Task<List<BaseTile>> FindPathAsync(Vector3Int hoveredTilePosition, CancellationTokenSource cts)
-    {
-        return await Task.FromResult(pathfinder2.FindPath(currentCellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(hoveredTilePosition).tilePosition, thisTraversableType));
     }
     internal void HidePathfinderLR()
     {
@@ -1213,10 +1119,6 @@ public class Creature : MonoBehaviour
         {
             tempLineRendererBetweenCreaturesGameObject.SetActive(false);
         }
-        if (pathVectorList != null)
-        {
-            pathVectorList = null;
-        }
         this.playerOwningCreature.creaturesOwned.Remove(this.creatureID);
         OnMouseExit();
         creatureState = CreatureState.Dead;
@@ -1234,10 +1136,6 @@ public class Creature : MonoBehaviour
         if (tempLineRendererBetweenCreaturesGameObject != null)
         {
             tempLineRendererBetweenCreaturesGameObject.SetActive(false);
-        }
-        if (pathVectorList != null)
-        {
-            pathVectorList = null;
         }
         lrGameObject.SetActive(false);
         lrGameObject2.SetActive(false);

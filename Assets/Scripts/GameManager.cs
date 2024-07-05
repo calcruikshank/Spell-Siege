@@ -42,8 +42,8 @@ public class GameManager : MonoBehaviour
 
     public int endingX;
     public int endingY;
-    public int startingX;
-    public int startingY;
+    public int startingX = -10;
+    public int startingY = 9;
 
     public Transform blueManaSymbol;
     public Transform redManaSymbol;

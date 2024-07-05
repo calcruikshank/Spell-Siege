@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.4465782, g: 0.49641293, b: 0.57481706, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657934, g: 0.49641353, b: 0.5748192, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -363,9 +363,25 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2016102486}
     - target: {fileID: 6785383560820262613, guid: 7d1e210212fe6fe419c1ec6b33ea6253, type: 3}
+      propertyPath: endingX
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6785383560820262613, guid: 7d1e210212fe6fe419c1ec6b33ea6253, type: 3}
+      propertyPath: endingY
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6785383560820262613, guid: 7d1e210212fe6fe419c1ec6b33ea6253, type: 3}
       propertyPath: mainCam
       value: 
       objectReference: {fileID: 963194227}
+    - target: {fileID: 6785383560820262613, guid: 7d1e210212fe6fe419c1ec6b33ea6253, type: 3}
+      propertyPath: startingX
+      value: -9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6785383560820262613, guid: 7d1e210212fe6fe419c1ec6b33ea6253, type: 3}
+      propertyPath: startingY
+      value: -20
+      objectReference: {fileID: 0}
     - target: {fileID: 6785383560820262613, guid: 7d1e210212fe6fe419c1ec6b33ea6253, type: 3}
       propertyPath: RectCanvas
       value: 
