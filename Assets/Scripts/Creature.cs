@@ -690,7 +690,7 @@ public class Creature : MonoBehaviour
         creatureID = GameManager.singleton.allCreatureGuidCounter;
         GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
         GameManager.singleton.allCreatureGuidCounter++;
-        this.transform.GetComponent<MeshRenderer>().material.color = controller.col;
+        //this.transform.GetComponent<MeshRenderer>().material.color = controller.col;
         //colorIndicator.GetComponent<SpriteRenderer>().color = controller.col;
         canAttack = true;
         canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon, this.transform.position, Quaternion.identity);

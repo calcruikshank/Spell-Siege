@@ -30,7 +30,7 @@ public struct SpellSiegeData
         CaptainOfTheGuard,
         Harvest,
         NaturalGrowth,
-        Bear,
+        Pig,
         BottomFeeder,
         Thenas,
         Kyoshi,
