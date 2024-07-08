@@ -137,8 +137,9 @@ public class Controller : NetworkBehaviour
         {
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
         }
+        turn += OnTurn;
 
-        
+
 
     }
     private void OnDestroy()
@@ -246,7 +247,6 @@ public class Controller : NetworkBehaviour
         transparentCol = col;
         transparentCol.a = .5f;
         SpawnHUDAndHideOnAllNonOwners();
-        turn += OnTurn;
         resources = new PlayerResources();
         resourcesChanged += UpdateHudForResourcesChanged;
 
@@ -548,7 +548,7 @@ public class Controller : NetworkBehaviour
         }
         if (turnTimer > turnThreshold)
         {
-            //turn.Invoke();
+            turn.Invoke();
             turnTimer = 0;
         }
 
@@ -580,7 +580,7 @@ public class Controller : NetworkBehaviour
     {
         numberOfLandsYouCanPlayThisTurn = 1;
         numberOfLandsPlayedThisTurn = 0;
-        ClearMana();
+        //ClearMana();
         AddToMana();
     }
 
