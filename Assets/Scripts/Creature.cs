@@ -156,7 +156,7 @@ public class Creature : MonoBehaviour
         {
             case CreatureState.Moving:
                 Move();
-                ChooseTarget();
+                //ChooseTarget();
                 HandleAttackRate();
                 CheckForCreaturesWithinRange();
                 HandleAbilityRate();
@@ -166,7 +166,7 @@ public class Creature : MonoBehaviour
                 break;
             case CreatureState.Idle:
                 ChooseTarget();
-                DrawLine();
+                //DrawLine();
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
                 HandleAbilityRate();
@@ -175,7 +175,7 @@ public class Creature : MonoBehaviour
                 break;
             case CreatureState.Summoned:
                 ChooseTarget();
-                DrawLine();
+                //DrawLine();
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
                 HandleAbilityRate();
@@ -251,6 +251,23 @@ public class Creature : MonoBehaviour
     void ChooseTarget()
     {
         float lowestHealthCreatureWithinRange = -1;
+
+        Creature closestCreature = null;
+        float minDistance = float.MaxValue;
+
+        foreach (Creature creatureWithinRange in creaturesWithinRange)
+        {
+            if (creatureWithinRange.playerOwningCreature != this.playerOwningCreature)
+            {
+                float distance = Vector3.Distance(this.transform.position, creatureWithinRange.transform.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestCreature = creatureWithinRange;
+                    currentTargetedCreature = closestCreature;
+                }
+            }
+        }
         if (currentTargetedCreature != null)
         {
             if (!IsCreatureWithinRange(currentTargetedCreature))
@@ -264,38 +281,24 @@ public class Creature : MonoBehaviour
         }
 
 
-        if (currentTargetedStructure != null)
+        if (currentTargetedCreature != null && IsCreatureWithinRange(currentTargetedCreature))
         {
-            if (!IsStructureInRange(currentTargetedStructure))
-            {
-                currentTargetedStructure = null;
-            }
+            creatureState = CreatureState.Idle;
         }
-        if (structureToFollow != null)
+        if (currentTargetedStructure != null && IsStructureInRange(currentTargetedStructure))
         {
-            if (structureToFollow.playerOwningStructure != this.playerOwningCreature)
-            {
-                currentTargetedStructure = structureToFollow;
-                currentTargetedCreature = null;
-            }
+            creatureState = CreatureState.Idle;
         }
 
-        #region cleanup
-        if (currentTargetedStructure != null && currentTargetedCreature != null)
+        if (currentTargetedCreature != null && !IsCreatureWithinRange(currentTargetedCreature))
         {
-            if (targetToFollow != null)
-            {
-                currentTargetedStructure = null;
-                return;
-            }
-            if (structureToFollow != null)
-            {
-                currentTargetedCreature = null;
-                return;
-            }
-            currentTargetedStructure = null;
+            creatureState = CreatureState.Moving;
         }
-        #endregion
+        if (currentTargetedStructure != null && !IsStructureInRange(currentTargetedStructure))
+        {
+            creatureState = CreatureState.Moving;
+        }
+
     }
 
 
@@ -554,6 +557,7 @@ public class Creature : MonoBehaviour
     {
         if (currentTargetedStructure != null)
         {
+            Debug.Log(currentTargetedStructure + "Targeted cell");
             BaseTile targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
             if (currentTargetedStructure.currentCellPosition.x < this.currentCellPosition.x)
             {
@@ -1156,6 +1160,7 @@ public class Creature : MonoBehaviour
         if (structureToFollowSent.playerOwningStructure != this.playerOwningCreature || playerOwningCreature.isAI)
         {
             structureToFollow = structureToFollowSent;
+            currentTargetedStructure = structureToFollowSent;
             if (IsStructureInRange(structureToFollowSent))
             {
                 return;

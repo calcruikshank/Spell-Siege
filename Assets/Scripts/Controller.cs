@@ -559,6 +559,7 @@ public class Controller : NetworkBehaviour
         foreach (KeyValuePair<int, Creature> kp in creaturesOwned)
         {
             kp.Value.OnTurn();
+            Debug.Log(kp + " triggering");
         }
         foreach (KeyValuePair<Vector3Int, BaseTile> kp in tilesOwned)
         {
