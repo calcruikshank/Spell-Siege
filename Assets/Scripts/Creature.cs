@@ -548,6 +548,8 @@ public class Creature : MonoBehaviour
     }
 
 
+    Animator animatorForObject;
+
     public void Move()
     {
         if (currentTargetedStructure != null)
@@ -556,16 +558,20 @@ public class Creature : MonoBehaviour
             if (currentTargetedStructure.currentCellPosition.x < this.currentCellPosition.x)
             {
                 targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x - 1, currentCellPosition.y, currentCellPosition.z));
+                animatorForObject.transform.localEulerAngles = new Vector3(0, -90, 0);
             }
             else
             {
                 targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x + 1, currentCellPosition.y, currentCellPosition.z));
+                animatorForObject.transform.localEulerAngles = new Vector3(0, 90, 0);
             }
 
             if (targetedCell.CreatureOnTile() == null && targetedCell.structureOnTile == null && targetedCell.traverseType == SpellSiegeData.traversableType.TraversableByAll)
             {
                 actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime);
             }
+
+
         }
         currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
         if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
@@ -659,10 +665,10 @@ public class Creature : MonoBehaviour
     internal void SetToPlayerOwningCreature(Controller controller)
     {
         this.playerOwningCreature = controller;
-
+        animatorForObject = transform.GetComponentInChildren<Animator>();
         grid = GameManager.singleton.grid;
         baseTileMap = GameManager.singleton.baseMap;
-
+        animatorForObject.SetTrigger("Walk");
         creatureImage = this.transform.GetChild(0);
 
         SetRangeLineRenderer();
