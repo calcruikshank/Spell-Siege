@@ -331,6 +331,16 @@ public class Creature : MonoBehaviour
                 canAttack = false;
                 OnAttack();
             }
+
+            if (targetedCell != null)
+            {
+                if (targetedCell.traverseType == SpellSiegeData.traversableType.Untraversable)
+                {
+                    VisualAttackAnimationOnStructure(currentTargetedStructure);
+                    canAttack = false;
+                    OnAttack();
+                }
+            }
         }
     }
 
@@ -552,13 +562,13 @@ public class Creature : MonoBehaviour
 
 
     Animator animatorForObject;
-
+    BaseTile targetedCell;
     public void Move()
     {
         if (currentTargetedStructure != null)
         {
-            Debug.Log(currentTargetedStructure + "Targeted cell");
-            BaseTile targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
+            targetedCell = null;
+            targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
             if (currentTargetedStructure.currentCellPosition.x < this.currentCellPosition.x)
             {
                 targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x - 1, currentCellPosition.y, currentCellPosition.z));
