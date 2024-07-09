@@ -30,7 +30,7 @@ public class FlyingCreature : Creature
                 HandleFlyingAnimation();
                 break;
             case CreatureState.Idle:
-                HandleFlyingAnimation();
+                transform.position = new Vector3(transform.position.x, .1f, transform.position.z);
                 break;
         }
 
