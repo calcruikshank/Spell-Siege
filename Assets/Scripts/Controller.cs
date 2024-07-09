@@ -74,7 +74,6 @@ public class Controller : NetworkBehaviour
 
     protected Vector3Int placedCellPosition;
 
-    public int turnTimer;
     protected int turnThreshold = 1400; //todo make this 1400
     protected int maxHandSize = 10;
     [SerializeField] protected List<CardInHand> dragonDeck = new List<CardInHand>();
@@ -210,9 +209,10 @@ public class Controller : NetworkBehaviour
     {
         GameManager.singleton.playerList[0].opponent = GameManager.singleton.playerList[1];
         GameManager.singleton.playerList[1].opponent = GameManager.singleton.playerList[0];
+        GameManager.singleton.hasStartedGame = true;
 
 
-        
+
         foreach (Controller controller in GameManager.singleton.playerList)
         {
             foreach (PlayerKeep pk in FindObjectsOfType<PlayerKeep>())
@@ -279,7 +279,7 @@ public class Controller : NetworkBehaviour
         transparentCol = col;
         transparentCol.a = .5f;
         GameManager.singleton.Shuffle(cardsInDeck);
-        for (int i = 0; i < 7; i++) 
+        for (int i = 0; i < 10; i++) 
         {
                 resources.greenManaCap++;
                 resources.greenMana++;
@@ -541,15 +541,14 @@ public class Controller : NetworkBehaviour
 
     private void HandleTurn()
     {
-        turnTimer++;
         if (hudElements != null)
         {
-            hudElements.UpdateDrawSlider(turnTimer);
+            hudElements.UpdateDrawSlider(GameManager.singleton.turnTimer);
         }
-        if (turnTimer > turnThreshold)
+        if (GameManager.singleton.turnTimer > turnThreshold)
         {
             turn.Invoke();
-            turnTimer = 0;
+            GameManager.singleton.turnTimer = 0;
         }
 
     }

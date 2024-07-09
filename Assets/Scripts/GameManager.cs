@@ -62,6 +62,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] public Canvas RectCanvas;
     [SerializeField] public Canvas scalableUICanvas;
+
+    public bool hasStartedGame = false;
+    public int turnTimer;
     private void Awake()
     {
         if (singleton != null) Destroy(this);
@@ -71,6 +74,14 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+    }
+
+    private void FixedUpdate()
+    {
+        if (hasStartedGame)
+        {
+            turnTimer += 1;
+        }
     }
     private void OnDestroy()
     {
