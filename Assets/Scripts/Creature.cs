@@ -258,6 +258,11 @@ public class Creature : MonoBehaviour
 
         foreach (Creature creatureWithinRange in creaturesWithinRange)
         {
+            if (creatureWithinRange == null)
+            {
+                creaturesWithinRange.Remove(creatureWithinRange);
+                return;
+            }
             if (creatureWithinRange.playerOwningCreature != this.playerOwningCreature)
             {
                 float distance = Vector3.Distance(this.transform.position, creatureWithinRange.transform.position);
