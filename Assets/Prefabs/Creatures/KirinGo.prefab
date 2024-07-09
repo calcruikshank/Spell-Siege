@@ -543,7 +543,7 @@ GameObject:
   - component: {fileID: 6239865746917987993}
   - component: {fileID: 6239865746917987992}
   - component: {fileID: 6239865746917987998}
-  - component: {fileID: 6237120432629272335}
+  - component: {fileID: -1382810802556330611}
   m_Layer: 6
   m_Name: KirinGo
   m_TagString: Untagged
@@ -602,7 +602,7 @@ CapsuleCollider:
   m_Height: 1.0085878
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &6237120432629272335
+--- !u!114 &-1382810802556330611
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -611,19 +611,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 6239865746917987997}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfee9ec014be0a74485cc91468044495, type: 3}
+  m_Script: {fileID: 11500000, guid: a2565440283af804383eb2e79dd984f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
   range: 1
   UsageRate: 1
-  highlightForCreatureSelected: {fileID: 4353893006797176972}
-  Attack: 2
-  CurrentAttack: 2
+  highlightForCreatureSelected: {fileID: 4769756027410212970}
+  Attack: 1
+  CurrentAttack: 1
   CurrentHealth: 0
-  MaxHealth: 2
-  attackText: {fileID: 3298186682565764544}
-  healthText: {fileID: 7534283529393728702}
+  MaxHealth: 1
+  attackText: {fileID: 0}
+  healthText: {fileID: 0}
   numOfTargetables: 1
   allTilesWithinRange: []
   creatureID: 0
