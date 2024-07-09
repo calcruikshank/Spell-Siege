@@ -74,7 +74,7 @@ public class Controller : NetworkBehaviour
 
     protected Vector3Int placedCellPosition;
 
-    protected int turnThreshold = 1400; //todo make this 1400
+    protected int turnThreshold = 700; //todo make this 1400
     protected int maxHandSize = 10;
     [SerializeField] protected List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] protected List<CardInHand> demonDeck = new List<CardInHand>();
@@ -136,7 +136,6 @@ public class Controller : NetworkBehaviour
         {
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
         }
-        turn += OnTurn;
 
 
 
@@ -242,6 +241,7 @@ public class Controller : NetworkBehaviour
     }
     private void StartGameCoroutine()
     {
+        turn += OnTurn;
         cardsInDeck = new List<CardInHand>( demonDeck );
         col.a = 1;
         transparentCol = col;
@@ -547,7 +547,10 @@ public class Controller : NetworkBehaviour
         }
         if (GameManager.singleton.turnTimer > turnThreshold)
         {
-            turn.Invoke();
+            foreach (Controller controller in GameManager.singleton.playerList)
+            {
+                controller.turn.Invoke();
+            }
             GameManager.singleton.turnTimer = 0;
         }
 

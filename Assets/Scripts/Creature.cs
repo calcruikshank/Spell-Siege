@@ -166,6 +166,7 @@ public class Creature : MonoBehaviour
                 //HandleAttack();
                 break;
             case CreatureState.Idle:
+                animatorForObject.SetTrigger("Idle");
                 ChooseTarget();
                 //DrawLine();
                 CheckForCreaturesWithinRange();
@@ -327,6 +328,8 @@ public class Creature : MonoBehaviour
                 VisualAttackAnimation(currentTargetedCreature);
                 canAttack = false;
                 OnAttack();
+                animatorForObject.SetTrigger("Attack");
+                return;
             }
         }
         if (currentTargetedStructure != null)
@@ -336,6 +339,8 @@ public class Creature : MonoBehaviour
                 VisualAttackAnimationOnStructure(currentTargetedStructure);
                 canAttack = false;
                 OnAttack();
+                animatorForObject.SetTrigger("Attack");
+                return;
             }
 
             if (targetedCell != null)
@@ -345,6 +350,8 @@ public class Creature : MonoBehaviour
                     VisualAttackAnimationOnStructure(currentTargetedStructure);
                     canAttack = false;
                     OnAttack();
+                    animatorForObject.SetTrigger("Attack");
+                    return;
                 }
             }
         }
@@ -559,6 +566,7 @@ public class Creature : MonoBehaviour
         //SetNewTargetPosition(positionToTarget);
         creatureState = CreatureState.Moving;
 
+        animatorForObject.SetTrigger("Run");
 
     }
 
@@ -589,6 +597,10 @@ public class Creature : MonoBehaviour
             if (targetedCell.CreatureOnTile() == null && targetedCell.structureOnTile == null && targetedCell.traverseType == SpellSiegeData.traversableType.TraversableByAll)
             {
                 actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime);
+            }
+            else
+            {
+                SetStateToIdle();
             }
 
 
@@ -688,7 +700,7 @@ public class Creature : MonoBehaviour
         animatorForObject = transform.GetComponentInChildren<Animator>();
         grid = GameManager.singleton.grid;
         baseTileMap = GameManager.singleton.baseMap;
-        animatorForObject.SetTrigger("Walk");
+        animatorForObject.SetTrigger("Run");
         creatureImage = this.transform.GetChild(0);
 
         SetRangeLineRenderer();
@@ -739,6 +751,7 @@ public class Creature : MonoBehaviour
         tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
         tileCurrentlyOn.AddCreatureToTile(this);
         creatureState = CreatureState.Idle;
+        animatorForObject.SetTrigger("Idle");
     }
 
     #region range
