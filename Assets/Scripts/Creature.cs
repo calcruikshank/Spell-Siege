@@ -64,10 +64,10 @@ public class Creature : MonoBehaviour
     public SpellSiegeData.travType thisTraversableType;
 
 
-    LineRenderer lr;
-    public LineRenderer lr2;
-    GameObject lrGameObject;
-    GameObject lrGameObject2;
+    //LineRenderer lr;
+    //public LineRenderer lr2;
+    //GameObject lrGameObject;
+    //GameObject lrGameObject2;
 
     Tilemap baseTileMap;
     [HideInInspector] public Vector3Int currentCellPosition;
@@ -92,38 +92,6 @@ public class Creature : MonoBehaviour
     protected virtual void SetTravType()
     {
     }
-
-    void SetupLR()
-    {
-        lrGameObject = new GameObject("LineRendererGameObject", typeof(LineRenderer));
-        lr = lrGameObject.GetComponent<LineRenderer>();
-        lr.enabled = false;
-        lr.alignment = LineAlignment.TransformZ;
-        lr.transform.localEulerAngles = new Vector3(90, 0, 0);
-        lr.sortingOrder = 1000;
-        lr.startWidth = .2f;
-        lr.endWidth = .2f;
-        lr.numCapVertices = 1;
-        lr.material = GameManager.singleton.RenderInFrontMat;
-        lr.startColor = playerOwningCreature.col;
-        lr.endColor = playerOwningCreature.col;
-    }
-    void SetupLR2()
-    {
-        lrGameObject2 = new GameObject("LineRendererGameObject2", typeof(LineRenderer));
-        lr2 = lrGameObject2.GetComponent<LineRenderer>();
-        lr2.enabled = false;
-        lr2.alignment = LineAlignment.TransformZ;
-        lr2.transform.localEulerAngles = new Vector3(90, 0, 0);
-        lr2.sortingOrder = 1000;
-        lr2.startWidth = .2f;
-        lr2.endWidth = .2f;
-        lr2.numCapVertices = 1;
-        lr2.material = GameManager.singleton.rangeIndicatorMat;
-        lr2.startColor = playerOwningCreature.col;
-        lr2.endColor = playerOwningCreature.col;
-    }
-
     protected virtual void Update()
     {
         switch (creatureState)
@@ -454,8 +422,6 @@ public class Creature : MonoBehaviour
     public void LocalDie()
     {
         Instantiate(GameManager.singleton.onDeathEffect, new Vector3(actualPosition.x, .4f, actualPosition.z), Quaternion.identity);
-        lrGameObject.SetActive(false);
-        lrGameObject2.SetActive(false);
         rangeLrGO.SetActive(false);
         OnDeath();
         GameManager.singleton.CreatureDied(this.creatureID);
@@ -596,7 +562,7 @@ public class Creature : MonoBehaviour
 
             if (targetedCell.CreatureOnTile() == null && targetedCell.structureOnTile == null && targetedCell.traverseType == SpellSiegeData.traversableType.TraversableByAll)
             {
-                actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime);
+                actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime * .5f);
             }
             else
             {
@@ -716,8 +682,6 @@ public class Creature : MonoBehaviour
         actualPosition = this.transform.position;
 
         CalculateAllTilesWithinRange();
-        SetupLR();
-        SetupLR2();
         creatureState = CreatureState.Summoned;
         creatureID = GameManager.singleton.allCreatureGuidCounter;
         GameManager.singleton.allCreaturesOnField.Add(creatureID, this);
@@ -740,10 +704,7 @@ public class Creature : MonoBehaviour
             playerOwningCreature.SetCreatureToIdleServerRpc(creatureID, currentCellPosition);
         }
         tileCurrentlyOn.RemoveCreatureFromTile(this);
-        lr.enabled = false;
 
-        lrGameObject.SetActive(true);
-        lrGameObject2.SetActive(true);
         HidePathfinderLR();
         this.actualPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(currentCellPosition);
         this.transform.position = actualPosition;
@@ -762,10 +723,7 @@ public class Creature : MonoBehaviour
         if (!playerOwningCreature.IsOwner)
         {
             tileCurrentlyOn.RemoveCreatureFromTile(this);
-            lr.enabled = false;
 
-            lrGameObject.SetActive(true);
-            lrGameObject2.SetActive(true);
             HidePathfinderLR();
             this.actualPosition = BaseMapTileState.singleton.GetWorldPositionOfCell(actualPositionSent);
             this.transform.position = actualPosition;
@@ -967,9 +925,6 @@ public class Creature : MonoBehaviour
         List<Vector3> lrList = new List<Vector3>();
         //targetPosition = positionToTarget;
 
-        lr2.enabled = true;
-        lr2.positionCount = lrList.Count;
-        lr2.SetPositions(lrList.ToArray());
     }
     internal void HidePathfinderLR()
     {
@@ -977,9 +932,6 @@ public class Creature : MonoBehaviour
         {
             positions = new Vector3[2];
         }
-        lr2.enabled = false;
-        lr2.positionCount = positions.Length;
-        lr2.SetPositions(positions);
     }
     void SetNewPositionsForRangeLr(List<Vector3> rangePositionsSent)
     {
@@ -1141,8 +1093,6 @@ public class Creature : MonoBehaviour
         {
             tempLineRendererBetweenCreaturesGameObject.SetActive(false);
         }
-        lrGameObject.SetActive(false);
-        lrGameObject2.SetActive(false);
 
         tileCurrentlyOn.RemoveCreatureFromTile(this);
         OnMouseExit();

@@ -441,7 +441,7 @@ public class Controller : NetworkBehaviour
                 {
                     if (cellPositionSentToClients != grid.WorldToCell(mousePosition))
                     {
-                        if (!CheckForRaycast())
+                        if (!CheckForRaycast() && state != State.CreatureInHandSelected || !CheckForRaycast() && state == State.CreatureInHandSelected  && CheckToSeeIfCanSpawnCreature(grid.WorldToCell(mousePosition)))
                         {
                             LeftClickQueue(grid.WorldToCell(mousePosition));
                         }
@@ -705,7 +705,7 @@ public class Controller : NetworkBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit raycastHitCardInHand, Mathf.Infinity))
         {
-            if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null)
+            if (raycastHitCardInHand.transform.GetComponent<CardInHand>() != null && state != State.CreatureInHandSelected)
             {
                 SetVisualsToNothingSelectedLocally();
                 SetStateToNothingSelected();
