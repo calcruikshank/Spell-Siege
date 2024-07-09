@@ -161,6 +161,7 @@ public class Creature : MonoBehaviour
                 CheckForCreaturesWithinRange();
                 HandleAbilityRate();
                 DrawLine();
+                ChooseTarget();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
                 break;
