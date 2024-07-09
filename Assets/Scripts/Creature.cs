@@ -290,7 +290,7 @@ public class Creature : MonoBehaviour
             creatureState = CreatureState.Idle;
         }
 
-        if (currentTargetedCreature != null && !IsCreatureWithinRange(currentTargetedCreature))
+        if (currentTargetedCreature != null && !IsStructureInRange(currentTargetedStructure))
         {
             creatureState = CreatureState.Moving;
         }
