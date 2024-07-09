@@ -6,31 +6,31 @@ public struct SpellSiegeData
 {
     public enum Cards
     {
-        AngryTurtle,
-        Avacyn,
+        turtle, //turtle
+        peggy, //peggy
         BattleScarredDemon,
-        DemonicVulture,
+        cerberus, //cerberus
         ElvishMystic,
-        GoldspanDragon,
-        HiredAssassin,
-        PrimitiveWeaponsmith,
+        dragon, //dragon
+        python, //python
+        monkey, //monkey
         Pudge,
         ShamanDarkWays,
         SlumberingAncient,
-        SpiritSummoner,
-        SymbioticOoze,
+        kitsune, //kitsune
+        kirin, //kirin
         Dissolve,
         LightningStrike,
         MeteorStrike,
-        OvercommitedCleric,
-        DragonWhisperer,
-        Archer,
+        OvercommitedCleric, //dog
+        iguana, //iguana
+        alpaca, //alpaca
         ArcanePortal,
         LeylineOfTheHarvest,
         CaptainOfTheGuard,
-        Harvest,
+        Harvest, 
         NaturalGrowth,
-        Pig,
+        Pig, //pig
         BottomFeeder,
         Thenas,
         Kyoshi,
