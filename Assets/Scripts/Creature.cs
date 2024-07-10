@@ -258,19 +258,20 @@ public class Creature : MonoBehaviour
 
         if (currentTargetedCreature != null && IsCreatureWithinRange(currentTargetedCreature))
         {
-            creatureState = CreatureState.Idle;
+            //creatureState = CreatureState.Idle;
         }
         if (currentTargetedStructure != null && IsStructureInRange(currentTargetedStructure))
         {
-            creatureState = CreatureState.Idle;
+            //creatureState = CreatureState.Idle;
         }
 
-        if (currentTargetedCreature != null && !IsStructureInRange(currentTargetedStructure))
+        if (currentTargetedCreature != null && !IsCreatureWithinRange(currentTargetedCreature))
         {
-            creatureState = CreatureState.Moving;
+            //creatureState = CreatureState.Moving;
         }
-        if (currentTargetedStructure != null && !IsStructureInRange(currentTargetedStructure))
+        if (currentTargetedStructure != null && !IsStructureInRange(currentTargetedStructure) && targetedCellForChoosingTargets.traverseType != SpellSiegeData.traversableType.Untraversable && targetedCellForChoosingTargets.CreatureOnTile() == null && targetedCellForChoosingTargets.structureOnTile == null)
         {
+            //&&
             creatureState = CreatureState.Moving;
         }
 
@@ -311,9 +312,9 @@ public class Creature : MonoBehaviour
                 return;
             }
 
-            if (targetedCell != null)
+            if (targetedCellForChoosingTargets != null)
             {
-                if (targetedCell.traverseType == SpellSiegeData.traversableType.Untraversable)
+                if (targetedCellForChoosingTargets.traverseType == SpellSiegeData.traversableType.Untraversable)
                 {
                     VisualAttackAnimationOnStructure(currentTargetedStructure);
                     canAttack = false;
@@ -475,6 +476,7 @@ public class Creature : MonoBehaviour
 
     internal void OnTurn()
     {
+        Debug.Log("On Tune!!!!!!!!!!");
         canAttack = true;
         canAttackIcon.gameObject.SetActive(true);
         HandleFriendlyCreaturesList();
@@ -543,34 +545,9 @@ public class Creature : MonoBehaviour
 
     Animator animatorForObject;
     BaseTile targetedCell;
+    BaseTile targetedCellForChoosingTargets;
     public void Move()
     {
-        if (currentTargetedStructure != null)
-        {
-            targetedCell = null;
-            targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
-            if (currentTargetedStructure.currentCellPosition.x < this.currentCellPosition.x)
-            {
-                targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x - 1, currentCellPosition.y, currentCellPosition.z));
-                animatorForObject.transform.localEulerAngles = new Vector3(0, -90, 0);
-            }
-            else
-            {
-                targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x + 1, currentCellPosition.y, currentCellPosition.z));
-                animatorForObject.transform.localEulerAngles = new Vector3(0, 90, 0);
-            }
-
-            if (targetedCell.CreatureOnTile() == null && targetedCell.structureOnTile == null && targetedCell.traverseType == SpellSiegeData.traversableType.TraversableByAll)
-            {
-                actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime * .5f);
-            }
-            else
-            {
-                SetStateToIdle();
-            }
-
-
-        }
         currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
         if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
         {
@@ -582,6 +559,47 @@ public class Creature : MonoBehaviour
             previousTilePosition.RemoveCreatureFromTile(this);
             previousTilePosition = tileCurrentlyOn;
             tileCurrentlyOn.AddCreatureToTile(this);
+        }
+        if (currentTargetedStructure != null)
+        {
+            targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
+            targetedCellForChoosingTargets = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
+            if (currentTargetedStructure.currentCellPosition.x < this.currentCellPosition.x)
+            {
+                targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x - 1, currentCellPosition.y, currentCellPosition.z));
+                targetedCellForChoosingTargets = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x - 1, currentCellPosition.y, currentCellPosition.z));
+                animatorForObject.transform.localEulerAngles = new Vector3(0, -90, 0);
+            }
+            else
+            {
+                targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x + 1, currentCellPosition.y, currentCellPosition.z));
+                targetedCellForChoosingTargets = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x + 1, currentCellPosition.y, currentCellPosition.z));
+                animatorForObject.transform.localEulerAngles = new Vector3(0, 90, 0);
+            }
+
+            if (targetedCell.CreatureOnTile() != null || targetedCell.structureOnTile != null || targetedCell.traverseType == SpellSiegeData.traversableType.Untraversable)
+            {
+                targetedCell = tileCurrentlyOn;
+
+                bool creatureCanMove = false;
+                if (Vector3.Distance(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z)) < .01f)
+                {
+                    if (targetedCell.CreatureOnTile() != null)
+                    {
+                        if (targetedCell.CreatureOnTile().playerOwningCreature == this.playerOwningCreature && targetedCell.CreatureOnTile().creatureState == CreatureState.Moving)
+                        {
+                            creatureCanMove = true;
+                        }
+                    }
+                    if (!creatureCanMove)
+                    {
+                        SetStateToIdle();
+                    }
+                }
+            }
+            animatorForObject.SetTrigger("Run");
+            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime * .5f);
+
         }
 
 
@@ -701,7 +719,7 @@ public class Creature : MonoBehaviour
     {
         if (playerOwningCreature.IsOwner)
         {
-            playerOwningCreature.SetCreatureToIdleServerRpc(creatureID, currentCellPosition);
+            //playerOwningCreature.SetCreatureToIdleServerRpc(creatureID, currentCellPosition);
         }
         tileCurrentlyOn.RemoveCreatureFromTile(this);
 

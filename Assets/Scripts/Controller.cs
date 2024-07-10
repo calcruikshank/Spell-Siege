@@ -137,6 +137,7 @@ public class Controller : NetworkBehaviour
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
         }
 
+        turn += OnTurn;
 
 
     }
@@ -241,7 +242,6 @@ public class Controller : NetworkBehaviour
     }
     private void StartGameCoroutine()
     {
-        turn += OnTurn;
         cardsInDeck = new List<CardInHand>( demonDeck );
         col.a = 1;
         transparentCol = col;
