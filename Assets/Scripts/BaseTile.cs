@@ -225,10 +225,13 @@ public class BaseTile : MonoBehaviour
     public int currentAmountOfManaProducing = 1;
     public void SetBeingHarvested()
     {
-        instantiatedManaSymbol.GetChild(0).gameObject.SetActive(true);
-        //costText.gameObject.SetActive(true);
+        if (instantiatedManaSymbol != null)
+        {
+            instantiatedManaSymbol.GetChild(0).gameObject.SetActive(true);
+            instantiatedManaSymbol.GetComponent<Image>().color = opaqueColor;
+            //costText.gameObject.SetActive(true);
+        }
         isBeingHarvested = true;
-        instantiatedManaSymbol.GetComponent<Image>().color = opaqueColor;
     }
     public void SetNotBeingHarvested()
     {
