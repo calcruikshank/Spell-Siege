@@ -593,12 +593,13 @@ public class Creature : MonoBehaviour
                     }
                     if (!creatureCanMove)
                     {
-                        SetStateToIdle();
+                        //SetStateToIdle();
                     }
+                    SetStateToIdle();
                 }
             }
             animatorForObject.SetTrigger("Run");
-            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime * .5f);
+            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime);
 
         }
 
