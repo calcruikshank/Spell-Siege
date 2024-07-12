@@ -113,7 +113,7 @@ public class Creature : MonoBehaviour
 
         if (canAttackIcon != null)
         {
-            canAttackIcon.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z) ;
+            canAttackIcon.transform.position = new Vector3(this.transform.position.x , this.transform.position.y + .1f, this.transform.position.z ) ;
             canAttackIcon.transform.localEulerAngles = new Vector3(creatureImage.localEulerAngles.x, creatureImage.localEulerAngles.y + 45, creatureImage.localEulerAngles.z) ;
         }
 
@@ -128,7 +128,7 @@ public class Creature : MonoBehaviour
                 HandleAttackRate();
                 CheckForCreaturesWithinRange();
                 HandleAbilityRate();
-                DrawLine();
+                //DrawLine();
                 ChooseTarget();
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
@@ -347,7 +347,7 @@ public class Creature : MonoBehaviour
 
                 canAttackIcon.GetComponent<SpawnAnimatedSword>().SpawnSword(creatureToAttack.transform);
                 canAttackIcon.gameObject.SetActive(false);
-                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .1f, this.transform.position.z), Quaternion.identity);
+                Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y - .1f, this.transform.position.z), Quaternion.identity);
                 instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, CurrentAttack);
                 if (deathtouch)
                 {
@@ -710,8 +710,8 @@ public class Creature : MonoBehaviour
         canAttack = true;
         canAttackIcon = Instantiate(GameManager.singleton.canAttackIcon, this.transform.position, Quaternion.identity);
         //canAttackIcon.parent = transform;
-        canAttackIcon.localScale = new Vector3(.4f, .4f, .4f);
-        canAttackIcon.position = new Vector3(0, 1.6f, 0);
+        canAttackIcon.localScale = new Vector3(.3f, .3f, .3f);
+        canAttackIcon.position = new Vector3(0, 0f, 0);
         canAttackIcon.localEulerAngles = new Vector3(0, -45, 0);
         canAttackIcon.gameObject.SetActive(true);
     }
