@@ -317,6 +317,9 @@ public class Controller : NetworkBehaviour
         }
         if (IsOwner)
         {
+            locallySelectedCard = null;
+
+            HandleMana();
             HandleHarvestTiles();
         }
     }
@@ -388,26 +391,26 @@ public class Controller : NetworkBehaviour
             case State.PlacingCastle:
                 break;
             case State.NothingSelected:
-                HandleHarvestTiles();
                 HandleMana();
+                HandleHarvestTiles();
                 HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
             case State.CreatureInHandSelected:
-                HandleHarvestTiles();
                 HandleMana();
+                HandleHarvestTiles();
                 HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
             case State.SpellInHandSelected:
-                HandleHarvestTiles();
                 HandleMana();
+                HandleHarvestTiles();
                 HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
             case State.StructureInHandSeleced:
-                HandleHarvestTiles();
                 HandleMana();
+                HandleHarvestTiles();
                 HandleDrawCards();
                 TriggerAllCreatureAbilities();
                 break;
