@@ -760,27 +760,27 @@ public class Controller : NetworkBehaviour
     {
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Green)
         {
-            resources.greenManaCap = 10;
+            resources.greenManaCap = 9;
             resources.greenMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Black)
         {
-            resources.blackManaCap = 10;
+            resources.blackManaCap = 9;
             resources.blackMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.White)
         {
-            resources.whiteManaCap = 10;
+            resources.whiteManaCap = 9;
             resources.whiteMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Blue)
         {
-            resources.blueManaCap = 10;
+            resources.blueManaCap = 9;
             resources.blueMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Red)
         {
-            resources.redManaCap = 10;
+            resources.redManaCap = 9;
             resources.redMana++;
         }
         if (!harvestedTiles.Contains(baseTileSent))

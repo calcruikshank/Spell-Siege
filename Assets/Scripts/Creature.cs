@@ -476,7 +476,6 @@ public class Creature : MonoBehaviour
 
     internal void OnTurn()
     {
-        Debug.Log("On Tune!!!!!!!!!!");
         canAttack = true;
         canAttackIcon.gameObject.SetActive(true);
         HandleFriendlyCreaturesList();
@@ -496,7 +495,6 @@ public class Creature : MonoBehaviour
 
     public void LocalGiveCounter(int numOfCounters)
     {
-        Debug.Log("Giving counter");
         if (this != null && this.transform != null)
         {
             MaxHealth += numOfCounters;

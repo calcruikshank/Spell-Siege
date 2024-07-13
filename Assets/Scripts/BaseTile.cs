@@ -272,7 +272,10 @@ public class BaseTile : MonoBehaviour
 
     internal void HideHarvestIcon()
     {
-        instantiatedManaSymbol.gameObject.SetActive(false);
+        if (!isBeingHarvested)
+        {
+            instantiatedManaSymbol.gameObject.SetActive(false);
+        }
     }
 
     internal void ShowHarvestIcon()
