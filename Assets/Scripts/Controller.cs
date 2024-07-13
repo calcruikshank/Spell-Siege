@@ -139,7 +139,6 @@ public class Controller : NetworkBehaviour
 
         turn += OnTurn;
 
-
     }
     private void OnDestroy()
     {
@@ -267,8 +266,8 @@ public class Controller : NetworkBehaviour
             {
                 controller.LocalPlaceCastle(new Vector3Int(-7, 0, 0));
             }
-            Debug.Log("controller " + GameManager.singleton.playerList.Count);
 
+            controller.StartTurnPhase();
         }
 
     }
@@ -311,17 +310,14 @@ public class Controller : NetworkBehaviour
         transparentCol = col;
         transparentCol.a = .5f;
         GameManager.singleton.Shuffle(cardsInDeck);
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 6; i++)
         {
             DrawCard();
         }
-        if (IsOwner)
-        {
-            locallySelectedCard = null;
+        locallySelectedCard = null;
 
-            HandleMana();
-            HandleHarvestTiles();
-        }
+
+
     }
 
 
@@ -764,27 +760,27 @@ public class Controller : NetworkBehaviour
     {
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Green)
         {
-            resources.greenManaCap++;
+            resources.greenManaCap = 10;
             resources.greenMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Black)
         {
-            resources.blackManaCap++;
+            resources.blackManaCap = 10;
             resources.blackMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.White)
         {
-            resources.whiteManaCap++;
+            resources.whiteManaCap = 10;
             resources.whiteMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Blue)
         {
-            resources.blueManaCap++;
+            resources.blueManaCap = 10;
             resources.blueMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Red)
         {
-            resources.redManaCap++;
+            resources.redManaCap = 10;
             resources.redMana++;
         }
         if (!harvestedTiles.Contains(baseTileSent))
@@ -847,28 +843,6 @@ public class Controller : NetworkBehaviour
                         if (cardSelected.GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
                         {
                             AddIndexOfCreatureOnBoard(raycastHitCreatureOnBoard.transform.GetComponent<Creature>().creatureID);
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        if (Physics.Raycast(ray, out RaycastHit raycastHitKeep, Mathf.Infinity))
-        {
-            if (raycastHitKeep.transform.GetComponent<PlayerKeep>() != null)
-            {
-                if (raycastHitKeep.transform.GetComponent<PlayerKeep>().playerOwningStructure == this)
-                {
-                    if (locallySelectedCard == null || locallySelectedCard.cardType != SpellSiegeData.CardType.Spell)
-                    {
-                        if (!ShowingPurchasableHarvestTiles)
-                        {
-                            ShowHarvestedTiles();
-                            return true;
-                        }
-                        if (ShowingPurchasableHarvestTiles)
-                        {
-                            HideHarvestedTiles();
                             return true;
                         }
                     }
