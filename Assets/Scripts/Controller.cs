@@ -126,6 +126,11 @@ public class Controller : NetworkBehaviour
 
 
     public Controller opponent;
+
+    private void Awake()
+    {
+        GameManager.singleton.playerList.Add(this);
+    }
     // Start is called before the first frame update
     protected virtual void Start()
     {
@@ -137,7 +142,19 @@ public class Controller : NetworkBehaviour
         }
 
         turn += OnTurn;
+        OnPlayerJoinedGameSceneServerRpc(this.OwnerClientId);
+    }
 
+    public List<ulong> gameSceneController = new List<ulong>();
+    [ServerRpc(RequireOwnership = false)]
+    public void OnPlayerJoinedGameSceneServerRpc(ulong controllerSent)
+    {
+        gameSceneController.Add(controllerSent);
+        if (IsHost && IsOwner && gameSceneController.Count >= 2 && !gameStarted && GameManager.singleton)
+        {
+            gameStarted = true;
+            StartGame();
+        }
     }
     private void OnDestroy()
     {
@@ -361,7 +378,7 @@ public class Controller : NetworkBehaviour
         waterMap = GameManager.singleton.waterTileMap;
         grid = GameManager.singleton.grid;
         castle = GameManager.singleton.castleTransform;
-        GameManager.singleton.playerList.Add(this);
+        //GameManager.singleton.playerList.Add(this);
     }
     protected void SpawnHUDAndHideOnAllNonOwners()
     {
