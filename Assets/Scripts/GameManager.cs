@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     [SerializeField] GameObject playerPrefab;
     [SerializeField] GameObject aiPrefab;
@@ -74,8 +75,47 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        Debug.Log(IsHost + " is host");
+
+        if (!IsHost)
+        {
+            ClientLoadedGameServerRpc();
+        }
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void ClientLoadedGameServerRpc()
+    {
+        foreach (ulong clientID in NetworkManager.ConnectedClientsIds)
+        {
+            SpawnPlayerPrefabs(clientID);
+        }
     }
 
+    private void SpawnPlayerPrefabs(ulong clientID)
+    {
+        if (playerPrefab != null)
+        {
+            // Instantiate the player prefab
+            GameObject playerInstance = Instantiate(playerPrefab);
+
+            // Get the NetworkObject component
+            NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
+
+            if (networkObject != null)
+            {
+                // Spawn the object on the network with the given client ID
+                networkObject.SpawnAsPlayerObject(clientID);
+            }
+            else
+            {
+                Debug.LogError("Player prefab does not have a NetworkObject component.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Player prefab is not assigned.");
+        }
+    }
     private void FixedUpdate()
     {
         if (hasStartedGame)

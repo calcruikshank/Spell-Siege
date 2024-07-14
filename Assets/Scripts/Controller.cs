@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
@@ -134,7 +133,7 @@ public class Controller : NetworkBehaviour
         mousePositionScript = GetComponent<MousePositionScript>();
         if (IsHost && IsOwner)
         {
-            NetworkManager.OnClientConnectedCallback += OnClientConnected;
+            //NetworkManager.OnClientConnectedCallback += OnClientConnected;
         }
 
         turn += OnTurn;
@@ -144,7 +143,7 @@ public class Controller : NetworkBehaviour
     {
         if (IsHost && IsOwner)
         {
-            NetworkManager.OnClientConnectedCallback -= OnClientConnected;
+            //NetworkManager.OnClientConnectedCallback -= OnClientConnected;
         }
     }
 
@@ -153,9 +152,20 @@ public class Controller : NetworkBehaviour
         Debug.Log($"Client connected with ID: {clientId}");
         if (IsHost && IsOwner && NetworkManager.Singleton.ConnectedClientsList.Count >= 2 && !gameStarted)
         {
-            gameStarted = true;
-            StartGame();
         }
+    }
+
+    [ServerRpc]
+    public void StartGameServerRpc()
+    {
+
+    }
+
+    [ClientRpc]
+    public void StartGameClientRpc()
+    {
+        gameStarted = true;
+        StartGame();
     }
     private bool gameStarted = false;
     private void StartGame()
