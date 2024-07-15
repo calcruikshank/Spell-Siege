@@ -14,7 +14,7 @@ public struct SpellSiegeData
         dragon, //dragon
         python, //python
         monkey, //monkey
-        Pudge,
+        Leviathan,
         ShamanDarkWays,
         SlumberingAncient,
         kitsune, //kitsune
@@ -27,13 +27,10 @@ public struct SpellSiegeData
         alpaca, //alpaca
         ArcanePortal,
         LeylineOfTheHarvest,
-        CaptainOfTheGuard,
+        Cow,
         Harvest, 
         NaturalGrowth,
         Pig, //pig
-        BottomFeeder,
-        Thenas,
-        Kyoshi,
         NumOfCardTypes
     }
 
