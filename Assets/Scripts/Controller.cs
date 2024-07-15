@@ -802,8 +802,8 @@ public class Controller : NetworkBehaviour
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Blue)
         {
-            resources.blueManaCap = 9;
-            resources.blueMana++;
+            //resources.blueManaCap = 9;
+            //resources.blueMana++;
         }
         if (baseTileSent.manaType == SpellSiegeData.ManaType.Red)
         {
@@ -1353,22 +1353,42 @@ public class Controller : NetworkBehaviour
                 if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Blue)
                 {
                     resources.blueMana++;
+                    if (resources.blueMana > resources.blueManaCap)
+                    {
+                        resources.blueMana = resources.blueManaCap;
+                    }
                 }
                 if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Black)
                 {
-                    resources.blackMana++;
+                    resources.blackMana++; 
+                    if (resources.blackMana > resources.blueManaCap)
+                    {
+                        resources.blackMana = resources.blueManaCap;
+                    }
                 }
                 if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Red)
                 {
                     resources.redMana++;
+                    if (resources.redMana > resources.redManaCap)
+                    {
+                        resources.redMana = resources.redManaCap;
+                    }
                 }
                 if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.White)
                 {
                     resources.whiteMana++;
+                    if (resources.whiteMana > resources.whiteManaCap)
+                    {
+                        resources.whiteMana = resources.whiteManaCap;
+                    }
                 }
                 if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Green)
                 {
                     resources.greenMana++;
+                    if (resources.greenMana > resources.greenManaCap)
+                    {
+                        resources.greenMana = resources.greenManaCap;
+                    }
                 }
             }
         }
