@@ -39,6 +39,7 @@ public class ProjectUtilities : MonoBehaviour
     [MenuItem("Project Tools/Create Card From Template")]
     private static void CreateCardFromTemplate()
     {
+        return;
         foreach (Transform transformSelected in Selection.transforms)
         {
             baseGameObjectToApplyTextureTo = transformSelected.gameObject;

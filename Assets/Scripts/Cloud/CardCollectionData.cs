@@ -58,6 +58,7 @@ public class CardCollectionData : MonoBehaviour
     private async void LoadDeck0FromCloudSave()
     {
         Dictionary<string, string> savedData = await CloudSaveService.Instance.Data.LoadAsync(new HashSet<string> { "Deck0" });
+        Debug.Log(savedData);
         if (savedData.Count < 1)
         {
             SaveInitialDecklist0();

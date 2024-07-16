@@ -1,6 +1,10 @@
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
+using System.Collections.Generic;
+
+using Unity.Services.CloudSave;
+
 
 #if UNITY_EDITOR
 using ParrelSync;
@@ -26,6 +30,9 @@ public static class Authentication {
 
         if (!AuthenticationService.Instance.IsSignedIn) {
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+            var data = new Dictionary<string, object> { { "MySaveKey", "HelloWorld" } };
+            await CloudSaveService.Instance.Data.ForceSaveAsync(data);
             PlayerId = AuthenticationService.Instance.PlayerId;
         }
     }

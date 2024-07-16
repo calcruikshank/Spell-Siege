@@ -31,6 +31,7 @@ public struct SpellSiegeData
         Harvest, 
         NaturalGrowth,
         Pig, //pig
+        Sacrifice,
         NumOfCardTypes
     }
 

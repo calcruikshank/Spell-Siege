@@ -11,7 +11,7 @@ public class OpenPackManager : MonoBehaviour
     [SerializeField] Transform coreSetPack;
 
     //todo take in a pack type "expansion"
-    public async void TempOpenPack()
+    public void TempOpenPack()
     {
         Instantiate(coreSetPack, new Vector3(0, 1.2f, 0), Quaternion.identity);
         Debug.Log("Pressed");
@@ -40,7 +40,7 @@ public class OpenPackManager : MonoBehaviour
             CardCollectionData.singleton.loadedCollection.cardsCollected.Add(i);
         }
         var data = new Dictionary<string, object> { { "CardsCollected", CardCollectionData.singleton.loadedCollection } };
-        await CloudSaveService.Instance.Data.ForceSaveAsync(data);
+        CloudSaveService.Instance.Data.ForceSaveAsync(data);
 
 
         //Todo subtract from total packs 
@@ -58,7 +58,7 @@ public class OpenPackManager : MonoBehaviour
     public SpellSiegeData.cardRarity GetRarity()
     {
         float randomNumber = UnityEngine.Random.Range(0f, 100f);
-        if (randomNumber < 1f)
+        if (randomNumber < 2f)
         {
             return SpellSiegeData.cardRarity.Legendary;
         }
