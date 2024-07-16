@@ -223,28 +223,11 @@ public class Controller : NetworkBehaviour
         Debug.Log($"Castle spawned with OwnerClientId: {networkObject.OwnerClientId}");
 
     }
-    protected bool canPurchaseHarvestTile = false;
-    protected virtual void HandleHarvestTiles()
+    public virtual void HandleHarvestTiles()
     {
-
-        if (canPurchaseHarvestTile == true)
-        {
-
-        }
-        canPurchaseHarvestTile = true;
-
         if (IsOwner)
         {
-            if (locallySelectedCard == null)
-            {
-                ShowHarvestedTiles();
-                foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
-                {
-                    if (ShowingPurchasableHarvestTiles)
-                    {
-                    }
-                }
-            }
+            ShowHarvestedTiles();
         }
     }
 
@@ -527,15 +510,19 @@ public class Controller : NetworkBehaviour
                 LeftClickQueue(cellPositionSentToClients);
             }
 
-        }
-        if (state == State.NothingSelected)
-        {
-            if (ShowingPurchasableHarvestTiles)
+            if (state == State.NothingSelected)
             {
-                if (CheckToSeeIfClickedHarvestTileCanBePurchased(cellPositionSentToClients))
+                if (ShowingPurchasableHarvestTiles)
                 {
-                    canPurchaseHarvestTile = false;
-                    AddToPuchaseTileQueueLocal(cellPositionSentToClients);
+                    if (CheckToSeeIfClickedHarvestTileCanBePurchased(cellPositionSentToClients))
+                    {
+                        if (numOfPurchasableHarvestTiles <= 0)
+                        {
+                        }
+                        Debug.Log(ShowingPurchasableHarvestTiles + " fgmkoijiojio");
+                        ShowingPurchasableHarvestTiles = false;
+                        AddToPuchaseTileQueueLocal(cellPositionSentToClients);
+                    }
                 }
             }
         }
@@ -547,7 +534,7 @@ public class Controller : NetworkBehaviour
         {
             if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent))
             {
-                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent).playerOwningTile == this && canPurchaseHarvestTile)
+                if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(tilePositionSent).playerOwningTile == this && numberOfLandsYouCanPlayThisTurn > numberOfLandsPlayedThisTurn)
                 {
                     return true;
                 }
@@ -557,20 +544,23 @@ public class Controller : NetworkBehaviour
     }
     private void AddToPuchaseTileQueueLocal(Vector3Int cellPositionSentToClients)
     {
+        ShowingPurchasableHarvestTiles = false;
         SelectTileToPurchaseServerRpc(cellPositionSentToClients);
     }
     protected void PurchaseHarvestTile(Vector3Int vector3Int)
     {
+        //ShowingPurchasableHarvestTiles = false;
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int).isBeingHarvested)
         {
             return;
         }
-
-        canPurchaseHarvestTile = false;
+        numberOfLandsPlayedThisTurn++;
         AddTileToHarvestedTilesList(BaseMapTileState.singleton.GetBaseTileAtCellPosition(vector3Int));
 
-
-        HideHarvestedTiles();
+        if (numberOfLandsPlayedThisTurn >= numberOfLandsYouCanPlayThisTurn)
+        {
+            HideHarvestedTiles();
+        }
         //IncreaseCostOfHarvestTiles();
     }
     private void HideHarvestedTiles()
@@ -585,13 +575,14 @@ public class Controller : NetworkBehaviour
     }
     private void ShowHarvestedTiles()
     {
+        Debug.Log("showing harvest tiles " + numberOfLandsYouCanPlayThisTurn + " " + numberOfLandsPlayedThisTurn);
         foreach (KeyValuePair<Vector3Int, BaseTile> bt in tilesOwned)
         {
-            if (harvestedTiles.Contains(bt.Value) || canPurchaseHarvestTile)
+            if (harvestedTiles.Contains(bt.Value) || numberOfLandsYouCanPlayThisTurn > numberOfLandsPlayedThisTurn)
             {
                 bt.Value.ShowHarvestIcon();
             }
-            if (!harvestedTiles.Contains(bt.Value) && canPurchaseHarvestTile)
+            if (!harvestedTiles.Contains(bt.Value) && numberOfLandsYouCanPlayThisTurn > numberOfLandsPlayedThisTurn)
             {
                 bt.Value.HighlightTile();
                 highlightedTiles.Add(bt.Value);
@@ -825,7 +816,7 @@ public class Controller : NetworkBehaviour
         }
         baseTileSent.ShowHarvestIcon();
         //baseTileSent.HighlightTile();
-        numberOfLandsPlayedThisTurn++;
+        //numberOfLandsPlayedThisTurn++;
 
         resourcesChanged.Invoke(resources);
     }

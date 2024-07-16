@@ -10,5 +10,6 @@ public class NaturalGrowth : Spell
         playerCastingSpell.DrawCard();
         playerCastingSpell.numberOfLandsYouCanPlayThisTurn++;
         playerCastingSpell.CheckAffordableCards();
+        playerCastingSpell.HandleHarvestTiles();
     }
 }
