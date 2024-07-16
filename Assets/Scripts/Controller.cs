@@ -1315,10 +1315,23 @@ public class Controller : NetworkBehaviour
                 if (!cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>().requiresCreatureBeFriendly)
                 {
                     CastSpellOnTargetedCreature(creatureSelectedSent);
+                    return;
                 }
-                if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>().requiresCreatureBeFriendly && creatureSelectedSent.playerOwningCreature == this)
+                if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>().requiresCreatureBeFriendly)
                 {
-                    CastSpellOnTargetedCreature(creatureSelectedSent);
+                    if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>().requiresCreatureBeFriendly && creatureSelectedSent.playerOwningCreature == null)
+                    {
+                        return;
+                    }
+                    if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>().requiresCreatureBeFriendly && creatureSelectedSent.playerOwningCreature == this)
+                    {
+                        CastSpellOnTargetedCreature(creatureSelectedSent);
+                        return;
+                    }
+                    if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>().requiresCreatureBeFriendly && creatureSelectedSent.playerOwningCreature != this)
+                    {
+                        return;
+                    }
                 }
             }
             return;
