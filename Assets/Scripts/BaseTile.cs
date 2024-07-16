@@ -225,6 +225,10 @@ public class BaseTile : MonoBehaviour
     public int currentAmountOfManaProducing = 1;
     public void SetBeingHarvested()
     {
+        if (traverseType == SpellSiegeData.traversableType.Untraversable)
+        {
+            return;
+        }
         if (instantiatedManaSymbol != null)
         {
             instantiatedManaSymbol.GetChild(0).gameObject.SetActive(true);
@@ -280,6 +284,10 @@ public class BaseTile : MonoBehaviour
 
     internal void ShowHarvestIcon()
     {
+        if (traverseType == SpellSiegeData.traversableType.Untraversable)
+        {
+            return;
+        }
         instantiatedManaSymbol.gameObject.SetActive(true);
     }
     float lifeTime;

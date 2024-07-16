@@ -285,7 +285,7 @@ public class Controller : NetworkBehaviour
                 controller.LocalPlaceCastle(new Vector3Int(8, 0, 0));
             }
 
-            if (controller.IsHost &&  !controller.IsOwner)
+            if (controller.IsHost && !controller.IsOwner)
             {
                 controller.LocalPlaceCastle(new Vector3Int(8, 0, 0));
             }
@@ -613,6 +613,11 @@ public class Controller : NetworkBehaviour
             }
             return;
         }
+        if (locallySelectedCard != null && locallySelectedCard.cardType == SpellSiegeData.CardType.Spell)
+        {
+            LeftClickBaseMapServerRpc(positionSent);
+            return;
+        }
         if (state == State.PlacingCastle)
         {
             LeftClickBaseMapServerRpc(positionSent);
@@ -767,7 +772,10 @@ public class Controller : NetworkBehaviour
         {
             foreach (BaseTile neighborOfNeighbor in neighbor.neighborTiles)
             {
-                SetOwningTile(neighborOfNeighbor.tilePosition);
+                foreach (BaseTile neighborOfNeighbor2 in neighborOfNeighbor.neighborTiles)
+                {
+                    SetOwningTile(neighborOfNeighbor2.tilePosition);
+                }
             }
         }
         //instantiatedCaste = Instantiate(castle, positionSent, Quaternion.identity);
@@ -1216,6 +1224,10 @@ public class Controller : NetworkBehaviour
 
     protected void SetOwningTile(Vector3Int cellPosition)
     {
+        if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellPosition).traverseType == SpellSiegeData.traversableType.Untraversable)
+        {
+            return;
+        }
         if (!tilesOwned.ContainsKey(cellPosition))
         {
             tilesOwned.Add(cellPosition, BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellPosition));
@@ -1360,7 +1372,7 @@ public class Controller : NetworkBehaviour
                 }
                 if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Black)
                 {
-                    resources.blackMana++; 
+                    resources.blackMana++;
                     if (resources.blackMana > resources.blackManaCap)
                     {
                         resources.blackMana = resources.blackManaCap;
