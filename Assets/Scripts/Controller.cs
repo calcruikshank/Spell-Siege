@@ -1361,9 +1361,9 @@ public class Controller : NetworkBehaviour
                 if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Black)
                 {
                     resources.blackMana++; 
-                    if (resources.blackMana > resources.blueManaCap)
+                    if (resources.blackMana > resources.blackManaCap)
                     {
-                        resources.blackMana = resources.blueManaCap;
+                        resources.blackMana = resources.blackManaCap;
                     }
                 }
                 if (harvestedTiles[i].manaType == SpellSiegeData.ManaType.Red)
