@@ -1312,7 +1312,14 @@ public class Controller : NetworkBehaviour
         {
             if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>() != null)
             {
-                CastSpellOnTargetedCreature(creatureSelectedSent);
+                if (!cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>().requiresCreatureBeFriendly)
+                {
+                    CastSpellOnTargetedCreature(creatureSelectedSent);
+                }
+                if (cardSelected.GetComponent<CardInHand>().GameObjectToInstantiate.GetComponent<TargetedSpell>().requiresCreatureBeFriendly && creatureSelectedSent.playerOwningCreature == this)
+                {
+                    CastSpellOnTargetedCreature(creatureSelectedSent);
+                }
             }
             return;
         }

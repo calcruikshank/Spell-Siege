@@ -9,6 +9,8 @@ public class TargetedSpell : MonoBehaviour
     protected Creature creatureTargeted;
     public GameObject instantiatedObject;
     [SerializeField] GameObject GOToInstantiate;
+
+    public bool requiresCreatureBeFriendly = false;
     public void InjectDependencies(Creature creatureTargeted, Controller playerCasting)
     {
         playerCastingSpell = playerCasting;
