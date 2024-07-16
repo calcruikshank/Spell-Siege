@@ -47,12 +47,13 @@ public class CardCollection : MonoBehaviour
         }
         for (int i = lastInstantiatedInt; i < myObject.cardsCollected.Count; i++)
         {
-            AssignButtonToTransform(CardCollectionData.singleton.GetCardAssociatedWithType((SpellSiegeData.Cards)myObject.cardsCollected[i]), i);
+            AssignButtonToTransform(CardCollectionData.singleton.GetCardAssociatedWithType((SpellSiegeData.Cards)myObject.cardsCollected[i]), myObject.cardsCollected.Count);
         }
         lastInstantiatedInt = myObject.cardsCollected.Count;
     }
 
-    private void AssignButtonToTransform(CardInHand transformSent, int i)
+    [SerializeField] TextMeshProUGUI amountInCollectionTextPrefab;
+    private void AssignButtonToTransform(CardInHand transformSent, int amountincollection)
     {
         if (!cardsInstantiatedInCollection.Contains(transformSent.cardAssignedToObject))
         {
@@ -63,6 +64,7 @@ public class CardCollection : MonoBehaviour
             newCardButton.AssignCard(cardToAssign.cardAssignedToObject);
             instantiatedCardButtons.Add(newCardButton);
             Destroy(cardToAssign);
+            newCardButton.amount = Instantiate(amountInCollectionTextPrefab, instantiatedObject);
         }
         else
         {
@@ -131,12 +133,15 @@ public class CardCollection : MonoBehaviour
 
     [SerializeField] GameObject cardInDeckIcon;
     [SerializeField] Transform loadedDeckVertScrollRect;
-    internal void AddCardToDeck(SpellSiegeData.Cards cardAssigned)
+    internal void AddCardToDeck(SpellSiegeData.Cards cardAssigned, int amountOwned)
     {
         if (currentSelectedDeck != null)
         {
-            InstantiateCardPrefabInCurrentSelectedDeck(cardAssigned);
-            currentSelectedDeck.deck.Add((int)cardAssigned);
+            if (currentSelectedDeck.GetAmountOfCard(cardAssigned) < amountOwned && currentSelectedDeck.GetAmountOfCard(cardAssigned) < 4)
+            {
+                InstantiateCardPrefabInCurrentSelectedDeck(cardAssigned);
+                currentSelectedDeck.deck.Add((int)cardAssigned);
+            }
         }
     }
 

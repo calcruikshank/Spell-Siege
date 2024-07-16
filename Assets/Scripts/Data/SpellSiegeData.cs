@@ -19,17 +19,17 @@ public struct SpellSiegeData
         SlumberingAncient,
         kitsune, //kitsune
         kirin, //kirin
-        Dissolve,
+        Murder,
         LightningStrike,
-        MeteorStrike,
-        OvercommitedCleric, //dog
+        MeteorShower,
+        Dog, //dog
         iguana, //iguana
         alpaca, //alpaca
         ArcanePortal,
         LeylineOfTheHarvest,
         Cow,
         Harvest, 
-        NaturalGrowth,
+        Growth, //growth
         Pig, //pig
         Sacrifice,
         NumOfCardTypes
