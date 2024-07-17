@@ -25,7 +25,7 @@ public class OpenPackManager : MonoBehaviour
     public int numOfPacks = 0;
     [SerializeField] TextMeshProUGUI amountofpacksLeft;
 
-    private bool testingPacks = true;
+    private bool testingPacks = false;
     private void Start()
     {
         numOfPacks = CardCollectionData.singleton.loadedCollection.numberOfCorePacks;
@@ -84,6 +84,7 @@ public class OpenPackManager : MonoBehaviour
         var data = new Dictionary<string, object> { { "CardsCollected", CardCollectionData.singleton.loadedCollection } };
         CloudSaveService.Instance.Data.ForceSaveAsync(data);
 
+        Invoke("SpawnPackWithDelay", 1.0f);
 
         //Todo subtract from total packs 
     }
@@ -170,6 +171,10 @@ public class OpenPackManager : MonoBehaviour
         return SpellSiegeData.cardRarity.common;
     }
 
+    void SpawnPackWithDelay()
+    {
+        SpawnPack();
+    }
     internal void SpawnPack()
     {
         if (numOfPacks > 0)

@@ -43,7 +43,6 @@ class Slicer
         SetupCollidersAndRigidBodys(ref positiveObject, positiveSideMeshData, sliceable.UseGravity);
         SetupCollidersAndRigidBodys(ref negativeObject, negativeSideMeshData, sliceable.UseGravity);
 
-        OpenPackManager.Singleton.SpawnPack();
         return new GameObject[] { positiveObject, negativeObject };
     }
 
