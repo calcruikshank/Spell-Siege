@@ -300,12 +300,12 @@ public class Controller : NetworkBehaviour
             }
             if (!IsHost && IsOwner)
             {
-                col = colorsToPickFrom[1];
+                col = colorsToPickFrom[3];
             }
 
             if (!IsOwner && IsHost)
             {
-                col = colorsToPickFrom[1];
+                col = colorsToPickFrom[3];
             }
             if (!IsOwner && !IsHost)
             {

@@ -258,7 +258,8 @@ public class Creature : MonoBehaviour
 
         if (currentTargetedCreature != null && IsCreatureWithinRange(currentTargetedCreature))
         {
-            //creatureState = CreatureState.Idle;
+            creatureState = CreatureState.Idle;
+            return;
         }
         if (currentTargetedStructure != null && IsStructureInRange(currentTargetedStructure))
         {
@@ -681,6 +682,14 @@ public class Creature : MonoBehaviour
     {
         this.playerOwningCreature = controller;
         animatorForObject = transform.GetComponentInChildren<Animator>();
+
+        Outline outline = animatorForObject.gameObject.GetComponent<Outline>();
+        if (outline == null)
+        {
+            outline = animatorForObject.gameObject.AddComponent<Outline>();
+        }
+        outline.OutlineColor = controller.col;
+        outline.OutlineWidth = 2.5f;
         grid = GameManager.singleton.grid;
         baseTileMap = GameManager.singleton.baseMap;
         animatorForObject.SetTrigger("Run");
