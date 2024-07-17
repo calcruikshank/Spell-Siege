@@ -22,7 +22,7 @@ public class CreateLobbyScreen : MonoBehaviour {
     public void OnCreateClicked() {
         var lobbyData = new LobbyData {
             Name = _nameInput.text,
-            MaxPlayers = int.Parse(_maxPlayersInput.text),
+            MaxPlayers = 2,
             Difficulty = _difficultyDropdown.value,
             Type = _typeDropdown.value
         };
