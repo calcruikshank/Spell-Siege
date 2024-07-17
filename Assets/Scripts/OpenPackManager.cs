@@ -10,10 +10,24 @@ public class OpenPackManager : MonoBehaviour
     [SerializeField] Transform cardVisualParent;
     [SerializeField] Transform coreSetPack;
 
+
+    public static OpenPackManager Singleton;
     //todo take in a pack type "expansion"
-    public void TempOpenPack()
+    private void Awake()
+    {
+        if (Singleton != null)
+        {
+            Destroy(this);
+        }
+        Singleton = this;
+    }
+    private void Start()
     {
         Instantiate(coreSetPack, new Vector3(0, 1.2f, 0), Quaternion.identity);
+        
+    }
+    public void TempOpenPack()
+    {
         Debug.Log("Pressed");
         //TODO add drop rates for each card based on rarity
 

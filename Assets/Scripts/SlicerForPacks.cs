@@ -163,6 +163,9 @@ public class SlicerForPacks : MonoBehaviour
         }
 
         GameObject[] slices = Slicer.Slice(plane, other.gameObject);
+
+
+
         Destroy(other.gameObject);
 
         Rigidbody rigidbody = slices[1].GetComponent<Rigidbody>();

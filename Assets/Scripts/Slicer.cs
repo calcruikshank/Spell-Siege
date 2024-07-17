@@ -14,6 +14,7 @@ class Slicer
     /// <returns></returns>
     public static GameObject[] Slice(Plane plane, GameObject objectToCut)
     {
+        OpenPackManager.Singleton.TempOpenPack();
         //Get the current mesh and its verts and tris
         Mesh mesh = objectToCut.GetComponent<MeshFilter>().mesh;
         var a = mesh.GetSubMesh(0);
@@ -55,15 +56,11 @@ class Slicer
         var originalMaterial = originalObject.GetComponent<MeshRenderer>().materials;
 
         GameObject meshGameObject = new GameObject();
-        Sliceable originalSliceable = originalObject.GetComponent<Sliceable>();
+        //Sliceable originalSliceable = originalObject.GetComponent<Sliceable>();
 
         meshGameObject.AddComponent<MeshFilter>();
         meshGameObject.AddComponent<MeshRenderer>();
-        Sliceable sliceable = meshGameObject.AddComponent<Sliceable>();
-
-        sliceable.IsSolid = originalSliceable.IsSolid;
-        sliceable.ReverseWireTriangles = originalSliceable.ReverseWireTriangles;
-        sliceable.UseGravity = originalSliceable.UseGravity;
+        //Sliceable sliceable = meshGameObject.AddComponent<Sliceable>();
 
         meshGameObject.GetComponent<MeshRenderer>().materials = originalMaterial;
 
@@ -83,11 +80,44 @@ class Slicer
     /// <param name="mesh"></param>
     private static void SetupCollidersAndRigidBodys(ref GameObject gameObject, Mesh mesh, bool useGravity)
     {
-        MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
-        meshCollider.sharedMesh = mesh;
-        meshCollider.convex = true;
-
         var rb = gameObject.AddComponent<Rigidbody>();
-        rb.useGravity = useGravity;
+        rb.useGravity = useGravity; gameObject.AddComponent<FadeAndDestroy>().StartFading(1.0f);
+    }
+    private class FadeAndDestroy : MonoBehaviour
+    {
+        public void StartFading(float duration)
+        {
+            StartCoroutine(FadeOutAndDestroy(duration));
+        }
+
+        private IEnumerator FadeOutAndDestroy(float duration)
+        {
+            MeshRenderer renderer = GetComponent<MeshRenderer>();
+            Material[] materials = renderer.materials;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float alpha = Mathf.Lerp(1f, 0f, elapsedTime / duration);
+                foreach (Material material in materials)
+                {
+                    Color color = material.color;
+                    color.a = alpha;
+                    material.color = color;
+                }
+                yield return null;
+            }
+
+            // Ensure alpha is set to 0 at the end
+            foreach (Material material in materials)
+            {
+                Color color = material.color;
+                color.a = 0f;
+                material.color = color;
+            }
+
+            Destroy(gameObject);
+        }
     }
 }

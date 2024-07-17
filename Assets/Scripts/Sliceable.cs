@@ -20,6 +20,7 @@ public class Sliceable : MonoBehaviour
     [SerializeField]
     private bool _smoothVertices = false;
 
+
     public bool IsSolid
     {
         get
