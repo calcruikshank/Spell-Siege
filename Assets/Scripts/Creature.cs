@@ -113,8 +113,8 @@ public class Creature : MonoBehaviour
 
         if (canAttackIcon != null)
         {
-            canAttackIcon.transform.position = new Vector3(this.transform.position.x , this.transform.position.y + .1f, this.transform.position.z ) ;
-            canAttackIcon.transform.localEulerAngles = new Vector3(creatureImage.localEulerAngles.x, creatureImage.localEulerAngles.y + 45, creatureImage.localEulerAngles.z) ;
+            canAttackIcon.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .1f, this.transform.position.z);
+            canAttackIcon.transform.localEulerAngles = new Vector3(creatureImage.localEulerAngles.x, creatureImage.localEulerAngles.y + 45, creatureImage.localEulerAngles.z);
         }
 
     }
@@ -140,6 +140,17 @@ public class Creature : MonoBehaviour
                 CheckForCreaturesWithinRange();
                 HandleAttackRate();
                 HandleAbilityRate();
+                if (currentTargetedCreature != null)
+                {
+                    // Calculate the direction vector
+                    Vector3 directionToTarget = currentTargetedCreature.transform.position - this.transform.position;
+
+                    // Calculate the rotation required to look at the target
+                    Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
+
+                    // Apply the rotation to your object
+                    animatorForObject.transform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
+                }
                 //HandleFriendlyCreaturesList();
                 //HandleAttack();
                 break;
@@ -218,13 +229,14 @@ public class Creature : MonoBehaviour
         }
 
     }
+    bool tauntFound = false;
     void ChooseTarget()
     {
         float lowestHealthCreatureWithinRange = -1;
 
         Creature closestCreature = null;
         float minDistance = float.MaxValue;
-
+        tauntFound = false;
         foreach (Creature creatureWithinRange in creaturesWithinRange)
         {
             if (creatureWithinRange == null)
@@ -232,16 +244,28 @@ public class Creature : MonoBehaviour
                 creaturesWithinRange.Remove(creatureWithinRange);
                 return;
             }
+
             if (creatureWithinRange.playerOwningCreature != this.playerOwningCreature)
             {
+                if (creatureWithinRange.taunt)
+                {
+                    currentTargetedCreature = creatureWithinRange;
+                    tauntFound = true;
+                    break; // Since we always want to target the creature with taunt, we can break the loop here
+                }
+
                 float distance = Vector3.Distance(this.transform.position, creatureWithinRange.transform.position);
-                if (distance < minDistance)
+                if (!tauntFound && distance < minDistance)
                 {
                     minDistance = distance;
                     closestCreature = creatureWithinRange;
-                    currentTargetedCreature = closestCreature;
                 }
             }
+        }
+
+        if (!tauntFound && closestCreature != null)
+        {
+            currentTargetedCreature = closestCreature;
         }
         if (currentTargetedCreature != null)
         {
@@ -568,14 +592,18 @@ public class Creature : MonoBehaviour
             {
                 targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x - 1, currentCellPosition.y, currentCellPosition.z));
                 targetedCellForChoosingTargets = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x - 1, currentCellPosition.y, currentCellPosition.z));
+
                 animatorForObject.transform.localEulerAngles = new Vector3(0, -90, 0);
             }
             else
             {
                 targetedCell = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x + 1, currentCellPosition.y, currentCellPosition.z));
                 targetedCellForChoosingTargets = BaseMapTileState.singleton.GetBaseTileAtCellPosition(new Vector3Int(currentCellPosition.x + 1, currentCellPosition.y, currentCellPosition.z));
+
                 animatorForObject.transform.localEulerAngles = new Vector3(0, 90, 0);
             }
+
+
 
             if (targetedCell.CreatureOnTile() != null || targetedCell.structureOnTile != null || targetedCell.traverseType == SpellSiegeData.traversableType.Untraversable)
             {
