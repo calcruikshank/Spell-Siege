@@ -523,7 +523,7 @@ public class Controller : NetworkBehaviour
                         {
                         }
                         Debug.Log(ShowingPurchasableHarvestTiles + " fgmkoijiojio");
-                        ShowingPurchasableHarvestTiles = false;
+                        //ShowingPurchasableHarvestTiles = false;
                         AddToPuchaseTileQueueLocal(cellPositionSentToClients);
                     }
                 }
@@ -547,7 +547,7 @@ public class Controller : NetworkBehaviour
     }
     private void AddToPuchaseTileQueueLocal(Vector3Int cellPositionSentToClients)
     {
-        ShowingPurchasableHarvestTiles = false;
+        //ShowingPurchasableHarvestTiles = false;
         SelectTileToPurchaseServerRpc(cellPositionSentToClients);
     }
     protected void PurchaseHarvestTile(Vector3Int vector3Int)

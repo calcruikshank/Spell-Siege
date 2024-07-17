@@ -256,7 +256,8 @@ public class Creature : MonoBehaviour
         }
 
 
-        if (currentTargetedCreature != null && IsCreatureWithinRange(currentTargetedCreature))
+
+        if (currentTargetedCreature != null && IsCreatureWithinRange(currentTargetedCreature) && Vector3.Distance(actualPosition, new Vector3(tileCurrentlyOn.transform.position.x, this.transform.position.y, tileCurrentlyOn.transform.position.z)) < .1f)
         {
             creatureState = CreatureState.Idle;
             return;
