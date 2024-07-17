@@ -45,7 +45,7 @@ public class Structure : NetworkBehaviour
         health -= amountofdamage;
         if (health <= 0)
         {
-            DestroyStructure();
+            GameManager.singleton.EndGame(this.OwnerClientId);
         }
         if (keepHealth != null)
         {

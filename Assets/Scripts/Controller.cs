@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.Services.CloudSave;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
@@ -1622,6 +1623,12 @@ public class Controller : NetworkBehaviour
         SetToCreatureOnFieldSelected(GameManager.singleton.allCreaturesOnField[creatureIDSent]);
     }
 
+    internal void WinGame()
+    {
+        CardCollectionData.singleton.loadedCollection.numberOfCorePacks++;
+        var data = new Dictionary<string, object> { { "CardsCollected", CardCollectionData.singleton.loadedCollection } };
+        CloudSaveService.Instance.Data.ForceSaveAsync(data);
+    }
 }
 
 

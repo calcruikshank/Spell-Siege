@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 public class GameManager : NetworkBehaviour
@@ -205,5 +206,20 @@ public class GameManager : NetworkBehaviour
         {
             kvp.Value.OtherCreatureEntered(allCreaturesOnField[creatureID]);
         }
+    }
+
+    public void EndGame(ulong playerOwningStructureID)
+    {
+        foreach (Controller controller in playerList)
+        {
+            if (controller.OwnerClientId != playerOwningStructureID)
+            {
+                if (controller.IsOwner)
+                {
+                    controller.WinGame();
+                }
+            }
+        }
+        SceneHandler.Instance.LoadMainMenu();
     }
 }

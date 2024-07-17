@@ -1,11 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Multiplayer.Samples.Utilities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneHandler : MonoBehaviour
 {
-   
+    public static SceneHandler Instance { get; private set; }
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance);
+        }
+        Instance = this;
+        DontDestroyOnLoad(this);
+    }
     public void LoadLobby()
     {
         SceneManager.LoadSceneAsync("Lobby");
