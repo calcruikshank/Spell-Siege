@@ -91,6 +91,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+
     private void SpawnPlayerPrefabs(ulong clientID)
     {
         if (playerPrefab != null)
@@ -145,10 +146,25 @@ public class GameManager : NetworkBehaviour
         return alpha;
     }
 
-    internal void AddPlayerToReady(Controller controller)
+    internal void AddPlayerToReady(Controller controllerSent)
     {
         //state = State.Game;
-        //playersThatHavePlacedCastle.Add(controller);
+        playersThatHavePlacedCastle.Add(controllerSent);
+
+        if (playersThatHavePlacedCastle.Count >= playerList.Count)
+        {
+            hasStartedGame = true;
+            foreach (Controller controller in playerList)
+            {
+
+                Shuffle(controller.cardsInDeck);
+                for (int i = 0; i < 6; i++)
+                {
+                    controller.DrawCard();
+                }
+                controller.StartTurnPhase();
+            }
+        }
     }
 
     public void SpawnDamageText(Vector3 positionSent, float damageSent)

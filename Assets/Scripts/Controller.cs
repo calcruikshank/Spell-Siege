@@ -134,6 +134,14 @@ public class Controller : NetworkBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
+        if (IsOwner)
+        {
+            DeckSelectorInScene.singleton.ShowDecksFromPlayer();
+
+            DeckSelectorInScene.singleton.ShowDecks();
+            DeckSelectorInScene.singleton.AssignLocalPlayer(this);
+        }
+
         GrabAllObjectsFromGameManager();
         mousePositionScript = GetComponent<MousePositionScript>();
         if (IsHost && IsOwner)
@@ -152,7 +160,7 @@ public class Controller : NetworkBehaviour
         gameSceneController.Add(controllerSent);
         if (IsHost && IsOwner && gameSceneController.Count >= 2 && !gameStarted && GameManager.singleton)
         {
-            gameStarted = true;
+            //gameStarted = true;
             StartGame();
         }
     }
@@ -241,8 +249,7 @@ public class Controller : NetworkBehaviour
     {
         GameManager.singleton.playerList[0].opponent = GameManager.singleton.playerList[1];
         GameManager.singleton.playerList[1].opponent = GameManager.singleton.playerList[0];
-        GameManager.singleton.hasStartedGame = true;
-
+        
 
 
         foreach (Controller controller in GameManager.singleton.playerList)
@@ -277,13 +284,12 @@ public class Controller : NetworkBehaviour
                 controller.LocalPlaceCastle(new Vector3Int(-7, 0, 0));
             }
 
-            controller.StartTurnPhase();
         }
 
     }
-    private void StartGameCoroutine()
+    public void StartGameCoroutine()
     {
-        cardsInDeck = new List<CardInHand>(demonDeck);
+        //cardsInDeck = new List<CardInHand>(demonDeck);
         col.a = 1;
         transparentCol = col;
         transparentCol.a = .5f;
@@ -319,11 +325,6 @@ public class Controller : NetworkBehaviour
         col.a = 1;
         transparentCol = col;
         transparentCol.a = .5f;
-        GameManager.singleton.Shuffle(cardsInDeck);
-        for (int i = 0; i < 6; i++)
-        {
-            DrawCard();
-        }
         locallySelectedCard = null;
 
 
@@ -342,6 +343,8 @@ public class Controller : NetworkBehaviour
         cardsInDeck = new List<CardInHand>();
         cardsInDeck = translatedCards;
         cardsInDeck = GameManager.singleton.Shuffle(cardsInDeck);
+
+        GameManager.singleton.AddPlayerToReady(this);
 
     }
 

@@ -33,7 +33,7 @@ public class DeckSelectorInScene : MonoBehaviour
         }
         singleton = this;
     }
-    public void Start()
+    public void ShowDecksFromPlayer()
     {
         for (int i = 0; i < decks.Length; i++)
         {
