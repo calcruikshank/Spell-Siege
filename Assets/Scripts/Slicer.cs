@@ -43,6 +43,7 @@ class Slicer
         SetupCollidersAndRigidBodys(ref positiveObject, positiveSideMeshData, sliceable.UseGravity);
         SetupCollidersAndRigidBodys(ref negativeObject, negativeSideMeshData, sliceable.UseGravity);
 
+        OpenPackManager.Singleton.SpawnPack();
         return new GameObject[] { positiveObject, negativeObject };
     }
 
@@ -116,7 +117,6 @@ class Slicer
                 color.a = 0f;
                 material.color = color;
             }
-
             Destroy(gameObject);
         }
     }

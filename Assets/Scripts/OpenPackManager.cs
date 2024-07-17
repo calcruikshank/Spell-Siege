@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Services.CloudSave;
 using UnityEngine;
 
@@ -21,13 +22,39 @@ public class OpenPackManager : MonoBehaviour
         }
         Singleton = this;
     }
+    public int numOfPacks = 0;
+    [SerializeField] TextMeshProUGUI amountofpacksLeft;
+
+    private bool testingPacks = true;
     private void Start()
     {
-        Instantiate(coreSetPack, new Vector3(0, 1.2f, 0), Quaternion.identity);
-        
+        numOfPacks = CardCollectionData.singleton.loadedCollection.numberOfCorePacks;
+        amountofpacksLeft.text = "x" + numOfPacks.ToString();
+        if (testingPacks)
+        {
+            CardCollectionData.singleton.loadedCollection.numberOfCorePacks = 30;
+            var data = new Dictionary<string, object> { { "CardsCollected", CardCollectionData.singleton.loadedCollection } };
+            CloudSaveService.Instance.Data.ForceSaveAsync(data);
+        }
+        SpawnPack();
     }
     public void TempOpenPack()
     {
+        if (cardsInScene.Count > 0)
+        {
+
+            foreach (GameObject go in cardsInScene)
+            {
+                Destroy(go);
+            }
+            StopAllCoroutines();
+            cardsInScene.Clear();
+
+        }
+        CardCollectionData.singleton.loadedCollection.numberOfCorePacks--;
+
+        numOfPacks = CardCollectionData.singleton.loadedCollection.numberOfCorePacks;
+        amountofpacksLeft.text = "x" + numOfPacks.ToString();
         Debug.Log("Pressed");
         //TODO add drop rates for each card based on rarity
 
@@ -63,6 +90,8 @@ public class OpenPackManager : MonoBehaviour
     public AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     public float movementDuration = 0.2f; // Adjust duration for faster movement
 
+
+    public List<GameObject> cardsInScene;
     private void InstantiateCardVisual(SpellSiegeData.Cards cardGrabbed, int position)
     {
         CardInHand cardGO = CardCollectionData.singleton.GetCardAssociatedWithType(cardGrabbed);
@@ -70,7 +99,7 @@ public class OpenPackManager : MonoBehaviour
         GameObject instantiatedCard = Instantiate(cardGO, cardVisualParent).gameObject;
 
         Destroy(instantiatedCard.GetComponent<CardInHand>());
-
+        cardsInScene.Add(instantiatedCard);
         // Start the coroutine to move the card to the target point with animation
         StartCoroutine(MoveCardToPoint(instantiatedCard, targetPoints[position].position, movementDuration));
     }
@@ -139,5 +168,13 @@ public class OpenPackManager : MonoBehaviour
             return SpellSiegeData.cardRarity.uncommon;
         }
         return SpellSiegeData.cardRarity.common;
+    }
+
+    internal void SpawnPack()
+    {
+        if (numOfPacks > 0)
+        {
+            Instantiate(coreSetPack, new Vector3(0, 1.2f, 0), Quaternion.identity);
+        }
     }
 }
