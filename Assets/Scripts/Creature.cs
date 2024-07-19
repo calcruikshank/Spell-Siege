@@ -316,13 +316,14 @@ public class Creature : MonoBehaviour
     {
         CheckForCreaturesWithinRange();
         ChooseTarget();
+
         if (currentTargetedCreature != null)
         {
             if (IsCreatureWithinRange(currentTargetedCreature))
             {
                 VisualAttackAnimation(currentTargetedCreature);
                 canAttack = false;
-                OnAttack();
+                //OnAttack();
                 animatorForObject.SetTrigger("Attack");
                 return;
             }
@@ -333,7 +334,7 @@ public class Creature : MonoBehaviour
             {
                 VisualAttackAnimationOnStructure(currentTargetedStructure);
                 canAttack = false;
-                OnAttack();
+                //OnAttack();
                 animatorForObject.SetTrigger("Attack");
                 return;
             }
@@ -344,7 +345,7 @@ public class Creature : MonoBehaviour
                 {
                     VisualAttackAnimationOnStructure(currentTargetedStructure);
                     canAttack = false;
-                    OnAttack();
+                    //OnAttack();
                     animatorForObject.SetTrigger("Attack");
                     return;
                 }

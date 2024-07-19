@@ -1544,6 +1544,7 @@ public class Controller : NetworkBehaviour
     [ClientRpc]
     private void GiveCounterClientRpc(int creatureID, int numOfCounters)
     {
+        Debug.Log("Giving counter " + this.OwnerClientId);
         GameManager.singleton.allCreaturesOnField[creatureID].LocalGiveCounter(numOfCounters);
     }
     [ServerRpc]

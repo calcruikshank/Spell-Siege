@@ -14,24 +14,24 @@ public struct SpellSiegeData
         dragon, //dragon
         python, //python
         monkey, //monkey
-        Leviathan,
-        ShamanDarkWays,
+        Leviathan,//levi
+        Squirell, //squirell
         SlumberingAncient,
         kitsune, //kitsune
         kirin, //kirin
-        Murder,
-        LightningStrike,
-        MeteorShower,
+        Murder, //murder
+        LightningStrike, //ls
+        MeteorShower, //msh
         Dog, //dog
         iguana, //iguana
         alpaca, //alpaca
-        ArcanePortal,
+        ArcanePortal, 
         LeylineOfTheHarvest,
-        Cow,
+        Cow, //cow
         Harvest, 
         Growth, //growth
         Pig, //pig
-        Sacrifice,
+        Sacrifice, //sac
         NumOfCardTypes
     }
 
