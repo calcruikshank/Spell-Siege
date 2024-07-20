@@ -8,7 +8,7 @@ public struct SpellSiegeData
     {
         turtle, //turtle
         peggy, //peggy
-        BattleScarredDemon,
+        Wyvern, //wyvern
         cerberus, //cerberus
         ElvishMystic,
         dragon, //dragon
@@ -32,6 +32,7 @@ public struct SpellSiegeData
         Growth, //growth
         Pig, //pig
         Sacrifice, //sac
+        Hamster, //hamster
         NumOfCardTypes
     }
 
