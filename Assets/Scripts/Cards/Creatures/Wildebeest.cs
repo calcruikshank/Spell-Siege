@@ -7,10 +7,26 @@ public class Wildebeest : Creature
     public List<Creature> creaturesYouveDealtDamageTo = new List<Creature>();
     public override void Move()
     {
+        Creature creatureOnCurrentTile = BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition);
+        if (creatureOnCurrentTile != null && creatureOnCurrentTile != this && creatureOnCurrentTile.playerOwningCreature != this)
+        {
+            if (!creaturesYouveDealtDamageTo.Contains(creatureOnCurrentTile))
+            {
+                creaturesYouveDealtDamageTo.Add(creatureOnCurrentTile);
+                VisualAttackAnimation(creatureOnCurrentTile);
+            }
+        }
         currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
         if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
         {
             tileCurrentlyOn = BaseMapTileState.singleton.GetBaseTileAtCellPosition(currentCellPosition);
+        }
+        if (previousTilePosition != tileCurrentlyOn)
+        {
+            CalculateAllTilesWithinRange();
+            previousTilePosition.RemoveCreatureFromTile(this);
+            previousTilePosition = tileCurrentlyOn;
+            tileCurrentlyOn.AddCreatureToTile(this);
         }
         if (previousTilePosition != tileCurrentlyOn)
         {
@@ -37,19 +53,21 @@ public class Wildebeest : Creature
                 animatorForObject.transform.localEulerAngles = new Vector3(0, 90, 0);
             }
             animatorForObject.SetTrigger("Run");
-            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime * 2);
+            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime);
 
         }
 
-        Creature creatureOnCurrentTile = BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition);
-        if (creatureOnCurrentTile != null)
+        if (targetedCell.structureOnTile != null || targetedCell.traverseType == SpellSiegeData.traversableType.Untraversable)
         {
-            if (!creaturesYouveDealtDamageTo.Contains(creatureOnCurrentTile))
+            targetedCell = tileCurrentlyOn;
+
+            bool creatureCanMove = false;
+            if (Vector3.Distance(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z)) < .05f)
             {
-                creaturesYouveDealtDamageTo.Add(creatureOnCurrentTile);
-                VisualAttackAnimation(creatureOnCurrentTile);
+                SetStateToIdle();
             }
         }
+
     }
 
     public override void ChooseTarget()

@@ -611,7 +611,7 @@ public class Creature : MonoBehaviour
                 targetedCell = tileCurrentlyOn;
 
                 bool creatureCanMove = false;
-                if (Vector3.Distance(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z)) < .01f)
+                if (Vector3.Distance(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z)) < .05f)
                 {
                     if (targetedCell.CreatureOnTile() != null)
                     {

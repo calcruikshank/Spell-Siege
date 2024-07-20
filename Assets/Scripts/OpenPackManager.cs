@@ -164,7 +164,7 @@ public class OpenPackManager : MonoBehaviour
         {
             return SpellSiegeData.cardRarity.rare;
         }
-        if (randomNumber < 40)
+        if (randomNumber < 50)
         {
             return SpellSiegeData.cardRarity.uncommon;
         }
