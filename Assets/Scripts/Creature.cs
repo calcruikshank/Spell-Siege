@@ -247,6 +247,12 @@ public class Creature : MonoBehaviour
 
             if (creatureWithinRange.playerOwningCreature != this.playerOwningCreature)
             {
+                // Skip creatures with stealth
+                if (creatureWithinRange.stealth)
+                {
+                    continue;
+                }
+
                 if (creatureWithinRange.taunt)
                 {
                     currentTargetedCreature = creatureWithinRange;
@@ -278,6 +284,7 @@ public class Creature : MonoBehaviour
         {
             currentTargetedCreature = targetToFollow;
         }
+
 
 
 
@@ -503,6 +510,10 @@ public class Creature : MonoBehaviour
 
     public virtual void OnTurn()
     {
+        if (turnStealthOff == true)
+        {
+            stealth = false;
+        }
         canAttack = true;
         canAttackIcon.gameObject.SetActive(true);
         HandleFriendlyCreaturesList();
@@ -953,6 +964,7 @@ public class Creature : MonoBehaviour
     public bool lifelink = false;
     public bool deathtouch = false;
     public bool taunt = false;
+    public bool stealth = false;
 
     GameObject rangeLrGO;
     LineRenderer rangeLr;
@@ -1112,9 +1124,10 @@ public class Creature : MonoBehaviour
         UpdateCreatureHUD();
     }
 
+    bool turnStealthOff = false;
     public virtual void OnAttack()
     {
-
+        turnStealthOff = true;
     }
 
     void SetStateToDead()

@@ -33,8 +33,9 @@ public struct SpellSiegeData
         Pig, //pig
         Sacrifice, //sac
         Hamster, //hamster
-        Lion,
-        Wildebeest,
+        Lion, //lion
+        Wildebeest, //wildebeest
+        Lynx, //lynx
         NumOfCardTypes
     }
 
