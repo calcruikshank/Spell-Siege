@@ -36,6 +36,7 @@ public struct SpellSiegeData
         Lion, //lion
         Wildebeest, //wildebeest
         Lynx, //lynx
+        Panther, //panther
         NumOfCardTypes
     }
 
