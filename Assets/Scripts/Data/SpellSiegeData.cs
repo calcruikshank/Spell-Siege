@@ -26,7 +26,7 @@ public struct SpellSiegeData
         iguana, //iguana
         alpaca, //alpaca
         ArcanePortal, 
-        LeylineOfTheHarvest,
+        Buff, //buff
         Cow, //cow
         Harvest, 
         Growth, //growth
