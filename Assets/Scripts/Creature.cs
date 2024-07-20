@@ -501,7 +501,7 @@ public class Creature : MonoBehaviour
         this.attackText.text = CurrentAttack.ToString();
     }
 
-    internal void OnTurn()
+    public virtual void OnTurn()
     {
         canAttack = true;
         canAttackIcon.gameObject.SetActive(true);

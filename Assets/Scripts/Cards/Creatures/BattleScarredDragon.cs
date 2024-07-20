@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BattleScarredDragon : FlyingCreature
+public class BattleScarredDragon : Creature
 {
     List<Creature> creaturesDoubled = new List<Creature>();
     protected override void CheckForCreaturesWithinRange()
