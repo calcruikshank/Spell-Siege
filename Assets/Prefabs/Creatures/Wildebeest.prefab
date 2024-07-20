@@ -543,9 +543,9 @@ GameObject:
   - component: {fileID: 6239865746917987993}
   - component: {fileID: 6239865746917987992}
   - component: {fileID: 6239865746917987998}
-  - component: {fileID: 8140395198483250823}
+  - component: {fileID: 3092785070996011585}
   m_Layer: 6
-  m_Name: Hamster
+  m_Name: Wildebeest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -568,7 +568,7 @@ Transform:
   - {fileID: 4769756027410212970}
   - {fileID: 4353893006797176972}
   - {fileID: 4742030054974793146}
-  - {fileID: 1650233796238113513}
+  - {fileID: 2937014964095337296}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6239865746917987992
@@ -602,7 +602,7 @@ CapsuleCollider:
   m_Height: 1.0085878
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &8140395198483250823
+--- !u!114 &3092785070996011585
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -611,17 +611,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 6239865746917987997}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 939767c9f506b6040b157d7291ddd85d, type: 3}
+  m_Script: {fileID: 11500000, guid: 33ee07b5c7d4ff6439cd3d3661417294, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
   range: 1
   UsageRate: 1
-  highlightForCreatureSelected: {fileID: 4353893006797176972}
-  Attack: 1
-  CurrentAttack: 1
+  highlightForCreatureSelected: {fileID: 0}
+  Attack: 5
+  CurrentAttack: 5
   CurrentHealth: 0
-  MaxHealth: 1
+  MaxHealth: 5
   attackText: {fileID: 3298186682565764544}
   healthText: {fileID: 7534283529393728702}
   numOfTargetables: 1
@@ -635,7 +635,11 @@ MonoBehaviour:
   previousTilePosition: {fileID: 0}
   actualPosition: {x: 0, y: 0, z: 0}
   targetedPosition: {x: 0, y: 0, z: 0}
-  visualAttackParticle: {fileID: 6131268248031804042, guid: 58eb57a8db9362b49a2c9d078230ae67, type: 3}
+  currentTargetedStructure: {fileID: 0}
+  visualAttackParticle: {fileID: 0}
+  animatorForObject: {fileID: 0}
+  targetedCell: {fileID: 0}
+  targetedCellForChoosingTargets: {fileID: 0}
   tempLineRendererBetweenCreaturesGameObject: {fileID: 0}
   canAttackIcon: {fileID: 0}
   lifelink: 0
@@ -643,6 +647,7 @@ MonoBehaviour:
   taunt: 0
   targetToFollow: {fileID: 0}
   structureToFollow: {fileID: 0}
+  creaturesYouveDealtDamageTo: []
 --- !u!1 &6330952787006823200
 GameObject:
   m_ObjectHideFlags: 0
@@ -1003,7 +1008,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1004158365535047214, guid: b744932c1e84d4e418332e045e6cfecd, type: 3}
   m_PrefabInstance: {fileID: 3567798863211269794}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &4904080950389590980
+--- !u!1001 &3872914269201381780
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -1011,77 +1016,73 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6239865746917987993}
     m_Modifications:
-    - target: {fileID: 5974030681375158562, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158572, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalScale.z
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5974030681375158574, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
+    - target: {fileID: 2124859609798867653, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
       propertyPath: m_Name
-      value: Hamster
+      value: Wildebeest
+      objectReference: {fileID: 0}
+    - target: {fileID: 2124859611086986283, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
---- !u!4 &1650233796238113513 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
+--- !u!4 &2937014964095337296 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 5974030681375158573, guid: 64805f52a03305d47aeb28b08c3d513f, type: 3}
-  m_PrefabInstance: {fileID: 4904080950389590980}
+  m_CorrespondingSourceObject: {fileID: 2124859609798867652, guid: 3a48ff1fb8392ce40b149a85b06fa0cf, type: 3}
+  m_PrefabInstance: {fileID: 3872914269201381780}
   m_PrefabAsset: {fileID: 0}

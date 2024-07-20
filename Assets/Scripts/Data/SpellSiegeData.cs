@@ -34,6 +34,7 @@ public struct SpellSiegeData
         Sacrifice, //sac
         Hamster, //hamster
         Lion,
+        Wildebeest,
         NumOfCardTypes
     }
 

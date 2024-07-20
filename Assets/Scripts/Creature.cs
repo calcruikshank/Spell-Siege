@@ -191,7 +191,7 @@ public class Creature : MonoBehaviour
     protected List<Structure> structresWithinRange = new List<Structure>();
 
     Creature currentTargetedCreature;
-    Structure currentTargetedStructure;
+    public Structure currentTargetedStructure;
     protected virtual void CheckForCreaturesWithinRange()
     {
         structresWithinRange = new List<Structure>();
@@ -230,7 +230,7 @@ public class Creature : MonoBehaviour
 
     }
     bool tauntFound = false;
-    void ChooseTarget()
+    public virtual void ChooseTarget()
     {
         float lowestHealthCreatureWithinRange = -1;
 
@@ -568,10 +568,10 @@ public class Creature : MonoBehaviour
     }
 
 
-    Animator animatorForObject;
-    BaseTile targetedCell;
-    BaseTile targetedCellForChoosingTargets;
-    public void Move()
+    public Animator animatorForObject;
+    public BaseTile targetedCell;
+    public BaseTile targetedCellForChoosingTargets;
+    public virtual void Move()
     {
         currentCellPosition = grid.WorldToCell(new Vector3(actualPosition.x, 0, actualPosition.z));
         if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
@@ -801,7 +801,7 @@ public class Creature : MonoBehaviour
         this.range--;
         CalculateAllTilesWithinRange();
     }
-    void CalculateAllTilesWithinRange()
+    public void CalculateAllTilesWithinRange()
     {
         List<Vector3Int> extents = new List<Vector3Int>();
         allTilesWithinRange.Clear();
