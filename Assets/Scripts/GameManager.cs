@@ -159,7 +159,7 @@ public class GameManager : NetworkBehaviour
             {
 
                 Shuffle(controller.cardsInDeck);
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     controller.DrawCard();
                 }

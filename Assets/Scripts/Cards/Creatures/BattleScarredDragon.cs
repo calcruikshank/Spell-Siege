@@ -22,7 +22,7 @@ public class BattleScarredDragon : Creature
             {
                 if (!friendlyCreaturesWithinRange.Contains(friendly))
                 {
-                    friendly.IncreaseAttackByX(-friendly.Attack);
+                    friendly.IncreaseAttackByX(-friendly.attack);
                 }
             }
         }
@@ -30,7 +30,7 @@ public class BattleScarredDragon : Creature
         {
             if (!creaturesDoubled.Contains(friendly))
             {
-                friendly.IncreaseAttackByX(friendly.Attack);
+                friendly.IncreaseAttackByX(friendly.attack);
             }
         }
         creaturesDoubled = friendlyCreaturesWithinRange;
@@ -40,7 +40,7 @@ public class BattleScarredDragon : Creature
     {
         foreach (Creature friendly in creaturesDoubled)
         {
-            friendly.IncreaseAttackByX(-friendly.Attack);
+            friendly.IncreaseAttackByX(-friendly.attack);
         }
         base.OnDeath();
 

@@ -20,8 +20,8 @@ public class Creature : MonoBehaviour
 
     protected Transform creatureImage;
 
-    [SerializeField] public float Attack;
-    public float CurrentAttack;
+    [SerializeField] public float attack;
+    public float currentAttack;
     float AttackRate = 4;
     protected float abilityRate = 4;
 
@@ -172,7 +172,7 @@ public class Creature : MonoBehaviour
 
     internal void IncreaseAttackByX(float v)
     {
-        CurrentAttack += v;
+        currentAttack += v;
         UpdateCreatureHUD();
     }
 
@@ -288,7 +288,7 @@ public class Creature : MonoBehaviour
 
 
 
-        if (currentTargetedCreature != null && IsCreatureWithinRange(currentTargetedCreature) && Vector3.Distance(actualPosition, new Vector3(tileCurrentlyOn.transform.position.x, this.transform.position.y, tileCurrentlyOn.transform.position.z)) < .1f)
+        if (currentTargetedCreature != null && IsCreatureWithinRange(currentTargetedCreature) && Vector3.Distance(new Vector3(actualPosition.x, this.transform.position.y, actualPosition.z), new Vector3(tileCurrentlyOn.transform.position.x, this.transform.position.y, tileCurrentlyOn.transform.position.z)) < .1f)
         {
             creatureState = CreatureState.Idle;
             return;
@@ -382,10 +382,10 @@ public class Creature : MonoBehaviour
                 canAttackIcon.GetComponent<SpawnAnimatedSword>().SpawnSword(creatureToAttack.transform);
                 canAttackIcon.gameObject.SetActive(false);
                 Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y - .1f, this.transform.position.z), Quaternion.identity);
-                instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, CurrentAttack);
+                instantiatedParticle.GetComponent<VisualAttackParticle>().SetTarget(creatureToAttack, currentAttack);
                 if (deathtouch)
                 {
-                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, CurrentAttack);
+                    instantiatedParticle.GetComponent<VisualAttackParticle>().SetDeathtouch(creatureToAttack, currentAttack);
                 }
                 if (range == 1)
                 {
@@ -415,7 +415,7 @@ public class Creature : MonoBehaviour
             canAttackIcon.GetComponent<SpawnAnimatedSword>().SpawnSword(structureToAttack.transform);
             canAttackIcon.gameObject.SetActive(false);
             Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), Quaternion.identity);
-            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, CurrentAttack);
+            instantiatedParticle.GetComponent<VisualAttackParticle>().SetTargetStructure(structureToAttack, currentAttack);
             if (range == 1)
             {
                 instantiatedParticle.GetComponent<VisualAttackParticle>().SetRange(1);
@@ -493,19 +493,19 @@ public class Creature : MonoBehaviour
         {
             this.healthText.color = Color.white;
         }
-        if (CurrentAttack > Attack)
+        if (currentAttack > attack)
         {
             this.attackText.color = Color.green;
         }
-        if (CurrentAttack == Attack)
+        if (currentAttack == attack)
         {
             this.attackText.color = Color.white;
         }
-        if (CurrentAttack < Attack)
+        if (currentAttack < attack)
         {
             this.attackText.color = Color.red;
         }
-        this.attackText.text = CurrentAttack.ToString();
+        this.attackText.text = currentAttack.ToString();
     }
 
     public virtual void OnTurn()
@@ -537,8 +537,8 @@ public class Creature : MonoBehaviour
         {
             MaxHealth += numOfCounters;
             CurrentHealth += numOfCounters;
-            CurrentAttack += numOfCounters;
-            Attack += numOfCounters;
+            currentAttack += numOfCounters;
+            attack += numOfCounters;
 
 
             //for numberofcounters trigger on counter gained
@@ -1013,9 +1013,9 @@ public class Creature : MonoBehaviour
     Transform originalCardTransform;
     internal void SetOriginalCard(CardInHand cardSelected)
     {
-        this.Attack = cardSelected.currentAttack;
+        this.attack = cardSelected.currentAttack;
         this.MaxHealth = cardSelected.currentHealth;
-        this.CurrentAttack = cardSelected.currentAttack;
+        this.currentAttack = cardSelected.currentAttack;
         this.CurrentHealth = cardSelected.currentHealth;
         this.creatureType = cardSelected.creatureType;
         Debug.Log("Setting original card to " + cardSelected);

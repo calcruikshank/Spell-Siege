@@ -30,7 +30,7 @@ public class OvercommitedCleric : Creature
         }
         if (creatureToHEal != null)
         {
-            creatureToHEal.Heal(this.CurrentAttack);
+            creatureToHEal.Heal(this.currentAttack);
         }
     }
 }

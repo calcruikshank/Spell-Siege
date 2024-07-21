@@ -10,6 +10,16 @@ public class FlyingCreature : Creature
 
     protected override void Update()
     {
+        switch (creatureState)
+        {
+            case CreatureState.Moving:
+                VisualMove();
+                HandleFlyingAnimation();
+                break;
+            case CreatureState.Idle:
+                transform.position = new Vector3(transform.position.x, .1f, transform.position.z);
+                break;
+        }
         if (targetToFollow != null)
         {
             Vector3 targetRotation = new Vector3(targetToFollow.transform.position.x, transform.position.y, targetToFollow.transform.position.z) - this.transform.position;
@@ -20,23 +30,11 @@ public class FlyingCreature : Creature
             Vector3 targetRotation = new Vector3(structureToFollow.transform.position.x, transform.position.y, structureToFollow.transform.position.z) - this.transform.position;
             creatureImage.forward = Vector3.RotateTowards(creatureImage.forward, targetRotation, 10 * Time.deltaTime, 0);
         }
-        switch (creatureState)
-        {
-            case CreatureState.Moving:
-                VisualMove();
-                HandleFlyingAnimation();
-                break;
-            case CreatureState.Summoned:
-                HandleFlyingAnimation();
-                break;
-            case CreatureState.Idle:
-                transform.position = new Vector3(transform.position.x, .1f, transform.position.z);
-                break;
-        }
 
         if (canAttackIcon != null)
         {
-            canAttackIcon.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z);
+            canAttackIcon.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .1f, this.transform.position.z);
+            canAttackIcon.transform.localEulerAngles = new Vector3(creatureImage.localEulerAngles.x, creatureImage.localEulerAngles.y + 45, creatureImage.localEulerAngles.z);
         }
     }
 

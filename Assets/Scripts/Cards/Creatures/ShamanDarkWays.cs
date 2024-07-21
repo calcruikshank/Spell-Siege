@@ -11,7 +11,7 @@ public class ShamanDarkWays : Creature
             {
                 if (friendlyCreature.CurrentHealth < friendlyCreature.MaxHealth)
                 {
-                    friendlyCreature.Heal(Attack);
+                    friendlyCreature.Heal(currentAttack);
                     didHeal = true;
                 }
             }
