@@ -1060,6 +1060,32 @@ public class Controller : NetworkBehaviour
         }
         instantiatedCreature.GetComponent<Creature>().SetStructureToFollow(opponent.instantiatedCaste, instantiatedCreature.GetComponent<Creature>().actualPosition);
     }
+    public void SpawnCreatureOnTileWithoutCard(GameObject animalToSpawn, Vector3Int cellSent, CardInHand cardSelectedSent)
+    {
+        Vector3 positionToSpawn = BaseMapTileState.singleton.GetWorldPositionOfCell(cellSent);
+        GameObject instantiatedCreature = Instantiate(animalToSpawn.gameObject, positionToSpawn, Quaternion.identity);
+        if (environmentMap.GetInstantiatedObject(cellSent))
+        {
+            GameObject instantiatedObject = environmentMap.GetInstantiatedObject(cellSent);
+            if (instantiatedObject.GetComponent<ChangeTransparency>() == null)
+            {
+                instantiatedObject.AddComponent<ChangeTransparency>();
+            }
+            ChangeTransparency instantiatedObjectsChangeTransparency = instantiatedObject.GetComponent<ChangeTransparency>();
+            instantiatedObjectsChangeTransparency.ChangeTransparent(100);
+        }
+
+        instantiatedCreature.GetComponent<Creature>().SetToPlayerOwningCreature(this);
+        creaturesOwned.Add(instantiatedCreature.GetComponent<Creature>().creatureID, instantiatedCreature.GetComponent<Creature>());
+        instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
+        instantiatedCreature.GetComponent<Creature>().OnETB();
+
+        if (instantiatedSpawnPArticle != null)
+        {
+            Destroy(instantiatedSpawnPArticle);
+        }
+        instantiatedCreature.GetComponent<Creature>().SetStructureToFollow(opponent.instantiatedCaste, instantiatedCreature.GetComponent<Creature>().actualPosition);
+    }
 
     private void HandleSpellInHandSelected(Vector3Int cellSent)
     {

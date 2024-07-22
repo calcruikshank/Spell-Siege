@@ -37,6 +37,7 @@ public struct SpellSiegeData
         Wildebeest, //wildebeest
         Lynx, //lynx
         Panther, //panther
+        Rebirth, //rebirth
         NumOfCardTypes
     }
 

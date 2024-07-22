@@ -47,6 +47,11 @@ public class Creature : MonoBehaviour
     [HideInInspector] public List<BaseTile> allTilesWithinRange;
     [HideInInspector] public int creatureID;
     public CreatureState creatureState;
+
+
+    public int numberOfTimesThisCanDie = 1;
+
+
     [HideInInspector]
     public enum CreatureState
     {
@@ -1093,7 +1098,18 @@ public class Creature : MonoBehaviour
     }
     public virtual void OnDeath()
     {
-        SetStateToDead();
+        numberOfTimesThisCanDie--;
+        if (numberOfTimesThisCanDie <= 0)
+        {
+            SetStateToDead();
+            return;
+        }
+        else
+        {
+            SetStateToDead();
+            playerOwningCreature.SpawnCreatureOnTileWithoutCard(this.gameObject, this.currentCellPosition, originalCard);
+        }
+        
     }
     public virtual void OnDamaged() { }
     public virtual void OnHealed() { }
