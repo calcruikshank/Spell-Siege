@@ -128,6 +128,11 @@ public class Creature : MonoBehaviour
         switch (creatureState)
         {
             case CreatureState.Moving:
+
+                if (garrison)
+                {
+                    SetStateToIdle();
+                }
                 Move();
                 //ChooseTarget();
                 HandleAttackRate();
@@ -973,6 +978,7 @@ public class Creature : MonoBehaviour
     public bool deathtouch = false;
     public bool taunt = false;
     public bool stealth = false;
+    public bool garrison = false;
 
     GameObject rangeLrGO;
     LineRenderer rangeLr;

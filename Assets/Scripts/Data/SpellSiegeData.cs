@@ -41,6 +41,7 @@ public struct SpellSiegeData
         Cat, //cat
         Bat, //bat
         Doomsday, //doomsday
+        Turkey, //turkey
         NumOfCardTypes
     }
 

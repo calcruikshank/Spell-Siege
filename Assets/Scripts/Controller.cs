@@ -1070,7 +1070,11 @@ public class Controller : NetworkBehaviour
         {
             Destroy(instantiatedSpawnPArticle);
         }
-        instantiatedCreature.GetComponent<Creature>().SetStructureToFollow(opponent.instantiatedCaste, instantiatedCreature.GetComponent<Creature>().actualPosition);
+
+        if (!instantiatedCreature.GetComponent<Creature>().garrison)
+        {
+            instantiatedCreature.GetComponent<Creature>().SetStructureToFollow(opponent.instantiatedCaste, instantiatedCreature.GetComponent<Creature>().actualPosition);
+        }
     }
     public void SpawnCreatureOnTileWithoutCard(GameObject animalToSpawn, Vector3Int cellSent, CardInHand cardSelectedSent)
     {
