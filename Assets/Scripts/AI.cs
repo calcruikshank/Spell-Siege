@@ -144,7 +144,7 @@ public class AI : Controller
         }
         SetStateToNothingSelected();
     }
-    protected override bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
+    public override bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
     {
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent) == null)
         {

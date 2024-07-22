@@ -997,7 +997,7 @@ public class Controller : NetworkBehaviour
         CastCreatureOnTile(cardSelected, cellSent);
         SetStateToNothingSelected();
     }
-    protected virtual bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
+    public virtual bool CheckToSeeIfCanSpawnCreature(Vector3Int cellSent)
     {
         if (BaseMapTileState.singleton.GetBaseTileAtCellPosition(cellSent) == null)
         {
@@ -1052,7 +1052,19 @@ public class Controller : NetworkBehaviour
         instantiatedCreature.GetComponent<Creature>().SetOriginalCard(cardSelectedSent);
         instantiatedCreature.GetComponent<Creature>().OnETB();
 
+        #region assignRebirthAbility
+        if (instantiatedCreature.GetComponent<Cat>() != null)
+        {
+            instantiatedCreature.GetComponent<Cat>().numberOfTimesThisCanDie++;
+        }
+        if (instantiatedCreature.GetComponent<Bat>() != null)
+        {
+            instantiatedCreature.GetComponent<Bat>().numberOfTimesThisCanDie++;
+        }
+        #endregion
         cardSelectedSent.transform.parent = null;
+
+
         RemoveCardFromHand(cardSelectedSent);
         if (instantiatedSpawnPArticle != null)
         {

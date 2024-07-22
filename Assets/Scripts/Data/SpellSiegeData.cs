@@ -38,6 +38,9 @@ public struct SpellSiegeData
         Lynx, //lynx
         Panther, //panther
         Rebirth, //rebirth
+        Cat, //cat
+        Bat, //bat
+        Doomsday, //doomsday
         NumOfCardTypes
     }
 

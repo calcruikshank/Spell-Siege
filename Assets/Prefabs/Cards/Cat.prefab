@@ -283,7 +283,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 80107ea20768a5e4d8e2143264fc23ac, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 99305baf52991e24ea9d301bc89e8b93, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -440,7 +440,7 @@ GameObject:
   - component: {fileID: 8490984263599025761}
   - component: {fileID: 9141729900352354612}
   m_Layer: 5
-  m_Name: Dragon
+  m_Name: Cat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -493,17 +493,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d64a1f6a99f40e4d9d3069f88da2f3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameObjectToInstantiate: {fileID: 6239865746917987993, guid: c6f04e5db8e24b74e9ee5a6677ac52df, type: 3}
+  GameObjectToInstantiate: {fileID: 6239865746917987993, guid: e8303e71b9681b847a75e4453a446cdd, type: 3}
   indexOfCard: 6
   greenManaCost: 0
   blueManaCost: 0
   whiteManaCost: 0
-  blackManaCost: 0
-  redManaCost: 6
+  blackManaCost: 1
+  redManaCost: 0
   genericManaCost: 0
   remainingMana: 0
-  currentAttack: 2
-  currentHealth: 4
+  currentAttack: 1
+  currentHealth: 1
   cardArt: {fileID: 8030601344647228176}
   raritySymbols:
   - {fileID: 1087928222838449144}
@@ -520,12 +520,12 @@ MonoBehaviour:
   genericManaText: {fileID: 8728899115942098730}
   playerOwningCard: {fileID: 0}
   isPurchasable: 0
-  cardAssignedToObject: 5
+  cardAssignedToObject: 32
   cardTitle: {fileID: 3816206094099844774}
   cardType: 0
-  creatureType: 1
-  rarity: 3
-  traversableType: 3
+  creatureType: 9
+  rarity: 1
+  traversableType: 0
   commonRarityImage: {fileID: 21300000, guid: 9b018ffb1c587804c8fcbcd443eaf627, type: 3}
   uncommon: {fileID: 21300000, guid: ccdb82b1f41c0ea4b9d28529f02fadd6, type: 3}
   rare: {fileID: 21300000, guid: 15e1fe999c1b72940b0086a8ba5f9411, type: 3}
@@ -586,8 +586,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.18761}
-  m_SizeDelta: {x: 12.11955, y: 3.07628}
+  m_AnchoredPosition: {x: 0, y: -0.0842}
+  m_SizeDelta: {x: 11.07373, y: 3.6199}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &198032678743028451
 CanvasRenderer:
@@ -617,7 +617,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Whenever this attacks add one red mana to your pool.
+  m_text: Rebirth 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f18e066a4ba1ab54dab6987841997390, type: 2}
   m_sharedMaterial: {fileID: 3128815464167386921, guid: f18e066a4ba1ab54dab6987841997390, type: 2}
@@ -826,7 +826,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Dragon
+  m_text: Cat
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: bd7fe8ee4cd11c849a96131ebf6a69f6, type: 2}
   m_sharedMaterial: {fileID: 5803435293214564226, guid: bd7fe8ee4cd11c849a96131ebf6a69f6, type: 2}
@@ -1239,7 +1239,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 2
+  m_text: 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f18e066a4ba1ab54dab6987841997390, type: 2}
   m_sharedMaterial: {fileID: 3128815464167386921, guid: f18e066a4ba1ab54dab6987841997390, type: 2}
@@ -1373,7 +1373,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 2
+  m_text: 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f18e066a4ba1ab54dab6987841997390, type: 2}
   m_sharedMaterial: {fileID: 3128815464167386921, guid: f18e066a4ba1ab54dab6987841997390, type: 2}

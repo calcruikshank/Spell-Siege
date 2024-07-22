@@ -470,7 +470,10 @@ public class Creature : MonoBehaviour
         {
             canAttackIcon.gameObject.SetActive(false);
         }
-        Destroy(this.gameObject);
+        if (this.gameObject != null)
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     void HandleAttackRate()
@@ -1107,7 +1110,10 @@ public class Creature : MonoBehaviour
         else
         {
             SetStateToDead();
-            playerOwningCreature.SpawnCreatureOnTileWithoutCard(this.gameObject, this.currentCellPosition, originalCard);
+            if (BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == this || BaseMapTileState.singleton.GetCreatureAtTile(currentCellPosition) == null)
+            {
+                playerOwningCreature.SpawnCreatureOnTileWithoutCard(this.gameObject, this.currentCellPosition, originalCard);
+            }
         }
         
     }
