@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class TargetedSpell : MonoBehaviour
 {
-    Controller playerCastingSpell;
+    public Controller playerCastingSpell;
     protected Creature creatureTargeted;
     public GameObject instantiatedObject;
     [SerializeField] GameObject GOToInstantiate;

@@ -47,6 +47,7 @@ public struct SpellSiegeData
         Poison, //poison
         Bow, //bow
         Hedgehog, //hedgehog
+        Attack, //attack
         NumOfCardTypes
     }
 

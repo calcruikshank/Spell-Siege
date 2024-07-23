@@ -652,7 +652,7 @@ public class Creature : MonoBehaviour
                 }
             }
             animatorForObject.SetTrigger("Run");
-            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime);
+            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime / 2);
 
         }
 

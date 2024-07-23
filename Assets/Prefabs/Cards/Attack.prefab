@@ -356,7 +356,7 @@ GameObject:
   - component: {fileID: 4255716214507035492}
   - component: {fileID: 3785849203500994701}
   m_Layer: 5
-  m_Name: Range
+  m_Name: Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -409,13 +409,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d64a1f6a99f40e4d9d3069f88da2f3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameObjectToInstantiate: {fileID: 720420457433826324, guid: cd22715816758e74bbaba9a5675ac56f, type: 3}
+  GameObjectToInstantiate: {fileID: 720420457433826324, guid: 6592a1524eddcf848b0eeaa18f186426, type: 3}
   indexOfCard: 8
-  greenManaCost: 1
+  greenManaCost: 0
   blueManaCost: 0
   whiteManaCost: 0
   blackManaCost: 0
-  redManaCost: 0
+  redManaCost: 2
   genericManaCost: 0
   remainingMana: 0
   currentAttack: 0
@@ -436,7 +436,7 @@ MonoBehaviour:
   genericManaText: {fileID: 5370495449841585311}
   playerOwningCard: {fileID: 0}
   isPurchasable: 0
-  cardAssignedToObject: 39
+  cardAssignedToObject: 20
   cardTitle: {fileID: 2682759985192988501}
   cardType: 1
   creatureType: 0
@@ -1649,7 +1649,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 380cf1e2f4da84443b06ffb385c3e391, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a22d92bc865ca774eafdee3cc02eed60, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2131,7 +2131,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Bow
+  m_text: Attack
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: bd7fe8ee4cd11c849a96131ebf6a69f6, type: 2}
   m_sharedMaterial: {fileID: 5803435293214564226, guid: bd7fe8ee4cd11c849a96131ebf6a69f6, type: 2}
@@ -2663,8 +2663,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.39}
-  m_SizeDelta: {x: 12.11955, y: 3.07628}
+  m_AnchoredPosition: {x: 0, y: 0.10675}
+  m_SizeDelta: {x: 9.89945, y: 3.64278}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3050500304256246919
 CanvasRenderer:
@@ -2694,9 +2694,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Give a creature Range: 3
-
-'
+  m_text: Target animal attacks, draw a card
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f18e066a4ba1ab54dab6987841997390, type: 2}
   m_sharedMaterial: {fileID: 3128815464167386921, guid: f18e066a4ba1ab54dab6987841997390, type: 2}
