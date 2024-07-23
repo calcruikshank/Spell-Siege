@@ -186,7 +186,7 @@ public class Creature : MonoBehaviour
         UpdateCreatureHUD();
     }
 
-    public bool IsCreatureWithinRange(Creature creatureSent)
+    public virtual bool IsCreatureWithinRange(Creature creatureSent)
     {
         return allTilesWithinRange.Contains(BaseMapTileState.singleton.GetBaseTileAtCellPosition(creatureSent.currentCellPosition));
     }
@@ -200,7 +200,7 @@ public class Creature : MonoBehaviour
     protected List<Creature> friendlyCreaturesWithinRange = new List<Creature>();
     protected List<Structure> structresWithinRange = new List<Structure>();
 
-    Creature currentTargetedCreature;
+    public Creature currentTargetedCreature;
     public Structure currentTargetedStructure;
     protected virtual void CheckForCreaturesWithinRange()
     {
@@ -239,7 +239,7 @@ public class Creature : MonoBehaviour
         }
 
     }
-    bool tauntFound = false;
+    public bool tauntFound = false;
     public virtual void ChooseTarget()
     {
         float lowestHealthCreatureWithinRange = -1;

@@ -16,7 +16,7 @@ public struct SpellSiegeData
         monkey, //monkey
         Leviathan,//levi
         Squirell, //squirell
-        SlumberingAncient,
+        SlumberingAncient, 
         kitsune, //kitsune
         kirin, //kirin
         Murder, //murder
@@ -43,6 +43,10 @@ public struct SpellSiegeData
         Doomsday, //doomsday
         Turkey, //turkey
         FastMana, //fastmana
+        Phoenix, //phoenix
+        Poison, //poison
+        Bow, //bow
+        Hedgehog, //hedgehog
         NumOfCardTypes
     }
 

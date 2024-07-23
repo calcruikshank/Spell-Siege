@@ -1516,7 +1516,12 @@ public class Controller : NetworkBehaviour
     //overridables
     public virtual void OnSpellCast()
     {
+       
         spellCounter++;
+        foreach (KeyValuePair<int, Creature> creature in creaturesOwned)
+        {
+            creature.Value.OnOwnerCastSpell();
+        }
 
     }
 
