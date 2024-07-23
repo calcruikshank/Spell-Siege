@@ -8,5 +8,5 @@ public class CardsCollectedForPlayer
 {
     public List<int> cardsCollected = new List<int>();
 
-    public int numberOfCorePacks = 20;
+    public int numberOfCorePacks = 30;
 }

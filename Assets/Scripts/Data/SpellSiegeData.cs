@@ -42,6 +42,7 @@ public struct SpellSiegeData
         Bat, //bat
         Doomsday, //doomsday
         Turkey, //turkey
+        FastMana, //fastmana
         NumOfCardTypes
     }
 
