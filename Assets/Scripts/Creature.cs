@@ -121,8 +121,9 @@ public class Creature : MonoBehaviour
             canAttackIcon.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + .1f, this.transform.position.z);
             canAttackIcon.transform.localEulerAngles = new Vector3(creatureImage.localEulerAngles.x, creatureImage.localEulerAngles.y + 45, creatureImage.localEulerAngles.z);
         }
-
     }
+
+
     void FixedUpdate()
     {
         switch (creatureState)
@@ -652,12 +653,8 @@ public class Creature : MonoBehaviour
                 }
             }
             animatorForObject.SetTrigger("Run");
-            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime / 2);
-
+            actualPosition = Vector3.MoveTowards(actualPosition, new Vector3(targetedCell.transform.position.x, this.transform.position.y, targetedCell.transform.position.z), speed * Time.fixedDeltaTime *.7f);
         }
-
-
-
     }
 
     void DrawLine()

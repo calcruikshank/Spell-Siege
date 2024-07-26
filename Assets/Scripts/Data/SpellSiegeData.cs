@@ -48,6 +48,8 @@ public struct SpellSiegeData
         Bow, //bow
         Hedgehog, //hedgehog
         Attack, //attack
+        Baboon, //baboon
+
         NumOfCardTypes
     }
 

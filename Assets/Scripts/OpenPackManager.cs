@@ -25,7 +25,7 @@ public class OpenPackManager : MonoBehaviour
     public int numOfPacks = 0;
     [SerializeField] TextMeshProUGUI amountofpacksLeft;
 
-    private bool testingPacks = true;
+    private bool testingPacks = false;
     private void Start()
     {
         numOfPacks = CardCollectionData.singleton.loadedCollection.numberOfCorePacks;

@@ -74,7 +74,7 @@ public class Controller : NetworkBehaviour
 
     protected Vector3Int placedCellPosition;
 
-    protected int turnThreshold = 1400; //todo make this 1400
+    protected int turnThreshold = 1100; //todo make this 1400
     protected int maxHandSize = 10;
     [SerializeField] protected List<CardInHand> dragonDeck = new List<CardInHand>();
     [SerializeField] protected List<CardInHand> demonDeck = new List<CardInHand>();
@@ -93,8 +93,8 @@ public class Controller : NetworkBehaviour
 
     protected PlayerResources resources;
 
-    protected delegate void ResourcesChanged(PlayerResources resources);
-    protected ResourcesChanged resourcesChanged;
+    public delegate void ResourcesChanged(PlayerResources resources);
+    public ResourcesChanged resourcesChanged;
 
     [SerializeField] protected Transform playerHud;
     protected HudElements hudElements;
@@ -485,7 +485,7 @@ public class Controller : NetworkBehaviour
                 {
                     if (cellPositionSentToClients != grid.WorldToCell(mousePosition))
                     {
-                        if (!CheckForRaycast() && state != State.CreatureInHandSelected || !CheckForRaycast() && state == State.CreatureInHandSelected && CheckToSeeIfCanSpawnCreature(grid.WorldToCell(mousePosition)))
+                        if (!CheckForRaycast())
                         {
                             LeftClickQueue(grid.WorldToCell(mousePosition));
                         }
@@ -502,19 +502,12 @@ public class Controller : NetworkBehaviour
                 mousePositionWorldPoint = raycastHit.point;
                 cellPositionSentToClients = grid.WorldToCell(mousePositionWorldPoint);
             }
-            if (state == State.NothingSelected)
-            {
-                if (!CheckForRaycast())
-                {
-                    LeftClickQueue(cellPositionSentToClients);
-                }
-            }
-            else
+            if (!CheckForRaycast())
             {
                 LeftClickQueue(cellPositionSentToClients);
             }
 
-            if (state == State.NothingSelected)
+            if (state == State.NothingSelected && cardSelected == null)
             {
                 if (ShowingPurchasableHarvestTiles)
                 {
@@ -859,6 +852,7 @@ public class Controller : NetworkBehaviour
         {
             if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>() != null)
             {
+                Debug.Log("Hit creature on board " + raycastHitCreatureOnBoard.transform.GetComponent<Creature>());
                 if (raycastHitCreatureOnBoard.transform.GetComponent<Creature>().playerOwningCreature == this && state != State.SpellInHandSelected)
                 {
                     SetVisualsToNothingSelectedLocally();
@@ -1220,7 +1214,7 @@ public class Controller : NetworkBehaviour
         resourcesChanged.Invoke(resources);
     }
 
-    private void SpendGenericMana(int genericManaCost)
+    public void SpendGenericMana(int genericManaCost)
     {
         int totalManaSpent = 0;
         for (int i = 0; i < genericManaCost; i++)
