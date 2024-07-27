@@ -45,7 +45,10 @@ public class Structure : NetworkBehaviour
         health -= amountofdamage;
         if (health <= 0)
         {
-            GameManager.singleton.EndGame(this.OwnerClientId);
+            if (IsOwner)
+            {
+                GameManager.singleton.EndGameServerRpc(this.OwnerClientId);
+            }
         }
         if (keepHealth != null)
         {

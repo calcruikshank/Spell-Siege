@@ -207,7 +207,9 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void EndGame(ulong playerOwningStructureID)
+
+    [ServerRpc(RequireOwnership = false)]
+    public void EndGameServerRpc(ulong playerOwningStructureID)
     {
         foreach (Controller controller in playerList)
         {
@@ -219,6 +221,44 @@ public class GameManager : NetworkBehaviour
                 }
             }
         }
-        SceneHandler.Instance.LoadMainMenu();
+
+        // Despawn or Destroy network objects
+        DespawnAllNetworkObjects();
+
+        // Load the game scene on the server and clients
+        ReloadGameScene();
+    }
+
+    private void DespawnAllNetworkObjects()
+    {
+        // Example logic to despawn all spawned network objects
+        foreach (var networkObject in FindObjectsOfType<NetworkObject>())
+        {
+            if (networkObject.IsSpawned)
+            {
+                networkObject.Despawn();
+            }
+        }
+    }
+
+    private async void ReloadGameScene()
+    {
+        // Lock the lobby if necessary (assuming you have a matchmaking service)
+        await MatchmakingService.LockLobby();
+
+        // Load the scene on the server
+        NetworkManager.Singleton.SceneManager.LoadScene("SimpleGame", LoadSceneMode.Single);
+
+        // Call the client RPC to load the scene on all clients
+        LoadGameSceneClientRpc();
+    }
+
+    [ClientRpc]
+    private void LoadGameSceneClientRpc()
+    {
+        if (!IsServer)
+        {
+            SceneManager.LoadScene("SimpleGame");
+        }
     }
 }

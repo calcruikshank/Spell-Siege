@@ -32,6 +32,10 @@ public class SceneHandler : MonoBehaviour
     {
         SceneManager.LoadSceneAsync("MainMenu");
     }
+    public void LoadGameScene()
+    {
+        SceneManager.LoadSceneAsync("SimpleGame");
+    }
     public void ExitGame()
     {
         Application.Quit();
