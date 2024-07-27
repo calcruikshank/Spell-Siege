@@ -1667,6 +1667,7 @@ public class Controller : NetworkBehaviour
 
     internal void WinGame()
     {
+        Debug.Log("WonGame " + this.OwnerClientId);
         CardCollectionData.singleton.loadedCollection.numberOfCorePacks++;
         var data = new Dictionary<string, object> { { "CardsCollected", CardCollectionData.singleton.loadedCollection } };
         CloudSaveService.Instance.Data.ForceSaveAsync(data);

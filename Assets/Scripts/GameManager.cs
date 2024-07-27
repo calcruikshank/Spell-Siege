@@ -54,7 +54,6 @@ public class GameManager : NetworkBehaviour
 
     public Transform purchasableGlow;
 
-
     [SerializeField] TextMeshPro damageText;
 
     [SerializeField] public Transform onDeathEffect;
@@ -81,7 +80,42 @@ public class GameManager : NetworkBehaviour
         {
             ClientLoadedGameServerRpc();
         }
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
     }
+
+    private void OnDestroy()
+    {
+        if (IsServer)
+        {
+            OnServerStopped();
+        }
+
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+        }
+    }
+
+    private void OnClientDisconnect(ulong clientId)
+    {
+        foreach (Controller controller in playerList)
+        {
+            if (controller.OwnerClientId == clientId)
+            {
+                // Call the ClientRpc to notify other clients
+                NotifyClientsOfDisconnectionClientRpc(clientId);
+                break;
+            }
+        }
+    }
+
+    private void OnServerStopped()
+    {// Despawn or Destroy network objects
+        DespawnAllNetworkObjects();
+        // Notify all clients that the server has stopped
+        NotifyClientsOfServerEndClientRpc();
+    }
+
     [ServerRpc(RequireOwnership = false)]
     private void ClientLoadedGameServerRpc()
     {
@@ -90,7 +124,6 @@ public class GameManager : NetworkBehaviour
             SpawnPlayerPrefabs(clientID);
         }
     }
-
 
     private void SpawnPlayerPrefabs(ulong clientID)
     {
@@ -117,15 +150,13 @@ public class GameManager : NetworkBehaviour
             Debug.LogError("Player prefab is not assigned.");
         }
     }
+
     private void FixedUpdate()
     {
         if (hasStartedGame)
         {
             turnTimer += 1;
         }
-    }
-    private void OnDestroy()
-    {
     }
 
     public enum State
@@ -134,6 +165,7 @@ public class GameManager : NetworkBehaviour
         Game,
         End //Setup for scaling
     }
+
     public List<CardInHand> Shuffle(List<CardInHand> alpha)
     {
         for (int i = 0; i < alpha.Count; i++)
@@ -156,7 +188,6 @@ public class GameManager : NetworkBehaviour
             hasStartedGame = true;
             foreach (Controller controller in playerList)
             {
-
                 Shuffle(controller.cardsInDeck);
                 for (int i = 0; i < 6; i++)
                 {
@@ -174,7 +205,6 @@ public class GameManager : NetworkBehaviour
         instantiatedDamageText.GetComponent<TextMeshPro>().text = damageSent.ToString();
     }
 
-
     [SerializeField] Transform healParticle;
     internal void SpawnHealText(Vector3 positionSent, float amount)
     {
@@ -184,6 +214,7 @@ public class GameManager : NetworkBehaviour
         instantiatedHealthText.GetComponent<TextMeshPro>().color = Color.green;
         Instantiate(healParticle, positionSent, Quaternion.identity);
     }
+
     internal void SpawnLevelUpPrefab(Vector3 positionSent)
     {
     }
@@ -197,8 +228,8 @@ public class GameManager : NetworkBehaviour
                 kvp.Value.OtherCreatureDied(allCreaturesOnField[creatureID]);
             }
         }
-
     }
+
     internal void CreatureEntered(int creatureID)
     {
         foreach (KeyValuePair<int, Creature> kvp in allCreaturesOnField)
@@ -207,7 +238,6 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-
     [ServerRpc(RequireOwnership = false)]
     public void EndGameServerRpc(ulong playerOwningStructureID)
     {
@@ -215,10 +245,8 @@ public class GameManager : NetworkBehaviour
         {
             if (controller.OwnerClientId != playerOwningStructureID)
             {
-                if (controller.IsOwner)
-                {
-                    controller.WinGame();
-                }
+                // Call the ClientRpc to execute WinGame on the owning client
+                WinGameClientRpc(controller.OwnerClientId);
             }
         }
 
@@ -229,17 +257,6 @@ public class GameManager : NetworkBehaviour
         ReloadGameScene();
     }
 
-    private void DespawnAllNetworkObjects()
-    {
-        // Example logic to despawn all spawned network objects
-        foreach (var networkObject in FindObjectsOfType<NetworkObject>())
-        {
-            if (networkObject.IsSpawned)
-            {
-                networkObject.Despawn();
-            }
-        }
-    }
 
     private async void ReloadGameScene()
     {
@@ -260,5 +277,81 @@ public class GameManager : NetworkBehaviour
         {
             SceneManager.LoadScene("SimpleGame");
         }
+    }
+
+    [ClientRpc]
+    private void WinGameClientRpc(ulong clientId)
+    {
+        // Find the controller for the given clientId and call WinGame
+        foreach (Controller controller in playerList)
+        {
+            if (controller.OwnerClientId == clientId && controller.IsOwner)
+            {
+                controller.WinGame();
+                break;
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void NotifyClientsOfDisconnectionClientRpc(ulong disconnectedClientId)
+    {
+        if (NetworkManager.Singleton == null)
+        {
+            Debug.LogError("NetworkManager.Singleton is null.");
+            return;
+        }
+
+        if (IsHost)
+        {
+            // Despawn all network objects
+            DespawnAllNetworkObjects();
+
+            // Stop the host
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        if (NetworkManager.Singleton.LocalClientId != disconnectedClientId)
+        {
+            // Call the WinGame method on clients that did not disconnect
+            foreach (Controller controller in playerList)
+            {
+                if (controller.OwnerClientId != disconnectedClientId && controller.IsOwner)
+                {
+                    controller.WinGame();
+                }
+            }
+
+            // Load the main menu scene
+            SceneHandler.Instance.LoadMainMenu();
+        }
+    }
+
+    private void DespawnAllNetworkObjects()
+    {
+        foreach (var networkObject in FindObjectsOfType<NetworkObject>())
+        {
+            if (networkObject.IsSpawned)
+            {
+                networkObject.Despawn();
+            }
+        }
+    }
+
+
+    [ClientRpc]
+    private void NotifyClientsOfServerEndClientRpc()
+    {
+        // Call the WinGame method on all remaining clients
+        foreach (Controller controller in playerList)
+        {
+            if (controller.IsOwner)
+            {
+                controller.WinGame();
+            }
+        }
+
+        // Load the main menu scene
+        SceneHandler.Instance.LoadMainMenu();
     }
 }
