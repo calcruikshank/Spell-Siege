@@ -11,16 +11,14 @@ public class Hedgehog : Creature
     public override void ChooseTarget()
     {
         float lowestHealthCreatureWithinRange = -1;
-
+        currentTargetedCreature = null;
         Creature closestCreature = null;
         float minDistance = float.MaxValue;
         tauntFound = false;
-        foreach (KeyValuePair<int, Creature> creatureWithinRange in GameManager.singleton.allCreaturesOnField)
+        foreach (KeyValuePair<int, Creature> creatureWithinRange in playerOwningCreature.opponent.creaturesOwned)
         {
             if (creatureWithinRange.Value == null)
             {
-                creaturesWithinRange.Remove(creatureWithinRange.Value);
-                return;
             }
 
             if (creatureWithinRange.Value.playerOwningCreature != this.playerOwningCreature)

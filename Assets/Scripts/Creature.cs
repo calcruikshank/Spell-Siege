@@ -304,9 +304,10 @@ public class Creature : MonoBehaviour
             creatureState = CreatureState.Idle;
             return;
         }
-        if (currentTargetedStructure != null && IsStructureInRange(currentTargetedStructure))
+        if (currentTargetedStructure != null && IsStructureInRange(currentTargetedStructure) && Vector3.Distance(new Vector3(actualPosition.x, this.transform.position.y, actualPosition.z), new Vector3(tileCurrentlyOn.transform.position.x, this.transform.position.y, tileCurrentlyOn.transform.position.z)) < .1f)
         {
-            //creatureState = CreatureState.Idle;
+            creatureState = CreatureState.Idle;
+            return;
         }
 
         if (currentTargetedCreature != null && !IsCreatureWithinRange(currentTargetedCreature))
@@ -385,11 +386,17 @@ public class Creature : MonoBehaviour
     }
     public virtual void LocalAttackCreature(Creature creatureToAttack)
     {
+        if (range > 1)
+        {
+            if (visualAttackParticle != GameManager.singleton.rangedVisualAttackParticle)
+            {
+                visualAttackParticle = GameManager.singleton.rangedVisualAttackParticle.transform;
+            }
+        }
         if (visualAttackParticle != null)
         {
             if (creatureToAttack != null)
             {
-
                 canAttackIcon.GetComponent<SpawnAnimatedSword>().SpawnSword(creatureToAttack.transform);
                 canAttackIcon.gameObject.SetActive(false);
                 Transform instantiatedParticle = Instantiate(visualAttackParticle, new Vector3(this.transform.position.x, this.transform.position.y - .1f, this.transform.position.z), Quaternion.identity);
@@ -421,6 +428,13 @@ public class Creature : MonoBehaviour
     }
     public void LocalAttackStructure(Structure structureToAttack)
     {
+        if (range > 1)
+        {
+            if (visualAttackParticle != GameManager.singleton.rangedVisualAttackParticle)
+            {
+                visualAttackParticle = GameManager.singleton.rangedVisualAttackParticle.transform;
+            }
+        }
         if (visualAttackParticle != null)
         {
             canAttackIcon.GetComponent<SpawnAnimatedSword>().SpawnSword(structureToAttack.transform);
@@ -437,6 +451,7 @@ public class Creature : MonoBehaviour
 
     public virtual void TakeDamage(float attack)
     {
+        animatorForObject.SetTrigger("TakeDamage");
         GameManager.singleton.SpawnDamageText(new Vector3(this.transform.position.x, this.transform.position.y + .2f, this.transform.position.z), attack);
         if (indestructible) return;
         this.CurrentHealth -= attack;

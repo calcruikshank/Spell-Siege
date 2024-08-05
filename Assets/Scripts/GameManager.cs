@@ -65,6 +65,9 @@ public class GameManager : NetworkBehaviour
 
     public bool hasStartedGame = false;
     public int turnTimer;
+
+
+    public VisualAttackParticle rangedVisualAttackParticle;
     private void Awake()
     {
         if (singleton != null) Destroy(this);
